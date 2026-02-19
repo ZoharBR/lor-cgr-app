@@ -1,0 +1,91 @@
+
+
+
+
+
+
+
+
+
+  MMM      MMM       KKK                          TTTTTTTTTTT      KKK
+
+  MMMM    MMMM       KKK                          TTTTTTTTTTT      KKK
+
+  MMM MMMM MMM  III  KKK  KKK  RRRRRR     OOOOOO      TTT     III  KKK  KKK
+
+  MMM  MM  MMM  III  KKKKK     RRR  RRR  OOO  OOO     TTT     III  KKKKK
+
+  MMM      MMM  III  KKK KKK   RRRRRR    OOO  OOO     TTT     III  KKK KKK
+
+  MMM      MMM  III  KKK  KKK  RRR  RRR   OOOOOO      TTT     III  KKK  KKK
+
+
+  MikroTik RouterOS 6.47 (c) 1999-2020       http://www.mikrotik.com/
+
+[?]             Gives the list of available commands
+
+command [?]     Gives help on the command and list of arguments
+
+
+[Tab]           Completes the command/word. If the input is ambiguous,
+
+                a second [Tab] gives possible options
+
+
+/               Move up to base level
+
+..              Move up one level
+
+/command        Use command at the base level
+
+[9999B
+[9999B
+
+
+[9999B[lorcgr@PPPoE BOA VENTURA] > 
+
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > 
+
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > 
+
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > /system resource print
+
+             uptime: 2w4d14h59m8s
+            version: 6.47 (stable)
+         build-time: Jun/02/2020 07:38:00
+   factory-software: 6.38.5
+        free-memory: 1550.4MiB
+       total-memory: 1984.0MiB
+                cpu: tilegx
+          cpu-count: 9
+      cpu-frequency: 1200MHz
+           cpu-load: 24%
+     free-hdd-space: 79.1MiB
+    total-hdd-space: 128.0MiB
+  architecture-name: tile
+         board-name: CCR1009-7G-1C-1S+
+           platform: MikroTik
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > 
+
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > /interface pppoe-server print count-only
+
+330
+
+
+
+[lorcgr@PPPoE BOA VENTURA] > quit

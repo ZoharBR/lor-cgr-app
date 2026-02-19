@@ -1,0 +1,5 @@
+nohup: ignoring input
+2026-02-11 21:09:41,332 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+2026-02-11 21:09:41,332 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+2026-02-11 21:09:41,332 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+2026-02-11 21:09:41,333 CRITICAL Listen failure: Couldn't listen on 0.0.0.0:8000: [Errno 98] Address already in use.

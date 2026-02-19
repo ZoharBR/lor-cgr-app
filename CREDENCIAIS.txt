@@ -1,0 +1,40 @@
+================================================================================
+           CREDENCIAIS DO SISTEMA LOR CGR - GUARDAR EM LOCAL SEGURO
+================================================================================
+
+=== 1. BANCO DE DADOS DJANGO ===
+Local: /opt/lorcgr/db.sqlite3
+Tipo: SQLite3 (arquivo local)
+Usuario: leonardo
+Senha: Lor#Vision#2016
+
+=== 2. API GROQ (IA ASSISTENTE) ===
+API Key: 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
+Console: https://console.groq.com
+Limite: 14 milhoes tokens/dia (gratuito)
+
+=== 3. DJANGO SECRET KEY ===
+Atual: django-insecure-chave-secreta-default
+Acao: SERA GERADA NOVA CHAVE SEGURA
+
+=== 4. LIBRENMS (CONFIGURAR NA INTERFACE) ===
+IP Exemplo: 192.168.0.214
+Token: CONFIGURAR NO MENU CONFIGURACOES
+Usuario: admin (padrao)
+
+=== 5. PHPIPAM (CONFIGURAR NA INTERFACE) ===
+URL: CONFIGURAR NO MENU CONFIGURACOES
+App ID: CONFIGURAR NO MENU CONFIGURACOES
+App Key: CONFIGURAR NO MENU CONFIGURACOES
+Usuario: admin (padrao)
+
+=== 6. SERVIDOR ===
+IP: 45.71.242.131
+Usuario SSH: root
+Sistema: Ubuntu 22.04
+RAM: 51GB
+CPU: 14 nucleos (Xeon E5620)
+
+================================================================================
+          APOS CORRIGIR, AS CREDENCIAIS FICARAO EM /opt/lorcgr/.env
+================================================================================
