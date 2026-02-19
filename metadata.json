@@ -1,5 +1,0 @@
-{
-  "name": "LOR CGR - Network Operations Center",
-  "description": "A comprehensive Network Operations web application integrating PHPIPAM, Remote Access (SSH/Telnet), Asset Management, and AI-driven Network Analysis using Google Gemini.",
-  "requestFramePermissions": []
-}
