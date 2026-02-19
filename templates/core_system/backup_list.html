@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-white fw-bold m-0"><i class="fas fa-hdd text-info me-2"></i>Gerenciador de Backups</h3>
+    </div>
+
+    <div class="card bg-dark border-secondary">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Data/Hora</th>
+                            <th>Equipamento</th>
+                            <th>Arquivo</th>
+                            <th>Tamanho</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                        <tr>
+                            <td class="ps-4 text-muted">{{ backup.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="fw-bold text-white">
+                                <a href="{% url 'device_detail' backup.device.pk %}" class="text-decoration-none text-info">
+                                    {{ backup.device.name }}
+                                </a>
+                            </td>
+                            <td class="text-muted small">{{ backup.file.name }}</td>
+                            <td class="text-white">{{ backup.size|default:"-" }}</td>
+                            <td>
+                                <span class="badge {% if backup.status == 'Sucesso' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ backup.status }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if backup.file %}
+                                <a href="{{ backup.file.url }}" class="btn btn-sm btn-outline-light" download>
+                                    <i class="fas fa-download"></i> Baixar
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-ghost fa-2x mb-3 d-block"></i>
+                                Nenhum backup encontrado no sistema.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

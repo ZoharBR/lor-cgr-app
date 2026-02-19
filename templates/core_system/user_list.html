@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Usuários</h3>
+        <a href="{% url 'user_create' %}" class="btn btn-success fw-bold"><i class="fas fa-user-plus me-2"></i> NOVO</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Usuário</th>
+                        <th>Função</th>
+                        <th>Detalhes</th>
+                        <th>Contato</th>
+                        <th class="text-end pe-4">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle me-3 d-flex align-items-center justify-content-center overflow-hidden" 
+                                     style="width:40px; height:40px; background-color: var(--bg-input); border: 1px solid var(--border-color);">
+                                    {% if u.profile.avatar %}
+                                        <img src="{{ u.profile.avatar.url }}" width="40" height="40" style="object-fit:cover;">
+                                    {% else %}
+                                        <i class="fas fa-user text-muted"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ u.first_name }}</div>
+                                    <small class="text-muted">{{ u.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if u.is_superuser %}
+                                <span class="badge" style="background-color: var(--accent-danger); color: #fff;">ADMIN</span>
+                            {% elif u.profile.is_guest %}
+                                <span class="badge bg-warning text-dark">CONVIDADO</span>
+                            {% else %}
+                                <span class="badge" style="background-color: var(--accent-primary); color: #fff;">OPERADOR</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ u.profile.company|default:"-" }} / {{ u.profile.sector|default:"-" }}</small>
+                        </td>
+                        <td>
+                            <small class="d-block text-muted"><i class="fas fa-envelope me-1"></i> {{ u.email }}</small>
+                        </td>
+                        <td class="text-end pe-4">
+                            <a href="{% url 'user_edit' u.pk %}" class="btn btn-sm btn-outline-warning"><i class="fas fa-pen"></i></a>
+                            {% if u.pk != request.user.pk %}
+                            <a href="{% url 'user_delete' u.pk %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

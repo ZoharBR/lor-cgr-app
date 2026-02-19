@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid var(--border-color);">
+        <div>
+            <h3 class="fw-bold mb-2">
+                <i class="fas fa-server me-2" style="color:var(--accent)"></i>{{ device.name }}
+            </h3>
+            
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-dark border border-secondary" title="IP"><i class="fas fa-network-wired me-1"></i> {{ device.ip }}</span>
+                <span class="badge bg-dark border border-secondary" title="Fabricante"><i class="fas fa-industry me-1"></i> {{ device.vendor }}</span>
+                
+                <span class="badge" style="background-color: #6f42c1; color: white;" title="Tempo Ligado">
+                    <i class="fas fa-clock me-1"></i> Uptime: {{ uptime }}
+                </span>
+
+                <span class="badge bg-info text-dark">SNMP v{{ device.snmp_version }}</span>
+                
+                {% if device.model_detected %}
+                <span class="badge bg-secondary text-white border border-light" title="Modelo Detectado">
+                    <i class="fas fa-microchip me-1"></i> {{ device.model_detected }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'trigger_discovery' device.pk %}" class="btn btn-sm btn-info fw-bold text-white" title="Detectar Modelo e OIDs">
+                <i class="fas fa-search me-1"></i> Redescobrir
+            </a>
+
+            <a href="{% url 'trigger_update' device.pk %}" class="btn btn-sm btn-success fw-bold" title="Ler CPU e PPPoE agora">
+                <i class="fas fa-sync me-1"></i> Atualizar
+            </a>
+
+            <a href="{% url 'trigger_backup' device.pk %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-save me-1"></i> Backup
+            </a>
+            <a href="{% url 'device_edit' device.pk %}" class="btn btn-sm btn-outline-light">
+                <i class="fas fa-cog"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-2">Uso de CPU</h6>
+                        <h1 class="fw-bold mb-0" style="font-size: 3rem; color: #fff;">{{ current_cpu }}%</h1>
+                    </div>
+                    <div class="text-end"><i class="fas fa-microchip fa-3x" style="opacity: 0.3;"></i></div>
+                </div>
+                <div class="progress" style="height: 5px; background-color: #333;">
+                    <div class="progress-bar" role="progressbar" style="width: {{ current_cpu }}%; background-color: var(--accent);"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-2">Clientes Conectados</h6>
+                        <h1 class="fw-bold mb-0" style="font-size: 3rem; color: #fff;">{{ current_pppoe }}</h1>
+                    </div>
+                    <div class="text-end"><i class="fas fa-users fa-3x" style="opacity: 0.3; color: #198754;"></i></div>
+                </div>
+                <div class="progress" style="height: 5px; background-color: #333;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Histórico de Tráfego</h5>
+            <span class="badge bg-dark border border-secondary">Tempo Real</span>
+        </div>
+        <div class="card-body">
+            <canvas id="deviceChart" style="max-height: 350px;"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header fw-bold">Interfaces</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr><th>Nome</th><th>Status</th><th>Temp</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for iface in interfaces %}
+                                <tr>
+                                    <td>{{ iface.name }}</td>
+                                    <td>
+                                        {% if iface.status == 'up' %}
+                                            <span class="text-success fw-bold">UP</span>
+                                        {% else %}
+                                            <span class="text-danger">DOWN</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ iface.temperature }}°C</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center py-3 text-muted">Nenhuma interface coletada.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header fw-bold">Logs de Terminal</div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for log in terminal_logs %}
+                        <li class="list-group-item bg-transparent text-white border-bottom border-secondary">
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-terminal me-2 text-muted"></i>{{ log.user }}</span>
+                                <small class="text-muted">{{ log.start_time|date:"d/m H:i" }}</small>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item bg-transparent text-center text-muted py-3">Sem logs recentes.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('deviceChart').getContext('2d');
+    Chart.defaults.color = '#bbbbbb';
+    Chart.defaults.borderColor = '#333333';
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ graph_labels|safe }},
+            datasets: [{
+                label: 'Clientes PPPoE',
+                data: {{ graph_pppoe|safe }},
+                borderColor: '#198754', backgroundColor: 'rgba(25, 135, 84, 0.1)', borderWidth: 2, tension: 0.4, fill: true, yAxisID: 'y'
+            },
+            {
+                label: 'CPU (%)',
+                data: {{ graph_cpu|safe }},
+                borderColor: '#0dcaf0', borderWidth: 2, borderDash: [5, 5], tension: 0.4, fill: false, yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { labels: { color: 'white' } } },
+            scales: {
+                x: { grid: { color: '#333' }, ticks: { color: '#bbb' } },
+                y: { type: 'linear', display: true, position: 'left', grid: { color: '#333' } },
+                y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#0dcaf0' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

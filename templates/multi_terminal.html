@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+
+<div class="container-fluid mt-2 h-100">
+    <div class="row h-100">
+        <div class="col-md-2 bg-dark border-end border-secondary p-0">
+            <div class="p-3 border-bottom border-secondary">
+                <h5 class="text-info fw-bold"><i class="fas fa-network-wired me-2"></i>Equipamentos</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for d in devices %}
+                <button onclick="openTerminal('{{ d.id }}', '{{ d.name }}')" class="list-group-item list-group-item-action bg-dark text-white border-bottom border-secondary d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="fw-bold">{{ d.name }}</div>
+                        <small class="text-white-50">{{ d.ip }}</small>
+                    </div>
+                    <i class="fas fa-terminal text-info"></i>
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-10 bg-black p-0 d-flex flex-column" style="height: 90vh;">
+            <ul class="nav nav-tabs bg-dark border-secondary" id="terminalTabs" role="tablist"></ul>
+            
+            <div class="tab-content flex-grow-1 bg-black" id="terminalContent">
+                <div class="d-flex align-items-center justify-content-center h-100 text-white-50">
+                    <div>
+                        <i class="fas fa-arrow-left fa-2x me-3"></i>
+                        <span class="fs-4">Selecione um equipamento para conectar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gerenciamento de Terminais Abertos
+    const terminals = {};
+    const sockets = {};
+
+    function openTerminal(deviceId, deviceName) {
+        // Se já existe, foca nele
+        if (document.getElementById(`tab-${deviceId}`)) {
+            const tabTrigger = new bootstrap.Tab(document.getElementById(`tab-${deviceId}`));
+            tabTrigger.show();
+            return;
+        }
+
+        // 1. Cria a Aba
+        const tabList = document.getElementById('terminalTabs');
+        const newTab = document.createElement('li');
+        newTab.className = 'nav-item';
+        newTab.innerHTML = `
+            <button class="nav-link text-white bg-dark border-end border-secondary active" id="tab-${deviceId}" data-bs-toggle="tab" data-bs-target="#content-${deviceId}" type="button" role="tab">
+                ${deviceName} <i class="fas fa-times text-danger ms-2" onclick="closeTerminal('${deviceId}', event)"></i>
+            </button>
+        `;
+        // Remove 'active' das outras abas
+        document.querySelectorAll('#terminalTabs .nav-link').forEach(t => t.classList.remove('active'));
+        tabList.appendChild(newTab);
+
+        // 2. Cria o Container do Conteúdo
+        const contentList = document.getElementById('terminalContent');
+        // Remove 'active' dos outros conteúdos
+        document.querySelectorAll('#terminalContent .tab-pane').forEach(c => c.classList.remove('show', 'active'));
+        // Remove a mensagem inicial se existir
+        if(contentList.querySelector('.text-white-50')) contentList.innerHTML = '';
+
+        const newContent = document.createElement('div');
+        newContent.className = 'tab-pane fade show active h-100';
+        newContent.id = `content-${deviceId}`;
+        newContent.style.padding = '10px';
+        contentList.appendChild(newContent);
+
+        // 3. Inicializa o Xterm.js
+        const term = new Terminal({
+            cursorBlink: true,
+            theme: { background: '#000000', foreground: '#00d4ff' },
+            fontSize: 14,
+            fontFamily: 'Courier New, monospace'
+        });
+        
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(newContent);
+        fitAddon.fit();
+
+        term.write(`\r\nConectando a ${deviceName}...\r\n`);
+
+        // 4. Abre o WebSocket (AQUI ESTÁ A MÁGICA)
+        const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const socket = new WebSocket(`${ws_scheme}://${window.location.host}/ws/terminal/${deviceId}/`);
+
+        socket.onopen = function() {
+            term.write('\r\nWebSocket Aberto. Iniciando SSH...\r\n');
+        };
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.message) {
+                term.write(data.message);
+            }
+        };
+
+        socket.onclose = function() {
+            term.write('\r\n\x1b[31mConexão encerrada pelo servidor.\x1b[0m\r\n');
+        };
+
+        socket.onerror = function(error) {
+            term.write('\r\n\x1b[31mErro de WebSocket.\x1b[0m\r\n');
+        };
+
+        // Envia teclas para o backend
+        term.onData(data => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ 'data': data }));
+            }
+        });
+
+        // Redimensionamento
+        window.addEventListener('resize', () => {
+            fitAddon.fit();
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ 
+                    'resize': { cols: term.cols, rows: term.rows } 
+                }));
+            }
+        });
+
+        // Salva referências
+        terminals[deviceId] = term;
+        sockets[deviceId] = socket;
+
+        // Ativa a aba
+        const tabTrigger = new bootstrap.Tab(document.getElementById(`tab-${deviceId}`));
+        tabTrigger.show();
+    }
+
+    function closeTerminal(deviceId, event) {
+        event.stopPropagation(); // Evita clicar na aba ao fechar
+        
+        // Fecha conexões
+        if (sockets[deviceId]) sockets[deviceId].close();
+        if (terminals[deviceId]) terminals[deviceId].dispose();
+
+        // Remove do DOM
+        document.getElementById(`tab-${deviceId}`).parentElement.remove();
+        document.getElementById(`content-${deviceId}`).remove();
+        
+        delete sockets[deviceId];
+        delete terminals[deviceId];
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 80vh;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-secondary">
+            <div class="card-body p-5 text-center">
+                <h2 class="fw-bold mb-4">LOR <span style="color: var(--accent-primary)">CGR</span></h2>
+                <h5 class="text-muted mb-4">Acesso ao Sistema</h5>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2 mb-3 small">
+                            Usuário ou senha inválidos.
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Usuário</label>
+                        <input type="text" name="username" class="form-control" autofocus required>
+                    </div>
+
+                    <div class="mb-4 text-start">
+                        <label class="form-label">Senha</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold">ENTRAR</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-dark border-top border-secondary">
+                <small class="text-muted">© 2025 LOR CGR System</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

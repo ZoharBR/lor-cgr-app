@@ -1,0 +1,15 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('api/list/', views.api_list_devices, name='api_list_devices'),
+    path('api/save/', views.api_save_device, name='api_save_device'),
+    path('api/dashboard/', views.api_dashboard_stats, name='api_dashboard_stats'),
+    path('api/discovery/', views.api_run_discovery, name='api_run_discovery'),
+    path('api/backup/run/', views.api_run_backup, name='api_run_backup'),
+    path('api/backup/list/', views.api_list_backups, name='api_list_backups'),
+    path('api/backup/view/', views.api_view_backup, name='api_view_backup'),
+    path('api/backup/bulk/', views.api_backup_bulk_action, name='api_backup_bulk_action'),
+    path('proxy/<int:device_id>/', views.api_proxy_web, kwargs={'path': ''}, name='api_proxy_root'),
+    path('proxy/<int:device_id>/<path:path>', views.api_proxy_web, name='api_proxy_web'),
+]

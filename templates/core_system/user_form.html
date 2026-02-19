@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container d-flex justify-content-center">
+    <div class="col-xl-10">
+        <div class="card shadow-lg">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">{{ title }}</h4>
+                <a href="{% url 'user_list' %}" class="btn btn-sm btn-secondary">Voltar</a>
+            </div>
+            
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_avatar" id="sel_av">
+
+                    <div class="row">
+                        <div class="col-md-5 pe-md-4 border-end" style="border-color: var(--border-color) !important;">
+                            <h6 class="mb-3 text-uppercase fw-bold" style="color: var(--accent-primary)">Sistema</h6>
+                            
+                            <div class="mb-3"><label class="form-label">Login</label>{{ u_form.username }}</div>
+                            <div class="mb-3">
+                                <label class="form-label">Senha</label>
+                                {{ u_form.password }}
+                                <small class="text-muted">Deixe vazio para não alterar.</small>
+                            </div>
+                            <div class="mb-3"><label class="form-label">Acesso</label>{{ u_form.role }}</div>
+                            <div class="mb-3"><label class="form-label">Tema Visual</label>{{ p_form.theme }}</div>
+                            <div class="mb-3"><label class="form-label">Validade (Convidado)</label>{{ p_form.guest_expiry }}</div>
+                        </div>
+
+                        <div class="col-md-7 ps-md-4">
+                            <h6 class="mb-3 text-uppercase fw-bold" style="color: var(--accent-success)">Pessoal</h6>
+                            
+                            <div class="d-flex align-items-center mb-4 p-3 rounded" style="background: var(--bg-input)">
+                                <div class="me-3">
+                                    {% if p_form.instance.avatar %}
+                                        <img src="{{ p_form.instance.avatar.url }}" width="80" height="80" class="rounded-circle" style="object-fit:cover;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width:80px;height:80px"><i class="fas fa-user fa-2x text-white"></i></div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1"><label>Upload Novo</label>{{ p_form.avatar }}</div>
+                            </div>
+
+                            {% if available_avatars %}
+                            <div class="mb-4">
+                                <label class="small text-muted mb-2">GALERIA DO SERVIDOR:</label>
+                                <div class="d-flex flex-wrap gap-2 p-2 rounded" style="background: var(--bg-input); max-height:160px; overflow-y:auto;">
+                                    {% for f in available_avatars %}
+                                        <div class="position-relative" style="cursor:pointer">
+                                            <img src="{{ media_url }}avatars/{{ f }}" width="60" height="60" class="rounded border" style="object-fit:cover" onclick="selAv('{{ f }}', this)">
+                                            <button type="submit" name="delete_image" value="{{ f }}" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0" style="width:18px;height:18px;font-size:10px" onclick="return confirm('Apagar?')">X</button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-info" id="sel_msg" style="display:none">Selecionado!</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-3"><label class="form-label">Nome</label>{{ u_form.first_name }}</div>
+                            <div class="row">
+                                <div class="col-6 mb-3"><label class="form-label">Email</label>{{ u_form.email }}</div>
+                                <div class="col-6 mb-3"><label class="form-label">Celular</label>{{ p_form.cellphone }}</div>
+                            </div>
+                            <div class="mb-3"><label class="form-label">Endereço</label>{{ p_form.address }}</div>
+                            <div class="row">
+                                <div class="col-6 mb-3"><label class="form-label">Empresa</label>{{ p_form.company }}</div>
+                                <div class="col-6 mb-3"><label class="form-label">Setor</label>{{ p_form.sector }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4"><button type="submit" class="btn btn-success btn-lg">SALVAR</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function selAv(f, el) {
+    document.querySelectorAll('img').forEach(i=>i.style.borderColor='gray');
+    el.style.borderColor='#0dcaf0';
+    document.getElementById('sel_av').value=f;
+    document.getElementById('sel_msg').style.display='block';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual do Usuário - Sistema NOC/CGR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 150px;
+            width: 250px;
+            background: white;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 170px);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar li {
+            margin: 10px 0;
+        }
+
+        .sidebar a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            padding-left: 16px;
+        }
+
+        .content {
+            margin-left: 280px;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+
+        .section h4 {
+            color: #333;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        .feature-box {
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .feature-box strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .example-title {
+            color: #50fa7b;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #0dcaf0;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                top: 0;
+                margin-bottom: 20px;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Manual do Usuário</h1>
+        <p>Sistema NOC/CGR - Vision Online</p>
+    </div>
+
+    <div class="container">
+        <a href="/" class="back-button">⬅️ Voltar ao Sistema</a>
+
+        <div class="sidebar">
+            <h3>📑 Índice</h3>
+            <ul>
+                <li><a href="#introducao">Introdução</a></li>
+                <li><a href="#assistente-ia">🤖 Assistente de IA</a></li>
+                <li><a href="#dispositivos">Dispositivos</a></li>
+                <li><a href="#ferramentas">Ferramentas de Rede</a></li>
+                <li><a href="#backups">Backups Automáticos</a></li>
+                <li><a href="#monitoramento">Monitoramento</a></li>
+                <li><a href="#exemplos">Exemplos Práticos</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <!-- INTRODUÇÃO -->
+            <section id="introducao" class="section">
+                <h2>📖 Introdução</h2>
+                <p>Bem-vindo ao Sistema NOC/CGR da Vision Online! Este é um sistema completo de gerenciamento de redes que integra múltiplas tecnologias para facilitar a administração de sua infraestrutura.</p>
+                
+                <h3>O que este sistema faz?</h3>
+                <ul>
+                    <li>🔧 <strong>Gerencia equipamentos de rede</strong> - Huawei, Cisco, Mikrotik e outros</li>
+                    <li>🔍 <strong>Monitora via SNMP</strong> - Integração com LibreNMS</li>
+                    <li>💾 <strong>Backup automático</strong> - Configurações salvas diariamente</li>
+                    <li>🤖 <strong>Assistente de IA</strong> - Claude AI integrado para ajudar em tudo</li>
+                    <li>🌐 <strong>Acesso remoto</strong> - SSH/Telnet via web</li>
+                    <li>📊 <strong>Relatórios e análises</strong> - Insights inteligentes</li>
+                </ul>
+
+                <div class="success">
+                    <strong>✅ Versão Atual:</strong> Sistema em produção com IA Claude integrada desde fevereiro de 2026.
+                </div>
+            </section>
+
+            <!-- ASSISTENTE DE IA -->
+            <section id="assistente-ia" class="section">
+                <h2>🤖 Assistente de IA (Claude)</h2>
+                
+                <p>O grande diferencial do nosso sistema! Um assistente inteligente que entende de redes e pode te ajudar em qualquer tarefa.</p>
+
+                <h3>Como usar o Assistente</h3>
+                
+                <div class="feature-box">
+                    <strong>🎯 Botão Flutuante</strong><br>
+                    Você verá um botão roxo com 🤖 no canto inferior direito de todas as páginas. Clique nele para abrir o chat.
+                </div>
+
+                <h3>O que a IA pode fazer?</h3>
+
+                <h4>1. Configuração de Protocolos</h4>
+                <div class="example">
+                    <div class="example-title">💬 Exemplo de conversa:</div>
+                    <strong>Você:</strong> "Quero configurar OSPF entre o roteador R1 e R2"<br><br>
+                    <strong>IA:</strong> "Vou analisar os dois equipamentos...<br>
+                    [Acessa R1 e R2 via SSH]<br>
+                    [Verifica configuração atual]<br><br>
+                    Encontrei:<br>
+                    - R1: 192.168.1.1 (Huawei NE40E)<br>
+                    - R2: 192.168.1.2 (Huawei NE40E)<br>
+                    - Interface de conexão: GigabitEthernet0/0/1<br><br>
+                    Aqui está a configuração OSPF recomendada:<br>
+                    [Mostra comandos completos]<br><br>
+                    Posso aplicar esta configuração? (Sim/Não)"
+                </div>
+
+                <h4>2. Troubleshooting Inteligente</h4>
+                <div class="example">
+                    <div class="example-title">💬 Exemplo:</div>
+                    <strong>Você:</strong> "O cliente X está sem internet"<br><br>
+                    <strong>IA:</strong> "Vou investigar...<br>
+                    1. Verificando status do BRAS<br>
+                    2. Consultando sessão PPPoE do cliente<br>
+                    3. Checando interfaces e VLANs<br><br>
+                    ❌ Problema encontrado: Sessão PPPoE desconectada<br>
+                    📊 Causa: Interface do OLT apresentando erros CRC<br>
+                    💡 Solução: Resetar porta ONU e verificar nível óptico<br><br>
+                    Comandos para resolver: [...]"
+                </div>
+
+                <h4>3. Análise e Sugestões</h4>
+                <div class="example">
+                    <div class="example-title">💬 Exemplo:</div>
+                    <strong>Você:</strong> "Analise o equipamento CORE-01"<br><br>
+                    <strong>IA:</strong> "Analisando CORE-01...<br><br>
+                    📊 Status: Online<br>
+                    🔥 CPU: 45% (Normal)<br>
+                    💾 Memória: 62% (Atenção)<br>
+                    🌡️ Temperatura: 38°C (Normal)<br><br>
+                    ⚠️ Alertas encontrados:<br>
+                    1. Interface GE0/0/10 com 15% de erros (últimas 24h)<br>
+                    2. Sessão BGP com AS64500 instável<br><br>
+                    💡 Recomendações:<br>
+                    1. Verificar cabo/SFP na GE0/0/10<br>
+                    2. Analisar logs BGP para identificar causa dos flaps"
+                </div>
+
+                <h4>4. Geração de Configurações</h4>
+                <p>A IA pode gerar configurações complexas automaticamente:</p>
+                <ul>
+                    <li>📡 OSPF, BGP, RIP</li>
+                    <li>🏷️ VLANs e Trunks</li>
+                    <li>🔒 ACLs e Firewalls</li>
+                    <li>⚡ QoS e Traffic Shaping</li>
+                    <li>🔐 VPNs (IPSec, L2TP, GRE)</li>
+                    <li>📊 SNMP e Syslog</li>
+                </ul>
+
+                <h4>5. Explicações e Aprendizado</h4>
+                <div class="example">
+                    <div class="example-title">💬 Exemplo:</div>
+                    <strong>Você:</strong> "Como funciona OSPF?"<br><br>
+                    <strong>IA:</strong> "OSPF (Open Shortest Path First) é um protocolo de roteamento...<br>
+                    [Explicação detalhada]<br>
+                    [Exemplos práticos]<br>
+                    [Comparação com outros protocolos]"
+                </div>
+
+                <div class="tip">
+                    <strong>💡 Dica:</strong> A IA entende contexto! Se você estiver na página de um equipamento específico, ela já sabe qual equipamento você está vendo e pode focar nele automaticamente.
+                </div>
+
+                <h3>Contextos Inteligentes</h3>
+                <table>
+                    <tr>
+                        <th>Página</th>
+                        <th>Contexto da IA</th>
+                        <th>Exemplo de Pergunta</th>
+                    </tr>
+                    <tr>
+                        <td>Lista de Dispositivos</td>
+                        <td>Visão geral da rede</td>
+                        <td>"Quais equipamentos estão offline?"</td>
+                    </tr>
+                    <tr>
+                        <td>Detalhes de um Device</td>
+                        <td>Equipamento específico</td>
+                        <td>"Me mostre a configuração BGP"</td>
+                    </tr>
+                    <tr>
+                        <td>Terminal SSH</td>
+                        <td>Sessão ativa</td>
+                        <td>"Explica este erro que apareceu"</td>
+                    </tr>
+                    <tr>
+                        <td>Backups</td>
+                        <td>Histórico de configs</td>
+                        <td>"Compare backup de hoje com ontem"</td>
+                    </tr>
+                </table>
+
+                <div class="warning">
+                    <strong>⚠️ Atenção:</strong> Antes de aplicar mudanças críticas, a IA sempre pedirá confirmação. Revise os comandos antes de confirmar a execução!
+                </div>
+            </section>
+
+            <!-- DISPOSITIVOS -->
+            <section id="dispositivos" class="section">
+                <h2>🖥️ Gerenciamento de Dispositivos</h2>
+                
+                <h3>Adicionar Novo Equipamento</h3>
+                <ol>
+                    <li>Acesse o menu "Dispositivos"</li>
+                    <li>Clique em "Adicionar Dispositivo"</li>
+                    <li>Preencha os campos obrigatórios:
+                        <ul>
+                            <li><code>Nome</code> - Hostname do equipamento</li>
+                            <li><code>IP</code> - Endereço IP de gerência</li>
+                            <li><code>Vendor</code> - Fabricante (Huawei, Cisco, etc.)</li>
+                            <li><code>Usuário/Senha</code> - Credenciais SSH/Telnet</li>
+                            <li><code>Porta</code> - Padrão: 22 (SSH) ou 23 (Telnet)</li>
+                        </ul>
+                    </li>
+                    <li>Configure SNMP (opcional mas recomendado)</li>
+                    <li>Salve</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>💡 Dica:</strong> Use a IA! Diga "Adicione o equipamento 192.168.1.10 com usuário admin" e ela te guiará no processo.
+                </div>
+
+                <h3>Discovery Automático</h3>
+                <p>O sistema pode descobrir equipamentos automaticamente na rede via SNMP.</p>
+
+                <h3>Marcar como BRAS</h3>
+                <p>Equipamentos marcados como BRAS recebem tratamento especial para gerenciamento de sessões PPPoE.</p>
+            </section>
+
+            <!-- FERRAMENTAS -->
+            <section id="ferramentas" class="section">
+                <h2>🔧 Ferramentas de Rede</h2>
+                
+                <h3>Terminal Web SSH/Telnet</h3>
+                <p>Acesse seus equipamentos diretamente pelo navegador sem precisar de PuTTY ou outro cliente.</p>
+                
+                <div class="feature-box">
+                    <strong>✨ Recursos:</strong>
+                    <ul>
+                        <li>Conexão SSH/Telnet em tempo real</li>
+                        <li>Histórico de comandos</li>
+                        <li>Log de sessões</li>
+                        <li>Suporte a cores ANSI</li>
+                    </ul>
+                </div>
+
+                <h3>Scanner de Rede</h3>
+                <p>Escaneia ranges de IP procurando por equipamentos ativos com SNMP habilitado.</p>
+
+                <h3>Consultas SNMP</h3>
+                <p>Execute queries SNMP diretamente na interface web.</p>
+            </section>
+
+            <!-- BACKUPS -->
+            <section id="backups" class="section">
+                <h2>💾 Backups Automáticos</h2>
+                
+                <h3>Como Funciona</h3>
+                <p>O sistema conecta via SSH/Telnet em cada equipamento e salva a configuração completa automaticamente.</p>
+
+                <h3>Configuração</h3>
+                <ul>
+                    <li><strong>Frequência:</strong> Diária (padrão às 03:00)</li>
+                    <li><strong>Retenção:</strong> 30 dias</li>
+                    <li><strong>Formato:</strong> Texto puro (.cfg)</li>
+                    <li><strong>Local:</strong> <code>/opt/lorcgr/backups/</code></li>
+                </ul>
+
+                <div class="success">
+                    <strong>✅ Dica com IA:</strong> Pergunte "Quando foi o último backup do CORE-01?" ou "Restaure a configuração de ontem do R2".
+                </div>
+            </section>
+
+            <!-- MONITORAMENTO -->
+            <section id="monitoramento" class="section">
+                <h2>📊 Monitoramento com LibreNMS</h2>
+                
+                <p>O sistema integra com LibreNMS para coleta de métricas SNMP.</p>
+
+                <h3>Métricas Coletadas</h3>
+                <ul>
+                    <li>📈 Tráfego de interfaces</li>
+                    <li>🔥 CPU e Memória</li>
+                    <li>🌡️ Temperatura</li>
+                    <li>💡 Status de interfaces (UP/DOWN)</li>
+                    <li>⚠️ Erros e descartes</li>
+                </ul>
+            </section>
+
+            <!-- EXEMPLOS PRÁTICOS -->
+            <section id="exemplos" class="section">
+                <h2>📝 Exemplos Práticos com a IA</h2>
+                
+                <h3>Exemplo 1: Configurar Rota Estática</h3>
+                <div class="example">
+                    <strong>Você:</strong> "Adicione rota estática para 10.20.0.0/16 via 192.168.1.254 no R1"<br><br>
+                    <strong>IA:</strong> "Vou configurar...<br><br>
+                    Equipamento: R1 (Huawei)<br>
+                    Comando:<br>
+                    <code>ip route-static 10.20.0.0 255.255.0.0 192.168.1.254</code><br><br>
+                    Confirma execução? (Sim/Não)"
+                </div>
+
+                <h3>Exemplo 2: Verificar Sessões PPPoE</h3>
+                <div class="example">
+                    <strong>Você:</strong> "Quantas sessões PPPoE ativas no BRAS?"<br><br>
+                    <strong>IA:</strong> "Consultando BRAS-01...<br>
+                    Total de sessões ativas: 847<br>
+                    - Online: 842<br>
+                    - Em autenticação: 5<br><br>
+                    Deseja detalhes de alguma sessão específica?"
+                </div>
+
+                <h3>Exemplo 3: Análise de Performance</h3>
+                <div class="example">
+                    <strong>Você:</strong> "Por que a interface GE0/0/5 está lenta?"<br><br>
+                    <strong>IA:</strong> "Analisando GE0/0/5...<br><br>
+                    📊 Estatísticas (últimas 24h):<br>
+                    - Input: 850 Mbps (médio)<br>
+                    - Output: 920 Mbps (médio)<br>
+                    - Erros CRC: 1.245<br>
+                    - Colisões: 0<br><br>
+                    ⚠️ Problema: Alto número de erros CRC<br>
+                    💡 Causa provável: Problema físico (cabo/SFP)<br>
+                    🔧 Ação recomendada: Trocar cabo ou SFP"
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq" class="section">
+                <h2>❓ Perguntas Frequentes (FAQ)</h2>
+                
+                <h3>A IA pode executar comandos sem eu confirmar?</h3>
+                <p><strong>Não.</strong> Para comandos que alteram configuração, a IA sempre pede confirmação explícita antes de executar.</p>
+
+                <h3>A IA aprende com minhas conversas?</h3>
+                <p><strong>Não.</strong> Cada conversa é independente. A IA não retém informações entre sessões por questões de privacidade e segurança.</p>
+
+                <h3>Posso usar a IA em português?</h3>
+                <p><strong>Sim!</strong> A IA entende perfeitamente português brasileiro e responde no mesmo idioma.</p>
+
+                <h3>O que fazer se a IA não conseguir acessar um equipamento?</h3>
+                <p>Verifique:
+                    <ul>
+                        <li>✅ Credenciais (usuário/senha) estão corretas</li>
+                        <li>✅ IP do equipamento está acessível</li>
+                        <li>✅ Porta SSH/Telnet correta (22/23)</li>
+                        <li>✅ Firewall não está bloqueando</li>
+                    </ul>
+                    Depois pergunte à IA: "Por que não consegue acessar o R1?" e ela ajudará no diagnóstico.
+                </p>
+
+                <h3>Posso solicitar relatórios personalizados?</h3>
+                <p><strong>Sim!</strong> Exemplo: "Gere um relatório de todos os equipamentos Huawei com CPU acima de 70%"</p>
+
+                <h3>A IA substitui o conhecimento técnico?</h3>
+                <p><strong>Não.</strong> A IA é uma ferramenta poderosa de auxílio, mas o conhecimento e validação final são sempre do engenheiro de redes.</p>
+            </section>
+
+            <div class="success" style="margin-top: 50px; padding: 30px; text-align: center;">
+                <h2>🎉 Pronto para começar!</h2>
+                <p style="font-size: 1.2em; margin: 20px 0;">Clique no botão 🤖 roxo no canto da tela e comece a conversar com a IA!</p>
+                <a href="/" class="back-button" style="margin-top: 20px;">⬅️ Voltar ao Sistema</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

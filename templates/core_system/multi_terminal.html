@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+
+<style>
+    /* Layout Estilo IDE / Terminus */
+    .terminal-wrapper {
+        display: flex;
+        height: 85vh;
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    
+    /* Barra Lateral */
+    .device-sidebar {
+        width: 260px;
+        background-color: #252526;
+        border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar-header {
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        background-color: #1e1e1e;
+        border-bottom: 1px solid #333;
+    }
+
+    .device-list {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .device-item {
+        padding: 12px 15px;
+        color: #cccccc;
+        cursor: pointer;
+        border-bottom: 1px solid #2d2d2d;
+        display: flex;
+        align-items: center;
+        transition: 0.2s;
+    }
+    .device-item:hover { background-color: #37373d; color: white; }
+    .device-item i { width: 25px; text-align: center; margin-right: 10px; }
+    
+    /* Área Principal */
+    .main-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #000;
+        position: relative;
+    }
+
+    /* Barra de Abas */
+    .tabs-bar {
+        height: 40px;
+        background-color: #252526;
+        display: flex;
+        overflow-x: auto;
+        align-items: flex-end;
+    }
+
+    .tab {
+        background-color: #2d2d2d;
+        color: #969696;
+        padding: 10px 15px;
+        font-size: 13px;
+        cursor: pointer;
+        border-right: 1px solid #1e1e1e;
+        display: flex;
+        align-items: center;
+        min-width: 140px;
+        justify-content: space-between;
+        user-select: none;
+    }
+
+    .tab.active {
+        background-color: #1e1e1e;
+        color: white;
+        border-top: 2px solid #007fd4;
+    }
+
+    .close-tab {
+        margin-left: 10px;
+        border-radius: 50%;
+        padding: 2px 5px;
+        font-size: 10px;
+    }
+    .close-tab:hover { background-color: #c53030; color: white; }
+
+    /* Container do Xterm */
+    .xterm-container {
+        flex: 1;
+        padding: 5px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .terminal-instance {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: none;
+    }
+    .terminal-instance.active {
+        display: block;
+    }
+
+    /* Mensagem de vazio */
+    .empty-state {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #555;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="terminal-wrapper shadow">
+        
+        <div class="device-sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-network-wired me-2"></i> EQUIPAMENTOS
+            </div>
+            <div class="device-list">
+                {% for device in devices %}
+                <div class="device-item" onclick="openSession('{{ device.id }}', '{{ device.name }}')">
+                    {% if device.vendor == 'MikroTik' %}
+                        <i class="fas fa-router text-info"></i>
+                    {% elif device.vendor == 'Huawei' %}
+                        <i class="fas fa-server text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-hdd text-secondary"></i>
+                    {% endif %}
+                    <div>
+                        <div class="fw-bold">{{ device.name }}</div>
+                        <small style="font-size: 10px; opacity: 0.7">{{ device.ip }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-3 text-muted text-center">Nenhum equipamento</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div class="tabs-bar" id="tabsBar"></div>
+            
+            <div class="xterm-container" id="terminalsArea">
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-terminal fa-4x mb-3"></i>
+                    <h4>Selecione um equipamento para conectar</h4>
+                    <p>Você pode abrir múltiplas abas simultaneamente.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const sessions = {}; // Armazena {id: {term, socket, fit, tab, el}}
+    let activeId = null;
+
+    function openSession(deviceId, name) {
+        // Se já existe, só foca
+        if (sessions[deviceId]) {
+            activateTab(deviceId);
+            return;
+        }
+
+        // 1. Esconde placeholder
+        document.getElementById('emptyState').style.display = 'none';
+
+        // 2. Cria Elemento da Aba
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.innerHTML = `
+            <span>${name}</span>
+            <span class="close-tab" onclick="closeSession('${deviceId}', event)"><i class="fas fa-times"></i></span>
+        `;
+        tab.onclick = () => activateTab(deviceId);
+        document.getElementById('tabsBar').appendChild(tab);
+
+        // 3. Cria Elemento do Terminal
+        const termEl = document.createElement('div');
+        termEl.className = 'terminal-instance';
+        document.getElementById('terminalsArea').appendChild(termEl);
+
+        // 4. Inicia Xterm
+        const term = new Terminal({
+            theme: { background: '#000000' },
+            cursorBlink: true,
+            fontSize: 14,
+            fontFamily: 'Consolas, monospace'
+        });
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(termEl);
+        
+        // Pequeno delay para garantir que o DOM renderizou antes do fit
+        setTimeout(() => fitAddon.fit(), 50);
+
+        // 5. Conecta WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const socket = new WebSocket(`${protocol}${window.location.host}/ws/terminal/${deviceId}/`);
+
+        socket.onopen = () => {
+            term.write(`\r\n\x1b[32m--- Iniciando sessão segura em ${name}... ---\x1b[0m\r\n`);
+        };
+        
+        socket.onmessage = (ev) => {
+            const data = JSON.parse(ev.data);
+            if(data.message) term.write(data.message);
+        };
+
+        socket.onclose = () => {
+            term.write('\r\n\x1b[31m--- Sessão Encerrada ---\x1b[0m\r\n');
+        };
+
+        // Envia dados
+        term.onData(data => {
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ data: data }));
+            }
+        });
+
+        // 6. Registra Sessão
+        sessions[deviceId] = { term, socket, fit: fitAddon, tab, el: termEl };
+        activateTab(deviceId);
+
+        // Auto-Resize
+        new ResizeObserver(() => fitAddon.fit()).observe(termEl);
+    }
+
+    function activateTab(deviceId) {
+        activeId = deviceId;
+        
+        // Remove active de todos
+        Object.keys(sessions).forEach(k => {
+            sessions[k].tab.classList.remove('active');
+            sessions[k].el.classList.remove('active');
+        });
+
+        // Ativa o atual
+        const s = sessions[deviceId];
+        if (s) {
+            s.tab.classList.add('active');
+            s.el.classList.add('active');
+            s.term.focus();
+            s.fit.fit();
+        }
+    }
+
+    function closeSession(deviceId, event) {
+        if (event) event.stopPropagation();
+        
+        const s = sessions[deviceId];
+        if (s) {
+            s.socket.close();
+            s.term.dispose();
+            s.tab.remove();
+            s.el.remove();
+            delete sessions[deviceId];
+        }
+
+        // Se fechou o ativo, tenta ativar outro
+        if (activeId === deviceId) {
+            const keys = Object.keys(sessions);
+            if (keys.length > 0) {
+                activateTab(keys[keys.length - 1]);
+            } else {
+                activeId = null;
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+    }
+</script>
+{% endblock %}

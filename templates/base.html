@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOR CGR - Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* === CORES DARK MODE FORÇADO === */
+        :root {
+            --bg-body: #0a0a0a;
+            --bg-sidebar: #000000;
+            --bg-card: #141414;
+            --border-color: #333333;
+            --text-main: #ffffff;
+            --text-muted: #bbbbbb;
+            --accent: #0dcaf0; /* Azul Neon */
+        }
+
+        body {
+            background-color: var(--bg-body) !important;
+            color: var(--text-main) !important;
+            font-family: 'Segoe UI', sans-serif;
+            padding-top: 0;
+        }
+
+        /* Força texto branco em tudo */
+        h1, h2, h3, h4, h5, h6, p, span, div, li, td, th, label, input, select {
+            color: var(--text-main) !important;
+        }
+        .text-muted, small { color: var(--text-muted) !important; }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh; width: 250px; position: fixed; top: 0; left: 0; 
+            background-color: var(--bg-sidebar) !important;
+            border-right: 1px solid var(--border-color);
+            padding-top: 20px; z-index: 1000;
+        }
+        .nav-link { 
+            color: var(--text-muted) !important; padding: 12px 20px; font-size: 16px; 
+            display: block; width: 100%; cursor: pointer; text-decoration: none;
+        }
+        .nav-link:hover { 
+            background-color: #222 !important; color: #fff !important; 
+            border-left: 4px solid var(--accent); 
+        }
+
+        /* Conteúdo Principal */
+        main { margin-left: 250px; padding: 30px; }
+        @media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: relative; } main { margin-left: 0; } }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-color) !important;
+            margin-bottom: 20px;
+        }
+        .card-header, .card-footer {
+            background-color: rgba(255,255,255,0.05) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        /* Tabelas */
+        .table { --bs-table-bg: transparent; }
+        .table th { background-color: rgba(255,255,255,0.1) !important; border-bottom: 2px solid var(--border-color); }
+        .table td { border-bottom: 1px solid var(--border-color); }
+
+        /* Inputs */
+        .form-control, .form-select {
+            background-color: #222 !important; border: 1px solid #444 !important; color: #fff !important;
+        }
+        .form-control:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(13,202,240,0.3); }
+
+        /* Botões e Links */
+        a { color: var(--accent) !important; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .btn-success { background-color: #198754 !important; border:none; color:#fff !important; }
+        .btn-danger { background-color: #dc3545 !important; border:none; color:#fff !important; }
+        
+        /* Correção Autofill Chrome */
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #222 inset !important;
+            -webkit-text-fill-color: #fff !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-3">LOR <span style="color:var(--accent)">CGR</span></h3>
+            {% if user.is_authenticated %}
+            <div class="d-flex flex-column align-items-center mb-3">
+                <div class="rounded-circle border border-2 border-secondary overflow-hidden" style="width: 70px; height: 70px;">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mt-2 fw-bold small">{{ user.first_name|default:user.username }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="mt-2">
+            <a href="{% url 'dashboard' %}" class="nav-link"><i class="fas fa-th-large me-2"></i> Dashboard</a>
+            <a href="{% url 'device_list' %}" class="nav-link"><i class="fas fa-network-wired me-2"></i> Equipamentos</a>
+            <a href="{% url 'backup_manager' %}" class="nav-link"><i class="fas fa-hdd me-2"></i> Backups</a>
+            <a href="{% url 'inventory' %}" class="nav-link"><i class="fas fa-boxes me-2"></i> Inventário</a>
+            <a href="{% url 'multi_terminal' %}" class="nav-link"><i class="fas fa-terminal me-2"></i> Multi-Terminal</a>
+            
+            {% if user.is_superuser %}
+            <a href="{% url 'user_list' %}" class="nav-link"><i class="fas fa-users me-2"></i> Usuários</a>
+            {% endif %}
+
+            <hr class="mx-3" style="border-color: var(--border-color);">
+            <a href="{% url 'settings_view' %}" class="nav-link"><i class="fas fa-sliders-h me-2"></i> Configurações</a>
+            
+            <form action="{% url 'logout' %}" method="post" class="d-block w-100">
+                {% csrf_token %}
+                <button type="submit" class="nav-link text-danger w-100 text-start bg-transparent border-0">
+                    <i class="fas fa-power-off me-2"></i> Sair
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

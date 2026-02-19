@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Estilos Visuais */
+    .form-control, .form-select {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+        border: 1px solid #475569 !important;
+        font-weight: 500 !important;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0ea5e9 !important;
+        box-shadow: 0 0 8px rgba(14, 165, 233, 0.4) !important;
+    }
+    label { color: #e2e8f0 !important; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem; }
+    
+    /* Painel de Info Detectada */
+    .info-panel {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+    .info-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+    .info-value { font-size: 1.2rem; font-weight: bold; color: #38bdf8; }
+    
+    /* Loading Overlay */
+    #loading-overlay {
+        display: none;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); z-index: 9999;
+        justify-content: center; align-items: center; flex-direction: column;
+    }
+</style>
+
+<div id="loading-overlay">
+    <div class="spinner-border text-info" style="width: 3rem; height: 3rem;" role="status"></div>
+    <h4 class="text-white mt-3">Conectando ao equipamento...</h4>
+    <p class="text-muted">Isso pode levar até 10 segundos.</p>
+</div>
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="glass-card">
+                
+                <form method="POST" id="main-form" onsubmit="handleFormSubmit()">
+                    {% csrf_token %}
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+                        <h4 class="text-white m-0"><i class="fas fa-server me-2 text-info"></i>{{ device.name }}</h4>
+                        
+                        <button type="submit" name="discover" value="1" class="btn btn-warning fw-bold text-dark shadow" onclick="activateLoading()">
+                            <i class="fas fa-sync-alt me-2"></i> Auto-Detectar (SSH)
+                        </button>
+                    </div>
+
+                    {% if device.uptime or device.cpu_usage %}
+                    <div class="info-panel row g-3 text-center">
+                        <div class="col-md-3 border-end border-secondary">
+                            <div class="info-label">Uso de CPU</div>
+                            <div class="info-value">{{ device.cpu_usage|default:"--" }}</div>
+                        </div>
+                        <div class="col-md-3 border-end border-secondary">
+                            <div class="info-label">Temperatura</div>
+                            <div class="info-value">{{ device.temperature|default:"--" }}</div>
+                        </div>
+                        <div class="col-md-3 border-end border-secondary">
+                            <div class="info-label">Versão Firmware</div>
+                            <div class="info-value">{{ device.firmware_version|default:"--" }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-label">Uptime</div>
+                            <div class="info-value">{{ device.uptime|default:"--" }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger border-danger bg-dark text-danger">
+                            <strong>Erro ao salvar:</strong> {{ form.errors }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>Nome do Host</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label>Endereço IP</label>
+                            {{ form.ip }}
+                        </div>
+
+                        <div class="col-12"><hr class="border-secondary opacity-25"></div>
+                        
+                        <div class="col-md-3">
+                            <label>Fabricante</label>
+                            {{ form.vendor }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Usuário SSH</label>
+                            {{ form.user }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Senha SSH</label>
+                            {{ form.password }}
+                        </div>
+                        <div class="col-md-3">
+                            <label>Porta SSH</label>
+                            {{ form.port }}
+                        </div>
+
+                        <div class="col-12"><hr class="border-secondary opacity-25"></div>
+
+                        <div class="col-md-4">
+                            <label>Community SNMP</label>
+                            {{ form.snmp_community }}
+                        </div>
+                        <div class="col-md-4">
+                            <label>Versão SNMP</label>
+                            {{ form.snmp_version }}
+                        </div>
+                        <div class="col-md-4">
+                            <label>Porta SNMP</label>
+                            {{ form.snmp_port }}
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <div class="p-3 rounded border border-secondary" style="background: rgba(255,255,255,0.02);">
+                                <div class="d-flex align-items-center">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label ms-2 mb-0 cursor-pointer" for="id_is_active">
+                                        Monitoramento Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label>Descrição</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top border-secondary">
+                        <a href="/devices/" class="btn btn-outline-light px-4">Voltar</a>
+                        <button type="submit" class="btn btn-info fw-bold px-5 text-white shadow-lg">
+                            <i class="fas fa-save me-2"></i> SALVAR DADOS
+                        </button>
+                    </div>
+
+                </form> </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function activateLoading() {
+        // Mostra o overlay de carregamento apenas para o botão de detectar
+        document.getElementById('loading-overlay').style.display = 'flex';
+    }
+</script>
+{% endblock %}

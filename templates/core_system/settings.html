@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold"><i class="fas fa-cogs me-2" style="color:var(--accent)"></i>Configurações Globais</h3>
+        <button type="submit" form="settingsForm" class="btn btn-success fw-bold px-4">
+            <i class="fas fa-save me-2"></i> SALVAR TUDO
+        </button>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show mb-4">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="settingsForm">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body p-2">
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            
+                            <button class="nav-link active text-start py-3 mb-1" id="tab-mon-tab" data-bs-toggle="pill" data-bs-target="#tab-mon" type="button">
+                                <i class="fas fa-chart-line me-2"></i> Monitoramento
+                            </button>
+                            
+                            <button class="nav-link text-start py-3 mb-1" id="tab-notif-tab" data-bs-toggle="pill" data-bs-target="#tab-notif" type="button">
+                                <i class="fab fa-telegram me-2"></i> Notificações
+                            </button>
+                            
+                            <button class="nav-link text-start py-3 mb-1" id="tab-maint-tab" data-bs-toggle="pill" data-bs-target="#tab-maint" type="button">
+                                <i class="fas fa-broom me-2"></i> Manutenção & Logs
+                            </button>
+
+                            <button class="nav-link text-start py-3" id="tab-sys-tab" data-bs-toggle="pill" data-bs-target="#tab-sys" type="button">
+                                <i class="fas fa-laptop-code me-2"></i> Sistema
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                    
+                    <div class="tab-pane fade show active" id="tab-mon">
+                        <div class="card shadow-sm">
+                            <div class="card-header fw-bold text-uppercase">Regras de Alerta e Limites</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Alerta de CPU Alta (%)</label>
+                                        {{ form.cpu_warning_threshold }}
+                                        <small class="text-muted">Equipamento fica amarelo no dashboard.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">CPU Crítica (%)</label>
+                                        {{ form.cpu_critical_threshold }}
+                                        <small class="text-muted">Equipamento fica vermelho e envia alerta.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Alerta de Queda PPPoE</label>
+                                        {{ form.pppoe_drop_alert }}
+                                        <small class="text-muted">Avisar se desconectar mais que X clientes de uma vez.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Timeout do Ping (seg)</label>
+                                        {{ form.ping_timeout }}
+                                        <small class="text-muted">Tempo máximo para considerar Offline.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-notif">
+                        <div class="card shadow-sm">
+                            <div class="card-header fw-bold text-uppercase">Integração Telegram</div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-4">
+                                    {{ form.telegram_enabled }}
+                                    <label class="form-check-label fw-bold">Ativar envio de mensagens</label>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Bot Token (API)</label>
+                                    {{ form.telegram_bot_token }}
+                                    <small class="text-muted">Token gerado pelo @BotFather</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Chat ID</label>
+                                    {{ form.telegram_chat_id }}
+                                </div>
+                                
+                                <div class="alert alert-info mt-3 border-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Ao ativar, o sistema enviará avisos quando um equipamento ficar <b>Offline</b>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-maint">
+                        <div class="card shadow-sm">
+                            <div class="card-header fw-bold text-uppercase">Limpeza Automática</div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Histórico de Logs (Dias)</label>
+                                        {{ form.keep_logs_days }}
+                                        <small class="text-muted">Apagar logs de terminal mais antigos que isso.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Retenção de Backups (Dias)</label>
+                                        {{ form.keep_backups_days }}
+                                        <small class="text-muted">Apagar arquivos .rsc/.backup antigos.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="tab-sys">
+                        <div class="card shadow-sm">
+                            <div class="card-header fw-bold text-uppercase">Geral</div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Nome do Sistema (Branding)</label>
+                                    {{ form.system_name }}
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.maintenance_mode }}
+                                    <label class="form-check-label text-danger fw-bold">Modo Manutenção</label>
+                                    <small class="d-block text-muted">Impede login de usuários comuns.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    var triggerTabList = [].slice.call(document.querySelectorAll('#v-pills-tab button'))
+    triggerTabList.forEach(function (triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl)
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault()
+            tabTrigger.show()
+        })
+    })
+</script>
+{% endblock %}

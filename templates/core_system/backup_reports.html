@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-white fw-bold"><i class="fas fa-history me-2"></i>Relatórios de Backup</h2>
+        <a href="{% url 'backup_manager' %}" class="btn btn-outline-light">
+            <i class="fas fa-arrow-left me-2"></i>Voltar para Gerenciador
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary shadow">
+                <div class="card-body text-center">
+                    <h6 class="text-info text-uppercase fw-bold">Total de Execuções</h6>
+                    <h2 class="text-white fw-bold display-4">{{ stats.total }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-success shadow" style="border-width: 1px;">
+                <div class="card-body text-center">
+                    <h6 class="text-success text-uppercase fw-bold">Sucesso</h6>
+                    <h2 class="text-white fw-bold display-4">{{ stats.success }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-danger shadow" style="border-width: 1px;">
+                <div class="card-body text-center">
+                    <h6 class="text-danger text-uppercase fw-bold">Falhas/Erros</h6>
+                    <h2 class="text-white fw-bold display-4">{{ stats.failed }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-dark border-secondary shadow">
+        <div class="card-header bg-black border-bottom border-secondary d-flex justify-content-between align-items-center">
+            <h5 class="text-white mb-0"><i class="fas fa-clock me-2 text-info"></i>Histórico de Operações</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                <i class="fas fa-sync-alt me-1"></i> Atualizar
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                    <thead class="bg-black text-white text-uppercase small border-secondary">
+                        <tr>
+                            <th class="ps-4">Data e Hora</th>
+                            <th>Equipamento</th>
+                            <th class="text-center">Status</th>
+                            <th>Detalhes do Retorno</th>
+                            <th class="text-end pe-4">Download</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-secondary">
+                        {% for report in reports %}
+                        <tr>
+                            <td class="ps-4 text-white fw-bold">
+                                {{ report.created_at|date:"d/m/Y H:i:s" }}
+                            </td>
+                            
+                            <td>
+                                <span class="text-info fw-bold">{{ report.device.name }}</span>
+                                <div class="small text-white-50">{{ report.device.ip }}</div>
+                            </td>
+
+                            <td class="text-center">
+                                {% if 'Sucesso' in report.status or 'OK' in report.status %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i> OK</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-times me-1"></i> ERRO</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-white-50 small">
+                                {{ report.status|truncatechars:80 }}
+                            </td>
+
+                            <td class="text-end pe-4">
+                                {% if report.file %}
+                                    <a href="{{ report.file.url }}" class="btn btn-sm btn-outline-info" title="Baixar Arquivo" download>
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-times"></i></button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-white-50">
+                                <i class="fas fa-folder-open fa-2x mb-3"></i><br>Nenhum registro de backup encontrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-black border-top border-secondary text-white-50 text-end small">
+            Exibindo os últimos 100 registros.
+        </div>
+    </div>
+</div>
+{% endblock %}

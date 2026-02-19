@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4 fw-bold"><i class="fas fa-tachometer-alt me-2 text-info"></i>Visão Geral da Rede</h2>
+
+    {% for category, devices in categorized_devices.items %}
+    <div class="card shadow-lg mb-5">
+        <div class="card-header d-flex justify-content-between align-items-center bg-dark">
+            <h5 class="m-0 fw-bold text-uppercase" style="letter-spacing: 1px;">
+                <i class="fas fa-layer-group me-2 text-info"></i>{{ category }}s
+            </h5>
+            <span class="badge bg-primary">{{ devices|length }} Total</span>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Equipamento</th>
+                        <th>Modelo/Versão</th>
+                        <th>IP</th>
+                        <th>Status</th>
+                        <th>Recursos</th>
+                        <th class="text-end">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in devices %}
+                    <tr>
+                        <td class="fw-bold">
+                            <i class="fas fa-microchip me-2 text-secondary"></i>{{ d.name }}
+                        </td>
+                        <td><small class="text-muted">{{ d.model_name|default:"Huawei NE8000 M4" }}</small></td>
+                        <td><code>{{ d.ip }}</code></td>
+                        <td>
+                            {% if d.is_online %}
+                            <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>UP</span>
+                            {% else %}
+                            <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>DOWN</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 8px; width: 100px; background: #222;">
+                                <div class="progress-bar bg-info" style="width: {{ d.last_cpu }}%"></div>
+                            </div>
+                            <small style="font-size: 10px;">CPU: {{ d.last_cpu }}%</small>
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'device_detail' d.id %}" class="btn btn-sm btn-outline-info">Acessar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

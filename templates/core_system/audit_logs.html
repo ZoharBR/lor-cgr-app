@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .audit-box { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+    .table-audit { width: 100%; color: #ffffff !important; }
+    .table-audit thead th { background: #0f172a; color: #00d4ff !important; padding: 15px; border-bottom: 2px solid #334155; }
+    .table-audit td { padding: 15px; border-bottom: 1px solid #334155; vertical-align: middle; }
+    .text-data { color: #facc15 !important; font-weight: bold; }
+    .text-user { background: #334155; color: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid #475569; }
+</style>
+
+<div class="container-fluid mt-4">
+    <h3 class="text-white fw-bold mb-4"><i class="fas fa-history text-info me-2"></i>Auditoria de Acessos</h3>
+    <div class="audit-box">
+        <div class="table-responsive">
+            <table class="table-audit">
+                <thead>
+                    <tr>
+                        <th>DATA E HORA</th>
+                        <th>USUÁRIO</th>
+                        <th>EQUIPAMENTO / IP</th>
+                        <th class="text-end">AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="text-data">{{ log.start_time|date:"d/m/Y H:i:s" }}</td>
+                        <td><span class="text-user"><i class="fas fa-user-shield me-1"></i> {{ log.user }}</span></td>
+                        <td><div class="fw-bold">{{ log.device_name }}</div><small class="text-data">{{ log.device_ip }}</small></td>
+                        <td class="text-end">
+                            {% if log.log_file %}
+                            <a href="{{ log.log_file.url }}" download class="btn btn-warning btn-sm fw-bold">
+                                <i class="fas fa-download me-1"></i> BAIXAR .TXT
+                            </a>
+                            {% else %}<span class="text-muted small">Sem registro</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
