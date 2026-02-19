@@ -1,0 +1,116 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card card-dark shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title"><i class="fas fa-sync"></i> Sincronizar com LibreNMS</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-network-wired"></i> Conectando ao Servidor: <strong>192.168.0.214</strong>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label>URL da API LibreNMS</label>
+                        <input type="text" id="librenms_url" class="form-control" value="http://192.168.0.214" placeholder="http://192.168.0.214">
+                        <small class="text-muted">O token de API já está integrado no sistema.</small>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <button onclick="syncLibreNMS()" class="btn btn-success btn-block mt-3" id="btnSync">
+                        <i class="fas fa-search"></i> Buscar Equipamentos
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="bg-secondary">
+            
+            <div id="sync-results" style="display: none;">
+                <div class="d-flex justify-content-between mb-3">
+                    <h4>Inventário Detectado</h4>
+                    <button onclick="importSelected()" class="btn btn-primary">
+                        <i class="fas fa-file-import"></i> Importar Selecionados
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-dark">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>IP / Hostname</th>
+                                <th>Hardware / OS</th>
+                                <th>Community</th>
+                                <th>Status LOR CGR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="loading" class="text-center mt-5" style="display: none;">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-2">Consultando API do LibreNMS em 192.168.0.214...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let foundDevices = [];
+
+    function syncLibreNMS() {
+        const url = document.getElementById('librenms_url').value;
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('sync-results').style.display = 'none';
+
+        fetch('/tools/discovery/run/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: `librenms_url=${encodeURIComponent(url)}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            if(data.error) alert("Erro: " + data.error);
+            else {
+                foundDevices = data.devices;
+                const tbody = document.getElementById('results-body');
+                tbody.innerHTML = '';
+                data.devices.forEach((dev, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${dev.exists ? '' : `<input type="checkbox" class="dev-check" value="${index}">`}</td>
+                            <td>${dev.ip}</td>
+                            <td>${dev.brand.toUpperCase()} - ${dev.model}</td>
+                            <td>${dev.snmp_community}</td>
+                            <td>${dev.exists ? '<span class="badge badge-secondary">Importado</span>' : '<span class="badge badge-success">Novo</span>'}</td>
+                        </tr>`;
+                });
+                document.getElementById('sync-results').style.display = 'block';
+            }
+        });
+    }
+
+    document.getElementById('selectAll').addEventListener('change', function() {
+        document.querySelectorAll('.dev-check').forEach(c => c.checked = this.checked);
+    });
+
+    function importSelected() {
+        let toImport = [];
+        document.querySelectorAll('.dev-check:checked').forEach(c => toImport.push(foundDevices[c.value]));
+        if(toImport.length === 0) { alert("Selecione ao menos um item novo."); return; }
+
+        fetch('/tools/discovery/import/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: `devices=${JSON.stringify(toImport)}`
+        }).then(r => r.json()).then(data => {
+            alert(`${data.count} dispositivos importados!`);
+            window.location.href = '/';
+        });
+    }
+</script>
+{% endblock %}

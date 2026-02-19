@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Terminal {{ device.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+    
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; background-color: #000; overflow: hidden; }
+        #terminal-container { width: 100%; height: 100vh; } /* Ocupa 100% da tela do iframe */
+    </style>
+</head>
+<body>
+
+    <div id="terminal-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.5.0/lib/xterm-addon-fit.js"></script>
+
+    <script>
+        // Inicializa xterm.js
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            fontFamily: 'Consolas, "Courier New", monospace',
+            theme: { background: '#000000', foreground: '#00ff00' }
+        });
+
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(document.getElementById('terminal-container'));
+        fitAddon.fit();
+
+        // WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const socketUrl = protocol + window.location.host + '/ws/terminal/{{ device.id }}/';
+        const socket = new WebSocket(socketUrl);
+
+        socket.onopen = function() { term.write('\r\n\x1b[32mConectado ao LOR CGR (Modo Clean)...\x1b[m\r\n'); };
+        socket.onmessage = function(event) { term.write(event.data); };
+        term.onData(function(data) { socket.send(data); });
+
+        // Ajuste automatico de tamanho
+        window.addEventListener('resize', () => fitAddon.fit());
+    </script>
+</body>
+</html>

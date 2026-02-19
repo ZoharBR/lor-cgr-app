@@ -1,0 +1,37 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<div class="card bg-dark text-white">
+    <div class="card-header">Terminal: {{ device.name }} ({{ device.ip_address }})</div>
+    <div class="card-body">
+        <textarea id="output" class="form-control bg-black text-success" rows="20" readonly style="font-family: monospace;"></textarea>
+        <div class="input-group mt-3">
+            <input type="text" id="command" class="form-control bg-dark text-white" placeholder="Digite o comando e aperte Enter...">
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('command').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value;
+            this.value = '';
+            const output = document.getElementById('output');
+            output.value += "\n> " + cmd + "\n";
+            
+            fetch('/tools/terminal/command/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `device_id={{ device.id }}&command=${cmd}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                output.value += data.output;
+                output.scrollTop = output.scrollHeight;
+            });
+        }
+    });
+</script>
+{% endblock %}

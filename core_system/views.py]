@@ -1,0 +1,19 @@
+# ... (Mantenha todo o código anterior de views.py) ...
+
+# === ADICIONE ESTA FUNÇÃO NO FINAL DO ARQUIVO ===
+
+@login_required
+def inventory_view(request):
+    """
+    Exibe uma tabela focada em Hardware: Modelo, Serial e Firmware.
+    """
+    devices = Device.objects.filter(is_active=True).order_by('vendor', 'name')
+    
+    context = {
+        'devices': devices,
+        'total_assets': devices.count(),
+        # Conta quantos Huaweis, Mikrotiks, etc temos
+        'total_huawei': devices.filter(vendor='Huawei').count(),
+        'total_mikrotik': devices.filter(vendor='MikroTik').count(),
+    }
+    return render(request, 'core_system/inventory.html', context)

@@ -1,0 +1,112 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 style="color: var(--neon-blue);"><i class="fas fa-edit"></i> {{ title }}</h4>
+        
+        <div class="custom-control custom-switch" style="transform: scale(1.2);">
+            <input type="checkbox" class="custom-control-input" id="is_active_main" name="is_active_dummy" {% if device.is_active or not device %}checked{% endif %} onchange="document.getElementById('real_active').checked = this.checked">
+            <label class="custom-control-label text-success font-weight-bold" for="is_active_main">MONITORAMENTO ATIVO</label>
+        </div>
+    </div>
+    
+    <div style="background: #111; padding: 30px; border: 1px solid #333; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="checkbox" name="is_active" id="real_active" style="display:none;" {% if device.is_active or not device %}checked{% endif %}>
+            
+            <h6 class="text-muted border-bottom border-secondary pb-2 mb-3">DADOS DE ACESSO</h6>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label class="text-white">Nome do Equipamento</label>
+                    <input type="text" name="name" class="form-control bg-dark text-white border-secondary" value="{{ device.name|default:'' }}" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-white">IP Address</label>
+                    <input type="text" name="ip_address" class="form-control bg-dark text-white border-secondary" value="{{ device.ip_address|default:'' }}" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 form-group">
+                    <label class="text-white">Fabricante / OS</label>
+                    <select name="brand" class="form-control bg-dark text-white border-secondary">
+                        <option value="mikrotik" {% if device.brand == 'mikrotik' %}selected{% endif %}>Mikrotik (RouterOS)</option>
+                        <option value="huawei" {% if device.brand == 'huawei' %}selected{% endif %}>Huawei (VRP)</option>
+                        <option value="cisco" {% if device.brand == 'cisco' %}selected{% endif %}>Cisco (IOS)</option>
+                        <option value="linux" {% if device.brand == 'linux' %}selected{% endif %}>Linux Server</option>
+                        <option value="windows" {% if device.brand == 'windows' %}selected{% endif %}>Windows Server</option>
+                        <option value="fiberhome" {% if device.brand == 'fiberhome' %}selected{% endif %}>Fiberhome OLT</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-white">Usuário SSH/Login</label>
+                    <input type="text" name="username" class="form-control bg-dark text-white border-secondary" value="{{ device.username|default:'' }}">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label class="text-white">Senha</label>
+                    <input type="password" name="password" class="form-control bg-dark text-white border-secondary" value="{{ device.password|default:'' }}">
+                </div>
+            </div>
+
+            <h6 class="text-muted border-bottom border-secondary pb-2 mt-4 mb-3">CONFIGURAÇÃO SNMP (MONITORAMENTO)</h6>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label class="text-white">Community (Comunidade)</label>
+                    <input type="text" name="snmp_community" class="form-control bg-dark text-white border-secondary" value="{{ device.snmp_community|default:'public' }}">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="text-white">Porta SNMP</label>
+                    <input type="number" name="snmp_port" class="form-control bg-dark text-white border-secondary" value="{{ device.snmp_port|default:'161' }}">
+                </div>
+            </div>
+
+            <h6 class="text-muted border-bottom border-secondary pb-2 mt-4 mb-3">PORTAS & SERVIÇOS</h6>
+            
+            <div class="row align-items-center mb-2">
+                <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="has_ssh" name="has_ssh" {% if device.has_ssh or not device %}checked{% endif %}>
+                        <label class="custom-control-label text-white" for="has_ssh">Habilitar SSH</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="port_ssh" class="form-control bg-dark text-white border-secondary form-control-sm" value="{{ device.port_ssh|default:'22' }}" placeholder="Porta (22)">
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="has_web" name="has_web" {% if device.has_web or not device %}checked{% endif %}>
+                        <label class="custom-control-label text-white" for="has_web">Web / WebFig</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="port_web" class="form-control bg-dark text-white border-secondary form-control-sm" value="{{ device.port_web|default:'80' }}" placeholder="Porta (80/443)">
+                </div>
+            </div>
+
+            <div class="row align-items-center mb-2">
+                <div class="col-md-3">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="has_rdp" name="has_rdp" {% if device.has_rdp %}checked{% endif %}>
+                        <label class="custom-control-label text-info" for="has_rdp">RDP (Windows)</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="port_rdp" class="form-control bg-dark text-white border-secondary form-control-sm" value="{{ device.port_rdp|default:'3389' }}" placeholder="Porta (3389)">
+                </div>
+            </div>
+
+            <hr class="border-secondary">
+            <div class="d-flex justify-content-between">
+                {% if device %}
+                <a href="/tools/device/delete/{{ device.id }}/" class="btn btn-outline-danger" onclick="return confirm('Excluir?')">Deletar</a>
+                {% else %}<div></div>{% endif %}
+                <button type="submit" class="btn btn-success px-5 font-weight-bold">SALVAR CONFIGURAÇÕES</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto Discovery - LOR CGR</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #222; color: #eee; }
+        .card { background-color: #333; border: 1px solid #444; }
+        .table { color: #eee; }
+    </style>
+</head>
+<body class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3"><i class="fas fa-satellite-dish text-primary"></i> Auto Discovery</h1>
+                <a href="/" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> Voltar</a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <p class="text-muted mb-4">Digite o bloco CIDR da sua rede para buscar equipamentos e testar credenciais SNMP.</p>
+
+                    <form method="POST" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-md-8">
+                            <input type="text" name="network" value="{{ cidr }}" class="form-control form-control-lg bg-dark text-white" placeholder="Ex: 45.71.240.0/24" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" name="scan" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search"></i> Escanear Rede
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if found_devices %}
+            <div class="card mt-4 shadow-lg">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Dispositivos Encontrados: {{ found_devices|length }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-dark mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>Nome (SNMP)</th>
+                                <th>Credencial Usada</th>
+                                <th class="text-end">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dev in found_devices %}
+                            <tr>
+                                <td class="align-middle fw-bold">{{ dev.ip }}</td>
+                                <td class="align-middle">
+                                    {% if dev.name != "Desconhecido" %}
+                                        <span class="text-success fw-bold"><i class="fas fa-check-circle"></i> {{ dev.name }}</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    {% if dev.snmp_comm %}
+                                        <span class="badge bg-success">{{ dev.snmp_comm }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <form method="POST" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="ip" value="{{ dev.ip }}">
+                                        <input type="hidden" name="discovered_name" value="{{ dev.name }}">
+                                        <input type="hidden" name="snmp_comm" value="{{ dev.snmp_comm }}">
+                                        <input type="hidden" name="snmp_ver" value="{{ dev.snmp_ver }}">
+                                        
+                                        <input type="hidden" name="original_cidr" value="{{ cidr }}">
+                                        <button type="submit" name="add_device" class="btn btn-success btn-sm">
+                                            <i class="fas fa-plus"></i> Cadastrar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

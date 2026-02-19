@@ -1,0 +1,114 @@
+/* === MOTOR DE TEMAS: PADRÃO DARK (FALLBACK) === */
+
+/* 1. VARIÁVEIS PADRÃO (Se nada for escolhido, usa isso) */
+:root {
+    --bg-body: #0a0a0a;          /* Fundo Preto */
+    --bg-card: #141414;          /* Card Cinza Escuro */
+    --bg-input: #1f1f1f;         /* Input */
+    --bg-hover: #2a2a2a;
+    --border-color: #333333;
+    
+    --text-main: #ffffff;        /* Texto Branco */
+    --text-muted: #b0b0b0;       /* Texto Cinza */
+    
+    --accent-primary: #0dcaf0;   /* Azul */
+    --accent-success: #198754;   /* Verde */
+    --accent-danger: #dc3545;    /* Vermelho */
+}
+
+/* 2. VARIAÇÃO LIGHT (Só ativa se o sistema mandar) */
+[data-theme="light"] {
+    --bg-body: #f4f6f9;
+    --bg-card: #ffffff;
+    --bg-input: #e9ecef;
+    --bg-hover: #dbe0e6;
+    --border-color: #dee2e6;
+    
+    --text-main: #212529;        /* Texto Preto */
+    --text-muted: #6c757d;
+    
+    --accent-primary: #0d6efd;
+    --accent-success: #198754;
+    --accent-danger: #dc3545;
+}
+
+/* 3. REGRAS GLOBAIS COM !IMPORTANT (Para vencer o Bootstrap) */
+
+body {
+    background-color: var(--bg-body) !important;
+    color: var(--text-main) !important;
+}
+
+/* Força a cor do texto em TUDO */
+h1, h2, h3, h4, h5, h6, p, span, div, li, td, th, label, input, select, b, strong {
+    color: var(--text-main) !important;
+}
+
+.text-muted, small, .small {
+    color: var(--text-muted) !important;
+}
+
+a {
+    color: var(--accent-primary) !important;
+    text-decoration: none;
+}
+
+/* Cartões */
+.card {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+.card-header, .card-footer {
+    background-color: rgba(125, 125, 125, 0.1) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Tabelas */
+.table {
+    --bs-table-bg: transparent;
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+}
+.table th {
+    background-color: rgba(125, 125, 125, 0.1) !important;
+    color: var(--text-main) !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+.table td {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+.table-hover tbody tr:hover td {
+    background-color: var(--bg-hover) !important;
+}
+
+/* Inputs */
+.form-control, .form-select {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+.form-control:focus {
+    box-shadow: 0 0 0 2px rgba(13, 202, 240, 0.3) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--bg-card) !important;
+    border-right: 1px solid var(--border-color) !important;
+}
+.nav-link { color: var(--text-muted) !important; }
+.nav-link:hover, .nav-link.active {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-main) !important;
+    border-left: 3px solid var(--accent-primary);
+}
+
+/* AutoComplete do Navegador (Fundo Preto) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-main) !important;
+}

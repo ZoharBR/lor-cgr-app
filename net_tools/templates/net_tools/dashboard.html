@@ -1,0 +1,246 @@
+{% extends 'core_system/base.html' %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    :root {
+        --bg-body: #050505;
+        --panel-bg: #111111; /* Preto quase absoluto */
+        --neon-blue: #00f3ff;
+        --neon-purple: #9d00ff;
+        --neon-green: #00ff41;
+        --text-main: #e0e0e0;
+    }
+
+    body { 
+        background-color: var(--bg-body) !important; 
+        color: var(--text-main); 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    }
+
+    /* Layout Principal */
+    .command-center {
+        display: grid;
+        grid-template-columns: 260px 1fr 320px; /* Layout de 3 colunas fixo */
+        gap: 25px;
+        padding: 25px;
+        max-width: 1920px;
+        margin: 0 auto;
+    }
+
+    /* Cards Cyberpunk */
+    .cyber-card {
+        background: var(--panel-bg);
+        border: 1px solid #333;
+        border-top: 2px solid #444;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Efeito de brilho lateral */
+    .cyber-card.glow-blue { border-left: 3px solid var(--neon-blue); }
+    .cyber-card.glow-green { border-left: 3px solid var(--neon-green); }
+    .cyber-card.glow-purple { border-left: 3px solid var(--neon-purple); }
+    .cyber-card.glow-red { border-left: 3px solid #ff2a2a; }
+
+    .cyber-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #222;
+        padding-bottom: 10px;
+    }
+    
+    .cyber-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #888;
+    }
+
+    .cyber-value { 
+        font-size: 2.8rem; 
+        font-weight: 700; 
+        color: white; 
+        line-height: 1;
+    }
+
+    /* Widget IA */
+    .ai-terminal {
+        background: #000;
+        border: 1px solid var(--neon-purple);
+        padding: 20px;
+        color: var(--neon-purple);
+        font-family: 'Courier New', monospace;
+        position: relative;
+    }
+    .ai-terminal::before {
+        content: "AI_CORE_ONLINE";
+        position: absolute;
+        top: 5px; right: 10px;
+        font-size: 0.6rem;
+        opacity: 0.7;
+    }
+
+    /* Tabela */
+    .cyber-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .cyber-table th { text-align: left; color: #666; padding: 10px 5px; border-bottom: 1px solid #333; font-weight: 600; }
+    .cyber-table td { padding: 12px 5px; border-bottom: 1px solid #1a1a1a; color: #ccc; }
+    .cyber-table tr:hover { background: #1a1a1a; }
+
+    /* Barra de Progresso */
+    .cyber-progress { height: 6px; background: #222; border-radius: 3px; margin-top: 5px; }
+    .cyber-fill { height: 100%; border-radius: 3px; box-shadow: 0 0 10px currentColor; }
+
+</style>
+
+<div class="container-fluid pt-4">
+    <div class="command-center">
+        
+        <div>
+            <div class="cyber-card glow-blue">
+                <div class="cyber-header">
+                    <span class="cyber-title">Total Assets</span>
+                    <i class="fas fa-server text-muted"></i>
+                </div>
+                <div class="cyber-value">{{ total_devices|default:0 }}</div>
+                <div class="mt-2 text-muted small">Dispositivos cadastrados</div>
+            </div>
+
+            <div class="cyber-card glow-green">
+                <div class="cyber-header">
+                    <span class="cyber-title">Online Status</span>
+                    <i class="fas fa-wifi text-success"></i>
+                </div>
+                <div class="cyber-value text-success">{{ online_devices|default:0 }}</div>
+                <div class="mt-2 text-muted small">Rede Operacional</div>
+            </div>
+
+            <div class="cyber-card glow-red">
+                <div class="cyber-header">
+                    <span class="cyber-title">Critical / Down</span>
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                </div>
+                <div class="cyber-value text-danger">{{ offline_devices|default:0 }}</div>
+                <div class="mt-2 text-muted small">Requer Atenção</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="cyber-card">
+                <div class="cyber-header">
+                    <span class="cyber-title">Real-Time Network Health</span>
+                </div>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="healthChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-center mt-3 small text-muted">
+                    <span class="mr-3"><i class="fas fa-circle" style="color: #00ff41"></i> Online</span>
+                    <span><i class="fas fa-circle" style="color: #ff2a2a"></i> Offline</span>
+                </div>
+            </div>
+
+            <div class="cyber-card">
+                <div class="cyber-header">
+                    <span class="cyber-title">Latest Config Backups</span>
+                    <span class="badge badge-dark border border-secondary">{{ total_backups|default:0 }}</span>
+                </div>
+                <table class="cyber-table">
+                    <thead><tr><th>DEVICE</th><th>TIMESTAMP</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                        {% for backup in recent_backups %}
+                        <tr>
+                            <td class="font-weight-bold text-white">{{ backup.device.name }}</td>
+                            <td>{{ backup.date|date:"d/m H:i" }}</td>
+                            <td><span class="badge badge-success" style="background: rgba(0,255,65,0.2); color: #00ff41;">SECURE</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center py-3 text-muted">Nenhum backup recente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div>
+            <div class="cyber-card glow-purple ai-terminal">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-robot fa-2x mr-3"></i>
+                    <div>
+                        <h5 class="m-0 font-weight-bold">LOR NOC AI</h5>
+                        <small style="opacity: 0.7">Gemini v1.5 Engine</small>
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; margin-bottom: 20px;">
+                    > System Analysis: <span style="color: #00ff41">COMPLETE</span><br>
+                    > Anomalies: 0 DETECTED<br>
+                    > Ready for instructions...
+                </p>
+                <a href="/tools/ai/" class="btn btn-outline-light btn-block" style="border-color: var(--neon-purple); color: var(--neon-purple); font-weight: bold;">
+                    OPEN CHAT CONSOLE
+                </a>
+            </div>
+
+            <div class="cyber-card">
+                <div class="cyber-header">
+                    <span class="cyber-title">Server Resources (Local)</span>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>CPU Load</span>
+                        <span>{{ cpu_usage }}%</span>
+                    </div>
+                    <div class="cyber-progress"><div class="cyber-fill" style="width: {{ cpu_usage }}%; background: #00f3ff;"></div></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Memory (RAM)</span>
+                        <span>{{ ram_usage }}%</span>
+                    </div>
+                    <div class="cyber-progress"><div class="cyber-fill" style="width: {{ ram_usage }}%; background: #9d00ff;"></div></div>
+                </div>
+
+                <div>
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>SSD Storage</span>
+                        <span>{{ disk_usage }}%</span>
+                    </div>
+                    <div class="cyber-progress"><div class="cyber-fill" style="width: {{ disk_usage }}%; background: #00ff41;"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gráfico de Rosca (Health)
+    const ctx = document.getElementById('healthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Online', 'Offline'],
+            datasets: [{
+                data: [{{ online_devices|default:0 }}, {{ offline_devices|default:0 }}],
+                backgroundColor: ['#00ff41', '#ff2a2a'],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endblock %}

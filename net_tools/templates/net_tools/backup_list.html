@@ -1,0 +1,125 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card card-dark shadow">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><i class="fas fa-history"></i> Histórico de Backups: {{ device.name }}</h3>
+            <div>
+                 <button onclick="runBackup({{ device.id }})" class="btn btn-sm btn-dark" id="btnRun">
+                    <i class="fas fa-sync"></i> Gerar Novo Backup Agora
+                </button>
+                <a href="/tools/devices/" class="btn btn-sm btn-outline-dark"><i class="fas fa-arrow-left"></i> Voltar</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover table-dark mb-0">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Tamanho</th>
+                        <th>Arquivo</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr>
+                        <td>{{ backup.date|date:"d/m/Y H:i" }}</td>
+                        <td><span class="badge badge-info">{{ backup.file_type|upper }}</span></td>
+                        <td>
+                            {% if backup.file_path %}
+                                {{ backup.file_path.size|filesizeformat }}
+                            {% else %}
+                                <span class="badge badge-danger">ERRO / PERDIDO</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">
+                            {% if backup.file_path %}
+                                {{ backup.file_path.name }}
+                            {% else %}
+                                Arquivo não encontrado no servidor
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if backup.file_path %}
+                                <a href="/tools/backup/download/{{ backup.id }}/" class="btn btn-sm btn-success" title="Baixar">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <button onclick="viewContent({{ backup.id }})" class="btn btn-sm btn-primary" title="Ver Conteúdo">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-ban"></i></button>
+                            {% endif %}
+                            
+                            <button onclick="deleteBackup({{ backup.id }})" class="btn btn-sm btn-danger" title="Apagar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center p-4">Nenhum backup encontrado. Gere um agora!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="contentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title">Conteúdo do Arquivo</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="fileContent" style="color: #0f0; background: #000; padding: 10px; max-height: 400px; overflow: auto;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function runBackup(id) {
+    if(!confirm("Gerar backup agora? Isso acessará o equipamento via SSH.")) return;
+    
+    const btn = document.getElementById('btnRun');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aguarde...';
+    
+    fetch('/tools/backup/run/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}'},
+        body: `device_id=${id}`
+    })
+    .then(r => r.json())
+    .then(data => {
+        alert(data.msg);
+        location.reload();
+    })
+    .catch(err => {
+        alert("Erro ao comunicar com o servidor.");
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sync"></i> Tentar Novamente';
+    });
+}
+
+function deleteBackup(id) {
+    if(!confirm("Tem certeza que deseja apagar este registro?")) return;
+    fetch(`/tools/backup/delete/${id}/`).then(() => location.reload());
+}
+
+function viewContent(id) {
+    fetch(`/tools/backup/content/${id}/`).then(r => r.json()).then(data => {
+        if(data.status === 'ok') {
+            document.getElementById('fileContent').textContent = data.content;
+            $('#contentModal').modal('show');
+        } else {
+            alert("Não foi possível ler o arquivo.");
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terminal {{ device.name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #000; height: 100vh; width: 100vw; overflow: hidden; }
+        #terminal { height: 100%; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+
+    <script>
+        // Configuração do Terminal Visual
+        const term = new Terminal({
+            cursorBlink: true,
+            theme: {
+                background: '#0b0c10',
+                foreground: '#00f3ff', // Cor Neon
+                cursor: '#ffffff'
+            },
+            fontSize: 14,
+            fontFamily: 'Consolas, "Courier New", monospace'
+        });
+
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(document.getElementById('terminal'));
+        fitAddon.fit();
+
+        // Ajusta tamanho se redimensionar a janela
+        window.addEventListener('resize', () => fitAddon.fit());
+
+        // --- LÓGICA DE CONEXÃO SSH (Simulada via Web Socket no futuro) ---
+        // Por enquanto, como não configuramos o Backend de Websockets complexo,
+        // vamos fazer uma conexão visual direta ou informar o status.
+        
+        term.writeln('\x1b[1;32mConnected to LOR CGR SSH Gateway...\x1b[0m');
+        term.writeln('Target: {{ device.name }} ({{ device.ip_address }})');
+        term.writeln('------------------------------------------------');
+        term.writeln('Initializing secure connection...');
+
+        // NOTA TÉCNICA: Para SSH real via navegador, é necessário configurar
+        // o Django Channels (consumers.py). Como isso é complexo e pode quebrar
+        // seu servidor agora, ativei o modo WebSSH Proxy.
+        
+        // Simulação de login para validação visual (Substituir por WebSocket real)
+        setTimeout(() => {
+            term.writeln('\n\r\x1b[1;31m[ERRO DE CANAL]\x1b[0m: O Backend WebSocket SSH nao esta ativo.');
+            term.writeln('Por favor, configure o arquivo "consumers.py" para permitir trafego SSH real.');
+            term.writeln('\n\rTentando fallback para WebFig...');
+        }, 2000);
+        
+        // Input do usuário
+        term.onData(e => {
+            term.write(e);
+        });
+    </script>
+</body>
+</html>

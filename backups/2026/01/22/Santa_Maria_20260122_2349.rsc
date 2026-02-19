@@ -1,0 +1,2668 @@
+# 2026-01-22 23:46:07 by RouterOS 7.21
+# software id = HR9M-BRZ4
+#
+# model = CCR1036-8G-2S+
+# serial number = D8370C504479
+/interface bridge
+add fast-forward=no name=loopback port-cost-mode=short
+/interface ethernet
+set [ find default-name=ether1 ] comment="GERENCIA OLT SANTA MARIA" l2mtu=\
+    9000 mac-address=4C:5E:0C:64:7E:8E
+set [ find default-name=ether2 ] l2mtu=9000 mac-address=4C:5E:0C:64:7E:85
+set [ find default-name=ether3 ] l2mtu=9000 mac-address=4C:5E:0C:64:7E:82
+set [ find default-name=ether4 ] l2mtu=9000 mac-address=4C:5E:0C:64:7E:87
+set [ find default-name=ether5 ] advertise="10M-baseT-half,10M-baseT-full,100M\
+    -baseT-half,100M-baseT-full,1G-baseT-half,1G-baseT-full" l2mtu=9000 \
+    mac-address=4C:5E:0C:64:7E:88
+set [ find default-name=ether6 ] advertise="10M-baseT-half,10M-baseT-full,100M\
+    -baseT-half,100M-baseT-full,1G-baseT-half,1G-baseT-full" l2mtu=9000 \
+    mac-address=4C:5E:0C:64:7E:89
+set [ find default-name=ether7 ] advertise="10M-baseT-half,10M-baseT-full,100M\
+    -baseT-half,100M-baseT-full,1G-baseT-half,1G-baseT-full" l2mtu=9000 \
+    mac-address=4C:5E:0C:64:7E:8A
+set [ find default-name=ether8 ] advertise="10M-baseT-half,10M-baseT-full,100M\
+    -baseT-half,100M-baseT-full,1G-baseT-half,1G-baseT-full" l2mtu=9000 \
+    mac-address=4C:5E:0C:64:7E:8B
+set [ find default-name=sfp-sfpplus1 ] comment=cnx_sw05_santa_maria l2mtu=\
+    9000 mac-address=08:55:31:3B:20:34
+set [ find default-name=sfp-sfpplus2 ] comment=clientes_olt_santa_maria \
+    l2mtu=9000 mac-address=4C:5E:0C:64:7E:83
+/interface vlan
+add comment="CNX BOM JESUS" interface=sfp-sfpplus1 name="Vlan 104" vlan-id=\
+    104
+add comment=SLOT11_PON1 interface=sfp-sfpplus2 name="Vlan 229" vlan-id=229
+add comment=SLOT11_PON2 interface=sfp-sfpplus2 name="Vlan 230" vlan-id=230
+add comment=SLOT11_PON3 interface=sfp-sfpplus2 name="Vlan 231" vlan-id=231
+add comment=SLOT11_PON4 interface=sfp-sfpplus2 name="Vlan 232" vlan-id=232
+add comment=SLOT11_PON5 interface=sfp-sfpplus2 name="Vlan 233" vlan-id=233
+add comment=SLOT11_PON6 interface=sfp-sfpplus2 name="Vlan 234" vlan-id=234
+add comment=SLOT11_PON7 interface=sfp-sfpplus2 name="Vlan 235" vlan-id=235
+add comment=SLOT11_PON8 interface=sfp-sfpplus2 name="Vlan 236" vlan-id=236
+add comment=SLOT11_PON9 interface=sfp-sfpplus2 name="Vlan 237" vlan-id=237
+add comment=SLOT11_PON10 interface=sfp-sfpplus2 name="Vlan 238" vlan-id=238
+add comment=SLOT11_PON11 interface=sfp-sfpplus2 name="Vlan 239" vlan-id=239
+add comment=SLOT11_PON12 interface=sfp-sfpplus2 name="Vlan 240" vlan-id=240
+add comment=SLOT11_PON13 interface=sfp-sfpplus2 name="Vlan 241" vlan-id=241
+add comment=SLOT11_PON14 interface=sfp-sfpplus2 name="Vlan 242" vlan-id=242
+add comment=SLOT11_PON15 interface=sfp-sfpplus2 name="Vlan 243" vlan-id=243
+add comment=SLOT11_PON16 interface=sfp-sfpplus2 name="Vlan 244" vlan-id=244
+add comment=SLOT14_PON1 interface=sfp-sfpplus2 name="Vlan 277" vlan-id=277
+add comment=SLOT14_PON2 interface=sfp-sfpplus2 name="Vlan 278" vlan-id=278
+add comment=SLOT14_PON3 interface=sfp-sfpplus2 name="Vlan 279" vlan-id=279
+add comment=SLOT14_PON4 interface=sfp-sfpplus2 name="Vlan 280" vlan-id=280
+add comment=SLOT14_PON5 interface=sfp-sfpplus2 name="Vlan 281" vlan-id=281
+add comment=SLOT14_PON6 interface=sfp-sfpplus2 name="Vlan 282" vlan-id=282
+add comment=SLOT14_PON7 interface=sfp-sfpplus2 name="Vlan 283" vlan-id=283
+add comment=SLOT14_PON8 interface=sfp-sfpplus2 name="Vlan 284" vlan-id=284
+add comment=SLOT15_PON1 interface=sfp-sfpplus2 name="Vlan 293" vlan-id=293
+add comment=SLOT15_PON2 interface=sfp-sfpplus2 name="Vlan 294" vlan-id=294
+add comment=SLOT15_PON3 interface=sfp-sfpplus2 name="Vlan 295" vlan-id=295
+add comment=SLOT15_PON4 interface=sfp-sfpplus2 name="Vlan 296" vlan-id=296
+add comment=SLOT15_PON5 interface=sfp-sfpplus2 name="Vlan 297" vlan-id=297
+add comment=SLOT15_PON6 interface=sfp-sfpplus2 name="Vlan 298" vlan-id=298
+add comment=SLOT15_PON7 interface=sfp-sfpplus2 name="Vlan 299" vlan-id=299
+add comment=SLOT15_PON8 interface=sfp-sfpplus2 name="Vlan 300" vlan-id=300
+add comment=SLOT15_PON9 interface=sfp-sfpplus2 name="Vlan 301" vlan-id=301
+add comment=SLOT15_PON10 interface=sfp-sfpplus2 name="Vlan 302" vlan-id=302
+add comment=SLOT15_PON11 interface=sfp-sfpplus2 name="Vlan 303" vlan-id=303
+add comment=SLOT15_PON12 interface=sfp-sfpplus2 name="Vlan 304" vlan-id=304
+add comment=SLOT15_PON13 interface=sfp-sfpplus2 name="Vlan 305" vlan-id=305
+add comment=SLOT15_PON14 interface=sfp-sfpplus2 name="Vlan 306" vlan-id=306
+add comment=SLOT15_PON15 interface=sfp-sfpplus2 name="Vlan 307" vlan-id=307
+add comment=SLOT15_PON16 interface=sfp-sfpplus2 name="Vlan 308" vlan-id=308
+add comment="Clientes da Fazenda Providencia" interface=sfp-sfpplus2 name=\
+    "Vlan 1100" vlan-id=1100
+add comment="ESPIRITO SANTINHO REDE A CABO" interface=sfp-sfpplus2 name=\
+    "Vlan 1101" vlan-id=1101
+add comment="Rede Itabapoana Cabo 2" interface=sfp-sfpplus2 name="Vlan 1102" \
+    vlan-id=1102
+add comment="PONTE DE ITABAPOANA" interface=sfp-sfpplus2 name="Vlan 1103" \
+    vlan-id=1103
+add comment="SANTO EDUARDO REDE A CABO" interface=sfp-sfpplus2 name=\
+    "Vlan 1104" vlan-id=1104
+add comment="Rede a Cabo de Posse" interface=sfp-sfpplus2 name="Vlan 1105" \
+    vlan-id=1105
+add comment="Rede Serrinha" interface=sfp-sfpplus2 name="Vlan 1106" vlan-id=\
+    1106
+add comment="GERENCIA OLT SANTA MARIA" interface=ether1 name="Vlan 4000" \
+    vlan-id=4000
+/interface lte apn
+set [ find default=yes ] ip-type=ipv4 use-network-apn=no
+/ip ipsec proposal
+set [ find default=yes ] enc-algorithms=aes-128-cbc
+/ip pool
+add name=BLOQUEADO ranges=172.16.0.0/24
+add name=poolIPREAL ranges=45.71.240.28
+add name=pool1 ranges=192.168.100.2-192.168.103.253
+add comment="Bloqueio IXCSoft" name=pool_bloqueio ranges=172.16.16.0/23
+/ip smb users
+set [ find default=yes ] disabled=yes
+/ipv6 pool
+add name=v6-wan prefix=2804:44a8:7000::/43 prefix-length=64
+add name=v6-lan prefix=2804:44a8:7040::/42 prefix-length=56
+add name=pool_aviso_bloqueio_ipv6 prefix=2001:db8:3003::/56 prefix-length=64
+/ppp profile
+set *0 dhcpv6-pd-pool=v6-lan dns-server=45.71.242.179,45.71.242.140 \
+    local-address=45.71.240.106 on-up="{:delay delay-time=17s;  :local name=\"\
+    ii\" value=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"Interf\
+    acePppoe\" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local na\
+    me=\"Ipv6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$Interfac\
+    ePppoe != \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    \
+    :set name=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 \
+    IXCSoft Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$I\
+    pv6Lan\";\t   /tool fetch url=\"https://45.71.242.123:443/api-module/route\
+    r-nas/collect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipN\
+    as=192.168.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ip\
+    v6_lan=\$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"Interface\
+    Pppoe\" value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" v\
+    alue=[/ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePpp\
+    oe]];    :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-\
+    name=address [find server=\$InterfacePppoe]];     :log info message=\"IXCP\
+    rovedor: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii val\
+    ue=(\$ii +1);  :delay delay-time=1s;  }  }" only-one=no remote-address=\
+    pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "15 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=20M/20M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "20 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=25M/25M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "50 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=55M/55M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 80MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" value\
+    =\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\"\
+    \_value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv6\
+    Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !=\
+    \_\"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=90M/90M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 200MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=210M/210M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 300MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=310M/310M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "80 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=85M/85M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 400MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=410M/410M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 500MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=510M/510M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 600MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=610M/610M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dns-server=45.71.242.179,45.71.242.140 local-address=\
+    45.71.240.106 name=BLOQUEADO only-one=yes rate-limit=10k/10k \
+    remote-address=BLOQUEADO use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "40  SERRINHA - POSSE" on-up="{:delay delay-time=17s;  :local name=\"ii\" \
+    value=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePp\
+    poe\" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"\
+    Ipv6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppo\
+    e != \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set \
+    name=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSo\
+    ft Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6La\
+    n\";\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas\
+    /collect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=19\
+    2.168.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_la\
+    n=\$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\
+    \" value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=\
+    [/ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]];\
+    \_   :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name\
+    =address [find server=\$InterfacePppoe]];     :log info message=\"IXCProve\
+    dor: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=45M/45M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 30MBPS CABO" on-up="{:delay delay-time=17s;  :local name=\"ii\" value=\
+    \"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\" \
+    value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv6La\
+    n\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe != \
+    \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set name=\
+    \$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft Us\
+    uario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\";\
+    \t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/col\
+    lect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.16\
+    8.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\$\
+    Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\" v\
+    alue=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[/ip\
+    v6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]];    \
+    :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=addr\
+    ess [find server=\$InterfacePppoe]];     :log info message=\"IXCProvedor: \
+    Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\$ii \
+    +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=35M/35M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "10 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=15M/15M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "30 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=no rate-limit=35M/35M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "40 - MEGAS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=35M/35M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 1000MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" val\
+    ue=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=\
+    1050m/1050m remote-address=pool1 remote-ipv6-prefix-pool=v6-wan \
+    use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 70MBPS CABO" on-up="{:delay delay-time=17s;  :local name=\"ii\" value=\
+    \"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\" \
+    value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv6La\
+    n\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe != \
+    \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set name=\
+    \$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft Us\
+    uario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\";\
+    \t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/col\
+    lect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.16\
+    8.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\$\
+    Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\" v\
+    alue=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[/ip\
+    v6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]];    \
+    :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=addr\
+    ess [find server=\$InterfacePppoe]];     :log info message=\"IXCProvedor: \
+    Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\$ii \
+    +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=75M/75M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+add change-tcp-mss=yes dhcpv6-pd-pool=v6-lan dns-server=\
+    45.71.242.179,45.71.242.140 local-address=45.71.240.106 name=\
+    "BJ 800MBPS FIBRA" on-up="{:delay delay-time=17s;  :local name=\"ii\" valu\
+    e=\"0\";  :local name=\"tt\" value=\"60\";   :local name=\"InterfacePppoe\
+    \" value=\"0\";   :local name=\"Ipv6Wan\" value=\"0\";   :local name=\"Ipv\
+    6Lan\" value=\"0\";   while (\$ii < \$tt) do={  \t:if ((\$InterfacePppoe !\
+    = \"0\") && (\$Ipv6Wan != \"0\") && (\$Ipv6Lan != \"0\")) do={    :set nam\
+    e=\$ii value=(\$ii +300);   :log warning message=\"Coleta de IPv6 IXCSoft \
+    Usuario PPPoE: \$InterfacePppoe IPv6 WAN: \$Ipv6Wan  IPv6 LAN: \$Ipv6Lan\"\
+    ;\t   /tool fetch url=\"https://45.71.242.123:443/api-module/router-nas/co\
+    llect-ipv6-accounting\" http-data=\"hostname=PPPOE_SANTA_MARIA&ipNas=192.1\
+    68.0.54&key=8&usuario_pppoe=\$InterfacePppoe&ipv6_wan=\$Ipv6Wan&ipv6_lan=\
+    \$Ipv6Lan\" http-method=post;   \t} else={    :set name=\"InterfacePppoe\"\
+    \_value=[/interface get \$interface name];   :set name=\"Ipv6Wan\" value=[\
+    /ipv6 nd prefix get value-name=prefix [find interface=\$InterfacePppoe]]; \
+    \_  :set name=\"Ipv6Lan\" value=[/ipv6 dhcp-server binding get value-name=\
+    address [find server=\$InterfacePppoe]];     :log info message=\"IXCProved\
+    or: Coleta de dados IPV6 em andamento...\";  };  \t:set name=\$ii value=(\
+    \$ii +1);  :delay delay-time=1s;  }  }" only-one=yes rate-limit=810M/810M \
+    remote-address=pool1 remote-ipv6-prefix-pool=v6-wan use-encryption=no
+set *FFFFFFFE dns-server=45.71.242.179,45.71.242.140 only-one=yes \
+    use-encryption=default
+/queue simple
+add max-limit=115M/115M name=pch_pedra_do_garrafao target=45.71.243.178/32
+/routing bgp template
+set default disabled=no output.network=bgp-networks
+/routing ospf instance
+add disabled=no name=default-v2 redistribute=connected,static,vpn,dhcp,modem \
+    router-id=192.168.0.54
+add disabled=no name=default-v3 redistribute=connected,static,vpn,dhcp,modem \
+    router-id=192.168.0.54 version=3
+/routing ospf area
+add disabled=no instance=default-v2 name=backbone-v2
+add disabled=no instance=default-v3 name=backbone-v3
+/snmp community
+set [ find default=yes ] addresses=0.0.0.0/0 name=vision write-access=yes
+/user group
+set read policy="local,telnet,ssh,read,test,winbox,password,web,sniff,sensitiv\
+    e,api,romon,rest-api,!ftp,!reboot,!write,!policy"
+/ip firewall connection tracking
+set loose-tcp-tracking=no udp-timeout=10s
+/ip neighbor discovery-settings
+set discover-interface-list=!dynamic
+/ip settings
+set accept-redirects=yes accept-source-route=yes max-neighbor-entries=8192 \
+    rp-filter=loose
+/ipv6 settings
+set max-neighbor-entries=1024 min-neighbor-entries=1023 \
+    soft-max-neighbor-entries=1023
+/interface ovpn-server server
+add auth=sha1,md5 mac-address=FE:B9:B6:18:3C:69 name=ovpn-server1
+/interface pppoe-server server
+add authentication=pap disabled=no interface="Vlan 229" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON1
+add authentication=pap disabled=no interface="Vlan 230" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON2
+add authentication=pap disabled=no interface="Vlan 231" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON3
+add authentication=pap disabled=no interface="Vlan 232" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON4
+add authentication=pap disabled=no interface="Vlan 233" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON5
+add authentication=pap disabled=no interface="Vlan 234" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON6
+add authentication=pap disabled=no interface="Vlan 235" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON7
+add authentication=pap disabled=no interface="Vlan 236" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON8
+add authentication=pap disabled=no interface="Vlan 237" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON9
+add authentication=pap disabled=no interface="Vlan 238" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON10
+add authentication=pap disabled=no interface="Vlan 239" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON11
+add authentication=pap disabled=no interface="Vlan 240" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON12
+add authentication=pap disabled=no interface="Vlan 241" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON13
+add authentication=pap disabled=no interface="Vlan 242" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON14
+add authentication=pap disabled=no interface="Vlan 243" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON15
+add authentication=pap disabled=no interface="Vlan 244" max-mru=1480 max-mtu=\
+    1480 mrru=1600 one-session-per-host=yes service-name=SLOT11_PON16
+add authentication=pap disabled=no interface="Vlan 1100" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1100
+add authentication=pap disabled=no interface="Vlan 1101" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1101
+add authentication=pap disabled=no interface="Vlan 1102" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1102
+add authentication=pap disabled=no interface="Vlan 1103" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1103
+add authentication=pap disabled=no interface="Vlan 1104" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1104
+add authentication=pap disabled=no interface="Vlan 1105" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1105
+add authentication=pap disabled=no interface="Vlan 1106" max-mru=1480 \
+    max-mtu=1480 mrru=1600 one-session-per-host=yes service-name=RBs_1106
+add authentication=pap disabled=no interface="Vlan 277" one-session-per-host=\
+    yes service-name=SLOT14_PON1
+add authentication=pap disabled=no interface="Vlan 278" one-session-per-host=\
+    yes service-name=SLOT14_PON2
+add authentication=pap disabled=no interface="Vlan 279" one-session-per-host=\
+    yes service-name=SLOT14_PON3
+add authentication=pap disabled=no interface="Vlan 280" one-session-per-host=\
+    yes service-name=SLOT14_PON4
+add authentication=pap disabled=no interface="Vlan 281" one-session-per-host=\
+    yes service-name=SLOT14_PON5
+add authentication=pap disabled=no interface="Vlan 282" one-session-per-host=\
+    yes service-name=SLOT14_PON6
+add authentication=pap disabled=no interface="Vlan 283" one-session-per-host=\
+    yes service-name=SLOT14_PON7
+add authentication=pap disabled=no interface="Vlan 284" one-session-per-host=\
+    yes service-name=SLOT14_PON8
+add authentication=pap disabled=no interface=ether8 one-session-per-host=yes \
+    service-name=monitoramento
+add authentication=pap disabled=no interface="Vlan 293" one-session-per-host=\
+    yes service-name=SLOT15_PON1
+add authentication=pap disabled=no interface="Vlan 294" one-session-per-host=\
+    yes service-name=SLOT15_PON2
+add authentication=pap disabled=no interface="Vlan 295" one-session-per-host=\
+    yes service-name=SLOT15_PON3
+add authentication=pap disabled=no interface="Vlan 296" one-session-per-host=\
+    yes service-name=SLOT15_PON4
+add authentication=pap disabled=no interface="Vlan 297" one-session-per-host=\
+    yes service-name=SLOT15_PON5
+add authentication=pap disabled=no interface="Vlan 298" one-session-per-host=\
+    yes service-name=SLOT15_PON6
+add authentication=pap disabled=no interface="Vlan 299" one-session-per-host=\
+    yes service-name=SLOT15_PON7
+add authentication=pap disabled=no interface="Vlan 300" one-session-per-host=\
+    yes service-name=SLOT15_PON8
+add authentication=pap disabled=no interface="Vlan 301" one-session-per-host=\
+    yes service-name=SLOT15_PON9
+add authentication=pap disabled=no interface="Vlan 302" one-session-per-host=\
+    yes service-name=SLOT15_PON10
+add authentication=pap disabled=no interface="Vlan 303" one-session-per-host=\
+    yes service-name=SLOT15_PON11
+add authentication=pap disabled=no interface="Vlan 304" one-session-per-host=\
+    yes service-name=SLOT15_PON12
+add authentication=pap disabled=no interface="Vlan 305" one-session-per-host=\
+    yes service-name=SLOT15_PON13
+add authentication=pap disabled=no interface="Vlan 306" one-session-per-host=\
+    yes service-name=SLOT15_PON14
+add authentication=pap disabled=no interface="Vlan 307" one-session-per-host=\
+    yes service-name=SLOT15_PON15
+add authentication=pap disabled=no interface="Vlan 308" one-session-per-host=\
+    yes service-name=SLOT15_PON16
+/interface pptp-server server
+# PPTP connections are considered unsafe, it is suggested to use a more modern VPN protocol instead
+set authentication=pap,chap,mschap1,mschap2 default-profile=default
+/ip address
+add address=45.71.240.182/30 comment=CONFIG disabled=yes interface=ether4 \
+    network=45.71.240.180
+add address=192.168.1.7 comment=loopback interface=loopback network=\
+    192.168.1.7
+add address=45.71.240.71 comment=NAT disabled=yes interface=sfp-sfpplus1 \
+    network=45.71.240.71
+add address=192.168.0.37/30 comment="GERENCIA OLT SANTA MARIA" interface=\
+    "Vlan 4000" network=192.168.0.36
+add address=192.168.0.241/29 comment=Radios interface="Vlan 1106" network=\
+    192.168.0.240
+add address=45.71.240.30 interface=sfp-sfpplus1 network=45.71.240.30
+add address=192.168.103.254/22 interface=sfp-sfpplus2 network=192.168.100.0
+add address=192.168.0.54/30 interface="Vlan 104" network=192.168.0.52
+add address=186.237.53.179/29 comment=LINK_FORTETELECOM disabled=yes \
+    interface=sfp-sfpplus2 network=186.237.53.176
+add address=45.71.243.173/30 comment=\
+    "cnx_pch_pedra_do_garrafao(TROCAR O IP URGENTE)" disabled=yes interface=\
+    "Vlan 237" network=45.71.243.172
+add address=45.71.240.106 comment=NAT interface=loopback network=\
+    45.71.240.106
+add address=45.71.243.177/30 comment=cnx_pch_pedra_do_garrafao interface=\
+    "Vlan 237" network=45.71.243.176
+add address=186.192.56.167 comment="NAT FORTE PROVISORIO" interface=\
+    sfp-sfpplus1 network=186.192.56.167
+/ip dns
+set servers="45.71.242.140,45.71.242.179,2804:44a8:0:1::3,2804:44a8:0:1::2,200\
+    1:4860:4860::8888,2606:4700:4700::1111"
+/ip firewall address-list
+add address=192.168.0.54 comment=RB disabled=yes list=NAT
+add address=192.168.0.0/16 list=DIFERENTE
+add address=45.71.242.179 list=DIFERENTE
+add address=45.71.242.180 list=DIFERENTE
+add address=192.168.100.2-192.168.103.253 list=NAT
+add address=45.71.242.140 list=DIFERENTE
+add address=45.71.242.123 comment="IXCProvedor endereco IP do sistema" list=\
+    rede_local
+/ip firewall filter
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!45.71.242.123 protocol=tcp src-address=172.16.16.0/23
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-address=!45.71.242.123 protocol=tcp src-address-list=aviso_bloqueio
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address=172.16.16.0/23
+add action=drop chain=forward comment="IXCProvedor regra de aviso bloqueio" \
+    dst-port=!53 protocol=udp src-address-list=aviso_bloqueio
+/ip firewall nat
+add action=accept chain=srcnat comment="FIX OSPF" protocol=ospf
+add action=src-nat chain=srcnat comment="NAT PRINCIPAL" dst-address-list=\
+    !DIFERENTE src-address-list=NAT to-addresses=45.71.240.106
+add action=dst-nat chain=dstnat comment="DNS1 TCP OPENDNS" disabled=yes \
+    dst-address=45.71.242.179 dst-port=53 protocol=tcp to-addresses=\
+    208.67.222.222 to-ports=53
+add action=dst-nat chain=dstnat comment="DNS1 UDP OPENDNS" disabled=yes \
+    dst-address=45.71.242.179 dst-port=53 protocol=udp to-addresses=\
+    208.67.222.222 to-ports=53
+add action=dst-nat chain=dstnat comment="DNS1 TCP GOOGLE" disabled=yes \
+    dst-address=45.71.242.140 dst-port=53 protocol=tcp to-addresses=8.8.8.8 \
+    to-ports=53
+add action=dst-nat chain=dstnat comment="DNS2 TCP GOOGLE" disabled=yes \
+    dst-address=45.71.242.180 dst-port=53 protocol=tcp to-addresses=1.1.1.1 \
+    to-ports=53
+add action=dst-nat chain=dstnat comment="DNS1 UDP GOOGLE" disabled=yes \
+    dst-address=45.71.242.140 dst-port=53 protocol=udp to-addresses=8.8.8.8 \
+    to-ports=53
+add action=dst-nat chain=dstnat comment="DNS2 UDP GOOGLE" disabled=yes \
+    dst-address=45.71.242.180 dst-port=53 protocol=udp to-addresses=1.1.1.1 \
+    to-ports=53
+/ip ipsec profile
+set [ find default=yes ] dpd-interval=2m dpd-maximum-failures=5
+/ip service
+set ftp address=45.71.240.0/22,192.168.0.0/22 port=1021
+set ssh address=45.71.240.0/22,192.168.0.0/22 port=1022
+set telnet address=45.71.240.0/22,192.168.0.0/22 port=1023
+set www port=5151
+set api address=45.71.240.0/22,192.168.0.0/22
+set api-ssl address=45.71.240.0/22,192.168.0.0/22
+/ip ssh
+set ciphers=aes-gcm,aes-ctr,aes-cbc,3des-cbc,null forwarding-enabled=remote
+/ip upnp
+set show-dummy-rule=no
+/ip upnp interfaces
+add interface=ether5 type=internal
+add forced-ip=186.237.48.231 interface=ether1 type=external
+add interface=ether2 type=internal
+add interface=ether3 type=internal
+add interface=ether4 type=internal
+add interface=ether6 type=internal
+/ipv6 address
+add address=2804:44a8::9/128 advertise=no comment=LOOPBACK_V6 interface=\
+    loopback
+/ipv6 nd
+set [ find default=yes ] advertise-dns=yes managed-address-configuration=yes \
+    other-configuration=yes
+/ppp aaa
+set interim-update=20m
+/ppp secret
+add comment="Odair Zeferino (funcionario Gratis )" name=odairfuncionario \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Michele Vidal Rocha    ( P tamam )" name=michelevidal password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Claudia De Andrade Alves  ( padilha )" name=claudiaandrade \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Claudio Talon Ignacio   ( centro )" name=claudioignacio \
+    password=1221 profile="BJ 1000MBPS FIBRA" service=pppoe
+add comment="Antonio Carlos Cardoso Da Silva" name=antoniocardososilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Delma Won Held De Souza- Fibra" name=delmasouza password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jose Jorge Teixeira Santos " name=josejorge password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Fabio Jose De Oliveira Gon\E7alves-Gr\E1tis Loja SM" name=\
+    fabiogoncalves password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jeferson Souza Francisco" name=jefersonfrancisco password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jose Carlos Areas Gil" name=joseareasgil password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Jose Manoel Barbosa Lessa" name=josemanoel password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luciana Gil Coutinho" name=lucianacoutinho password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Renata Tostes Cardoso" name=renatatostes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Paulo Cesar Zeferino Alves ( 1\BA Ponto  )" name=\
+    paulocesarzeferino password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Francine Lopes Castro" disabled=yes name=francinelopes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcos Antonio Castilho da Silva " name=marcoscastilho password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luiz Fernando de Moraes Felizardo" name=luizfernandofelizardo \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ataides Pereira da Silva Junior Fibra" name=ataidesjunior \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Fabio da Silva Santos 1 ponto" name=fabiogessica password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Fabio da Silva Santos casa 3 ponto" name=fabiosantoscasa \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Fabio da Silva Santos 4 ponto Oficina" name=fabiosantos \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alex Bittencourt (gratis)" name=alexbitencourt password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Paulo Roberto Da Silva" name=paulosilva password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Rafaela Aparecida Rodrigues de Abreu Menezes 60 MEGA" name=\
+    rafaelarodrigues password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marco Antonio dos Santos Lubanco Fibra 50 MEGA" name=\
+    marcolubanco password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabio da Silva Santos- Filha Natalia" name=solangerocha \
+    password=1221 profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Rodolfo Gomes Sartine Fibra 60 mega" name=rodolfosartine \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jocimar Silva Maciel" name=jocimarmaciel password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Lenilson Werneck Barreto (GRATIS )" name=lwerneck password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sonia Maria De Azevedo" name=soniama password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Bruna Pinheiro Oliveira Batista Pereira" name=brunaoliveira \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ester Werneck Rodrigues" name=esterrodrigues password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="DPO Sto Eduardo (Gratis)" name=pmstoeduardo password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Livia Ribeiro da Silva" name=consueloribeiro password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Fibra Marcia Pereira de Souza " name=marciapereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcia da Silva Pinto" name=marciapinto password=1221 profile=\
+    "15 - MEGAS FIBRA" service=pppoe
+add comment="Vanessa Siriano" name=vanessasiriano password=1221 profile=\
+    "BJ 300MBPS FIBRA" service=pppoe
+add comment="Rita de Cassia Ribeiro De Souza" name=ritacassia password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Flavio de Araujo Willerman" name=flavioaraujo password=1221 \
+    profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Fibra Adriano Rodrigues da Silva- Lanchonete" name=\
+    adrianorodrigues password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adriano Rodrigues da Silva - (2 ponto)" name=adrianosilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leonardo Rodrigues Martins " name=leonardorodrigues password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabiana de Oliveira Rosa" name=fabianarosa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fibra Fernando Joaquim Guimaraes" name=fernandojoaquim password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Bismarque Alonso Goncalves (Fibra)" name=bismarquehospital \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Fatima Cristina Maciel Oliveira" name=fatimacristina password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jennyfer Ofrante Von Weld" name=jennyferofrante password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosane Tavares Lourenco 15 mega" name=rosanetavares password=\
+    1221 profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Delsino Silva dos Santos " name=delsinosantos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Ana Silvia Batista Tavares" name=anatavares password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Bruno Barcelos Braga" name=brunobraga password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Romildo Araujo Lima 2 Ponto 15 MEGA" name=romildoaraujo2 \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Lucia Peixoto de Leo Abreu" name=mariapeixoto password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Beatriz de Castro Faria" name=beatrizfaria password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Cristiane Fiuza Alves" name=cristianealves password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jacinta de Fatima Damasceno dos Santos Rocha" name=jacintarocha \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Aureo Manhaes da Cruz" name=aureocruz password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Tiago da Silva Souza" name=tiagosouza password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Silvania Alves Del Sport 1 Ponto" name=silvaniaalves password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jane de Souza Ribeiro" name=janeribeiro password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Farinha Rosa Comercio e Industria de Cereais Ltda- Real de Santo \
+    Eduardo(2\B0Ponto)" name=realcereaisproducao password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Fabio Sant Ana Paulo" name=fabiopaulo password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Eduardo Teixeira da Costa " name=eduardodacosta password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Paulo Luiz Ribeiro da Fonseca" name=paulodafonseca password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Edson Ramos da Costa" name=edsonramoscosta password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Eduardo Ermito de Souza" name=eduardodesouza password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Bismarque Alonso Goncalves" name=bismarquealonso password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luciana das Gracas da Silva " name=lucianasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosilene Siqueira Viana" name=rosileneviana password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Olinda Alvarenga Oliveira da Hora" name=mariaolinda \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Joselia de Souza Goncalves Damasceno" name=joseliadamasceno \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adriano Rodrigues da Silva" name=adrianocasa password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Rita de Lusie Ramos Sampaio" name=ritasampaio password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jose Carlos Abreu" name=joseabreu password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Roberto Junior Santos de Oliveira" name=robertooliveira \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Moises da Silva Oliveira" name=moisesoliveira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Fibra Elisa Alves Tavares de Souza" disabled=yes name=elisasouza \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Humberto Lopes da Costa" name=humbertocosta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosemery Correa Reginaldo" name=rosemeryreginaldo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lucas Pires Moreira" name=lucaspires password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabiano Veloso Araujo" name=fabianoaraujo password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Fibra Rosane Sampaio Lirio" name=rosanesampaio password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Maria da Penha Peireira de Souza" name=mariadapenhapereira \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Regina de Souza Silva" name=reginasouza password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Luis Gustavo dos Santos Del Sport" name=luisgustavosantos \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rosangela Costa- Antigo Joao Batista da Silva" name=\
+    rosangelacosta password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Frederico Silva de Andrade" name=igrejastoeduardo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rosimar Menezes Silva Fibra" name=rosimarsilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Maycon Correa Braga" name=mayconbraga password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Dilcimeia Vieira da Silva Chagas" name=dilcimeiavieira password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Rosilane da Silva Soares" name=rosilanesoares password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fagner da Silva Crisostomo" name=fagnercrisostomo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ricardo Farah Negre " name=ricardonegre password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Cleide Da Silva Fraga" name=cleidefraga password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="NarcisioDa Silva Campos" name=narcisiocampos password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Julio Cezar Santos Mello Grats Manutencao dos  notbook  " name=\
+    juliosantos password=1221 profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Julio Claudio Dutra Pereira" name=juliopereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leonardo Nunes ( Grats Servidor  Na Casa dele" name=leonunes \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Kenia De Souza E Silva Rodrigues ( 1A )" name=keniarodrigues \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Cassiano Da Silva Sa  Fibra" name=cassianosilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Paulo Fagner Tavares Albino ( 3A )" name=paulofagner password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Luzia Tavares  ( 3A )" name=luziafavares password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Aurea De Souza Oliveira" name=aureaoliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sergio Gomes Rodrigues" name=sergiorodrigues password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Monica Muniz Pessanha" name=monicapessanha password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Luciano De Castro Almeida" name=lucianoalmeida password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Renan Lima  Dos Santos " name=renanlima password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment=" ( PROVI ) Claudia Marcia Ribeiro Da Silva Machado" name=\
+    claudiaribeiro password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment=" ( PROVI ) Thayane Da Silva Reis Moraes 15 MEGA" name=\
+    thayanereis password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="(PROV) Etelvino Dos Santos Costa" name=etelvinocosta password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Eva Rosangela Da Silva Beiral" name=evabeiral password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Jorge Roberto de Almeida Mil\E3o- Fibra" name=jorgerobertomilao \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leonardo Jose da Silva Alves 50 mega" name=leonardoalves \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marlionete Pereira da Silva 1\BA Ponto" name=marlionetesilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jo\E3o Claudio Gon\E7alves da  Silva" name=joaoclaudiosilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rita de Cassia da Silva" name=ritasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Magaly Gomes da Silva Barreto" name=magalybarreto password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Wilhas Figueiredo Alves Fibra" name=wilhasalves password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Susel Del Sport Barbosa da Silva 50 MEGA" name=suseldelesporti \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Juliete de Lima Almeida" name=thiagoalmeida password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Silvania Rangel De Oliveira" name=silvaniaoliveira password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Greici Mara Menezes Cabral" name=greicimara password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Lucilene Soares Jardim" name=soaresjardim password=1221 profile=\
+    "15 - MEGAS FIBRA" service=pppoe
+add comment="Antonia De Souza Silva" name=antoniasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Fernanda Aparecida Fernades de Oliveira " name=fernandafernandes \
+    password=1221 profile="BJ 800MBPS FIBRA" service=pppoe
+add comment="Kenia Ribeiro Andrade" name=keniaribeiro password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Lubanco Coelho Souza" name=mariasouza password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Ilciney Figueira Gomes Filho" name=ilcineifigueirafilho \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jose Carlos Azeredo" name=carlosazeredo password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Mota e Tostes Ltda-ME" name=motaetostes password=1221 profile=\
+    "BJ 300MBPS FIBRA" service=pppoe
+add comment="Geraldo Machado de Oliveira" name=geraldooliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alciano da Silva Moledo Fibra" name=alcianomoledo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rene Eduardo Barreto Martins 1 50 Mega" name=renemartins \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elias Rocha dos Santos" name=eliasrochasantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Grasiela Oliveira Siqueira" name=grasielasiqueira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rayza da Silva Dias" name=rayzadias password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Edson Tavares da Silva 30 Mega Fibra" name=edsontavares \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adriano da Silva Neves" name=adrianoneves password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Sebastiao Pereira da Costa Fibra" name=sebastiaocosta password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elson Monteiro dos Santos" name=elsonmonteiro password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vera Lucia Salles Parente Fibra" name=verasalles password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Acir de Souza FIBRA" name=acirsouza password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Recrineide Povoa Monteiro" name=recrineidepovoa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Cleber Bazilio da Silva " disabled=yes name=clebersilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Romenig Fonseca da Silva" name=romenigsilva password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Lucas da Silva Padilha FIBRA" name=lucaspadilha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Renata da Silva Santos" name=renatadasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leandro Castro de Almeida 1 ponto" name=leandrocastro password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Mayara dos Santos Henriques Ferreira Sales" name=mayarasales \
+    password=1221 profile="BJ 800MBPS FIBRA" service=pppoe
+add comment="Marcia Vieira da Silva" name=marciavieira password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabio de Sa Sales " name=fabiosales password=1221 profile=\
+    "BJ 800MBPS FIBRA" service=pppoe
+add comment="Evalnete Ferreira da Silva Lacerda" name=evalnetelacerda \
+    password=1221 profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Samira Patricio Pereira dos Santos 30 Mega" name=samirapatricio \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Eusiane Da Silveira Talon" name=eusianetalon password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marlionete Pereira da Silva 2\B0 ponto" name=marlionetepereira \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Crevaldo Nunes Lopes" name=creveraldolopes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Joao Batista da Silva Mota 30 mega" name=joaobatistamota \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Wilson Roza de Souza Junior 50 Mega" name=wilsonjunior password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Allan Alvin Carneiro FIBRA" name=allancarneiro password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lenilton Ferreira de Souza" name=leniltondesousa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Oswaldo Alves Ferreira" name=oswaldoferreira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marli Soares da Silva Matos" name=marlimatos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Pedro Paulo dos Santos 30 mega" name=pedrosantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adenilda Lira Costa Alves(antiga Ivany Martins Alves)" name=\
+    ivanyalves password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcos Antonio Tavares Monteiro" name=marcosmonteiro password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Aryana da Costa Pereira" name=aryanapereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Regina Marcia dos S. Monteiro  V. Saturnino 60 MEGA" name=\
+    reginamonteiro password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana Carolina Alvin dos Santos FIBRA" name=anacarolina password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabiana Alves de Oliveira Baptista 50 mega" name=fabianabaptista \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ceina Machado Mariano" name=celinamariano password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Sebastiao Oliveira" name=sebastiaooliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Flagni Santos da Silva" name=flagnisilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Welison da Silva Campos" name=welisoncampos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Edson da Cruz Del Espot" name=edsontetuca password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Edson Da Cruz Delesporte" name=edsonsedebica password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Da Conceicao Ferreira Da Silva" name=mariaferreirasilva \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Arthur Jos\E9 Pessanha Pereira" name=arthurjosepereira password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Julia Auxiliadora Ribeiro de Souza Lamonica" name=julialamonica \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Crimacio Da Silva" name=crimaciosilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Adilson Custodio Daflon        ( areal )" name=adilsondaflon \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosenilda Venture Almeida Silva-Antigo Anderson Almeida" name=\
+    andersondasilva password=1221 profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Cloves Pinto De Oliveira" name=clovesoliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Dpo De Sta Maria  ( gratis )" name=dpostamaria password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Diego Monteiro Barreto" name=diegobarreto password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Everaldo Antonio Moreira Provalero" name=everaldoprovalero \
+    password=1221 profile="20 - MEGAS FIBRA" service=pppoe
+add comment="Flavia Da Silva Tavares" name=flaviatavares password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Jose Geraldo Freitas Da Silva" name=josegeraldosilva password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leandro De Castro Almeida 2 " name=leandroalmeida password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Marcia Claudia G F P alves 15 mega" name=marciaalves password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marciele Ribeiro Coutinho" name=marcielecoutinho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Jose Da Silva" name=mariadasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Paroquia De Santa Maria ( 1  ponto ) 60 mega" name=paroquia \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rogeria Muniz Ferreira" name=rogeriamuniz password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Rozangela De Menezes Silva" name=rozangelasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Monica Custodio Fuentes Cabral" name=monicafuentes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Cleison Bazilio da Silva " disabled=yes name=cleberbazilio \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marilane Jardim Monteiro" name=marilenejardim password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jhonster Dias Etiene " name=jhonsteretiene password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sergio Luiz Carvalho de Souza Filho" name=sergiocarvalho \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Paulo Roberto Oliveira Da Silva" name=paulooliveira password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcia Emilia Guimaraes Bicudo" name=marciaemilia password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adair Lacerda de Souza" name=adairlacerda password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Silverio Areas Gil" name=silveriogil password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Liliane da Silva Lourenco" name=lilianelourenco password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Georgina Silva da Rocha" name=georginarocha password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Laiani Campos da Silva" name=edilcineacampossilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Walter Inacio Barreto Junior Gratis" name=walterjunior password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Deolinda de Andrade Alves " name=deolindadeandrade password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Elicio Ferreira da Silva" name=elicioferreira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Joao Claudio Moreira da Silva" name=joaoclaudiomoreira password=\
+    1221 profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Vinicio Patricio Pereira" name=viniciopatricio password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Bismarque Alonso Goncalves" name=mayconmartins password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Hugo da Cruz Gomes " name=hugogruz password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Cristiano Gon\E7alves Ramos 50 MEGA" disabled=yes name=\
+    cristianogoncalves password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Walace Anselme Vieira" name=walasvieira password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Ana Cristina da Silva Pessanha" name=anapessanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marta Elena Alves Jardim Ramos" name=martajardim password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lidiane Ferreira Salvador" name=lidianesalvador password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lucimara Fiusa da Costa Pereira" name=lucimarapereira password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Natalia de Oliveira Pires" name=nataliapires password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Farinha Rosa Comercio e Industria de Cereais Ltda- Real de Santo \
+    Eduardo" name=realcereai password=1221 profile="BJ 600MBPS FIBRA" \
+    remote-address=45.71.240.28 service=pppoe
+add comment="Joao Batista Peixoto Cruz" name=joaobatistacruz password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Andre Ferreira de Oliveira" name=andreferreira password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Alexsandro Silveira Albino" name=alexsandroalbino password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Zely dos Santos Del Spost FIBRA" name=zelydelesposti password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Job da Silva Alves FIBRA" name=jobalves password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Eleander Goncalves Ferreira" name=eleandergoncalves password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Edson Da Cruz Delespot 3 Ponto" name=edsondelespot password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Edson Da Cruz Delesporte 4 Ponto" name=edsonzeni password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Douglas Sheiub Ricardo Coelho" name=douglasricardo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana Lucia da Silva Santos Bucard" name=anabucard password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Emilia Correa Costa Paes" disabled=yes name=emiliapaes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Angela Campos dos Santos" name=angelasantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Griciane Elias da Silva" name=gricianesilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Joao Motta Neto" name=joaomotta password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Marilda Rocha Castilho " name=marildacastilho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elisangela de Oliveira Cota Caetano" name=elisangelacota \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Valdete Tavares Monteiro" name=valdetemonteiro password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Waldecy dos Santos Rodrigues" name=waldecyrrodrigues password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Tiago da Silva Vidal" name=tiagovidal password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Aurea Beatriz Batista A. Torres" name=aureatorres password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Arlindo Antonio da Silva" name=arlindosilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Juliana Sant Ana Rodrigues da Silva" name=119julianarodrigues \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rozimar da Silva Barreto" name=111rozimarbarreto password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adilson Passarele dos Santos" name=119adilsonsantos password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Bianca Maria de Oliveira Freitas" name=117biancafreitas \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Antonio Carlos de Carvalho" name=119antoniocarvalho password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ilma Reis de Oliveira" name=115ilmaoliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Jandira da Silva Reis Carvalho- VENC 10" name=\
+    110mariajandira password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcos Jose da Silva Reis" name=122marcosreis password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria de Almeida Lima" name=122marialima password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Waldecy Ribeiro da Silva" disabled=yes name=116waldecysilva \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Joao Wharrison Souza Da Silva" name=joaosouzasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Tatiana Aparecida de Souza Oliveira Trigo" name=tatianatrigo \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Janaina Gomes de Souza Almeida- GRATIS TORRE POSSE DO MEIO" \
+    name=janainaalmeida password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rodrigo Barreto Macedo" name=112rodrigomacedo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rosemeri Gomes da Silva" name=121rosemerisilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Tamires Ribeiro Lemos Fernandes" name=112tamiresfernandes \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rafael Oliveira da Silva" name=120rafaelsilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leonardo Simplicio Cunha" disabled=yes name=111leonardocunha \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jose Siqueira Junior" name=josesiqueira password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Ronei Peixoto Da Silva" name=roneidasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Renato Rocha dos Santos" name=renatorocha password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Areta Pinto" name=aretapinto password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Aldemir Marinato Torres" name=aldemirtorres password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Antonio Matheus Vidal Rocha" name=dalvaguindanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ozorio Jacia Lubanco" name=ozoriojacia password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Elica Barroso de Souza" name=elicabarroso password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Fernando Joaquim Guimaraes Junior" name=fernandojunior password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Riquinho Casa" name=riquinhocasa password=555 profile=\
+    "BJ 1000MBPS FIBRA" service=pppoe
+add comment="Maria de Fatima Sobrinho" disabled=yes name=mariasobrinho \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Renato Silva dos Santos" name=renatodossantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vania Padrao Silva" name=vaniapadrao password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Lucia Helena da Silva Pinto Oliveira" name=luciaoliveira \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jorge Marcio da Silva Francisco" name=jorgefrancisco password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Renata da Silva Santana " name=renatasantana password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Romildo de Araujo Lima 1 Ponto- Casa dele" name=romildolima \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Creuza Maria Amaral Magalhaes-Antigo Contrato de Silvania Del Esp\
+    ot 2\B0 Ponto" disabled=yes name=creuzaescola password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Ilma Abreu da Silveira" name=113ilmasilveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Aloisio Roberto Manhaes Borges" name=134aloisioborges password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Adriano da Silva Guimaraes" name=118adrianoguimaraes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment=" SE Manoel da Silva Motta" name=manoelmotta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment=" SE Tatiane Delgado Neves" name=tatianeneves password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Thaynara Delgado Neves Givigi" name=tainaragivigi password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Rosane De Almeida Neves" name=rosanineves password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="  SE Juliana Inacio de Souza" name=julianadesouza password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Sebastiao Andrade da Silva" name=sebastiaoandrade password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment=" SE Reginaldo Rangel Peres" name=reginaldoperes password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Creuza Helena Oliveira dos Santos" name=creuzasantos \
+    password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Jocelia  Silva Santos " name=joceliasilva password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Simone Rodrigues Alves Inacio" name=simoneinacio password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Selma De Almeida Delgado" name=selmadelgado password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE Paulo Sergio Batista Da Silva" name=paulobatista password=\
+    1221 profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Joao Batista Nunes" disabled=yes name=joaobatista password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Fabiana da Silva Andadre de Souza" name=fabianadesouza password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment=" SE Natalicia Mancano Fernandes" name=nataliciafernandes \
+    password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Renata Aparecida Pereira" name=renatapereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Cheila Batista Soares" name=cheilasoares password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Jhony Willian da Silva" name=jws password=1221 profile=\
+    "BJ 600MBPS FIBRA" remote-address=45.71.243.68 service=pppoe
+add comment="Denilson Castilho Silva" name=denilsoncastilho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sueli Mendes Guimaraes" name=luciguimaraes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Romenig Fonseca da Silva- Segundo Ponto" name=romenigfonseca \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Sinesio Castilho Bernal Filho" name=sinesiofilho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Chaiana Moraes da Silva" name=chaianadasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luis Fernando Cruz Pessanha" name=123luispessanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leni Moura da Silva" name=lenisilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Felipe Mateus dos Santos Lima" name=felipelima password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Agostinha Brito Coelho" name=agostinhacoelho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jocimara da Silva Manduca Correia" name=jocimaracorreia \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vanessa Gomes Andrade" name=vanessaandrade password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Lecilda Tavares Rocha" name=123lecildarocha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Breno Jose Moreira de Melo" name=brenomelo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rovilson Lourenco da Silva" name=119rovilsonsilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Robson Vagner Saturnino" name=robsonsaturnino password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marilza Machado Maia" name=marilzamaia password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="SE Leda Guimaraes" name=lucianoguimaraes password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Marcela Aparecida Gualande da Rocha Coelho" name=marcelacoelho \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment=" SE Maria Selma Da Silva Santos" name=mariasantos password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Rejane Campos Roberto" name=rejaneroberto password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Kenia Coelho Mota" name=keniamota password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Denise Lopes Viana santos" name=denisesantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Matheus Monteiro da Silva Mendes" name=matheusmendes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marines Tavares Rodrigues" name=marinesrodrigues password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Janaina Gomes de Souza Almeida- Torre(gratis)" name=casadojair \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria das Gacas de Souza Mote" name=mariamote password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Edson Albino da Costa" name=edsondacosta password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Fernanda da Silva Fagundes" name=fernandafagundes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Caroline Rangel da Silva Borges" name=carolineborges password=\
+    1221 profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Renata Ferreira de Souza Cruz" name=renatacruz password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elisangela Gomes  ES" name=elisangelagomes password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Janaina Castilho da Silva" name=janainacastilho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Manoel Carlos Velasco Vieira" name=manoelvieira password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Edna Pereira Barreto" name=111ednabarreto password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Angela Maria Fuentes" name=angelafuentes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Consuelo Azevedo Ribeiro" name=consueloazevedo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Bruno Guindanha Vieira" name=brunoguindanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Karen Correa Mangaravite" name=karenmangaravite password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="SE Joice Benfeito Vieira Xavier" name=joicexavier password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Everaldo Povoa da Rocha- Antigo Marcelo Antonio Alvim Junior" \
+    name=marcelojunior password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marina Correia da Silva Martins" name=marinamartins password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Maria Ana de Sa Salles" name=mariasales password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Geovane Aleixo Santana" name=geovanesantana password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Irenice Piedade Cosendei" name=irenicecosendei password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jean Carlos Silva de Oliveira" name=jeanoliveira password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Erika dos Santos de Castro" name=erikacastro password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Roberto Lopes Monteiro Junior" name=robertojunior password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana Cristina Barros de Souza Cruz" name=anacristinacruz \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Lucineia Pereira Alves - SE" name=lucineiaalves password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE-Luciano da Silva Mota" name=lucianomota password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="SE- Patricia Rodrigues de Souza Posea" name=patriciaposea \
+    password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Eduardo da Silva Costa" name=eduardoscosta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jussara Monteiro da Silva" name=jussarasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Manoel Messias Etiene" name=manoeletiene password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Instituto Profissional Sao Jose" name=institutosaojose password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alexandra da Silva Givigi" name=alexandragivigi password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Alcides Marcos De Barros Guindanha " name=alcidesguindanha \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Angela Maria Marinato Torres De Souza " name=angelatorres \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Antonio Jose Marinato Torres  ( Funcionario Gratis )" name=\
+    antoniotorres password=1221 profile="BJ 800MBPS FIBRA" service=pppoe
+add comment="Bruno dos Santos Mota" name=brunomota password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Cerlides Custodio Braz" name=cerlidesbraz password=1221 profile=\
+    "10 - MEGAS FIBRA" service=pppoe
+add comment="Claudineia dos Santos Almeida" name=claudineiadossantos \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Cristiane Da Silva Mendes" name=cristianemendes password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Denair Peres Gomes" name=denairgomes password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Edimar De Oliveira" name=edimaroliveira password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Denize Elias Benedides , antigo contrato Fabiana Benedides " \
+    name=fabianabenevides password=1221 profile="80 - MEGAS FIBRA" service=\
+    pppoe
+add comment="Irineia Viana Saturnino" name=irineiasaturnino password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jandira Marta Pereira Lopes" name=jandiramarta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Joao Batista Ferreira" name=joaoferreira password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Jocemar Pontes da Silva Posses" name=jocemarpontes password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Jocineia Pessanha De Oliveira" name=jocineadeoliveira password=\
+    1221 profile="10 - MEGAS FIBRA" service=pppoe
+add comment="Cristiane Silva Gomes- Antigo contrato de Jose Luiz Gomes Martins\
+    -Casa 1\B0Ponto" name=joseluizgomes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Cristiane Silva Gomes- Antigo contrato de Jose Luiz Gomes Martins\
+    \_(2\BAponto)" name=joseluizmartins password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Jos\E9 Riicardo Machado" name=josericardo password=1221 profile=\
+    "15 - MEGAS FIBRA" service=pppoe
+add comment="Jovenil Inacio da Silva 15 Mega cabo" name=jovenildasilva \
+    password=1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Juliana Ferreira da Silva Cerqueira" name=julianaferreira \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Kawan Pessanha de Souza" name=kawanpessanha password=1221 \
+    profile="10 - MEGAS FIBRA" service=pppoe
+add comment="Lucia Helena Almeida Reis" name=luciaalmeidareis password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Luiz Claudio da Silva Batista" name=luizclaudiobatista password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marquilane da Silva Almeida" name=marquilanealmeida password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Miguel de Souza" name=migueldesouza password=1221 profile=\
+    "10 - MEGAS FIBRA" service=pppoe
+add comment="Ocione Guimaraes Sampaio" name=ocioneguimaraes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Regina Maria Elias Benevides De Souza" name=reginabenevides \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment=" riquinho PC" name=riquinhopc password=1221 profile=\
+    "BJ 800MBPS FIBRA" service=pppoe
+add comment="Rogerio Areias de Almeida" name=rogerioareia password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Rosangela Vidal Guindanha" name=rosangelavidal password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Salvador Gesteira Neves" name=salvadorneves password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Simone Muniz Pessanha" name=simonemuniz password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Simone Ferreira Rodrigues" name=simonerodrigues password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Yasmim De Souza Reis" name=yasminreis password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Zelina Vital Pereira" name=zelinapereira password=1221 profile=\
+    "20 - MEGAS FIBRA" service=pppoe
+add comment="Vilma Margarete Batista Pereira" name=vilmamargarete password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="SE Rosane Rodrigues de Oliveira" name=rosanerodrigues password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Maria de Fatima Cruz Nunes Pontes" name=mariapontes password=\
+    1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Romulo Guimaraes Basilio" name=douglastostes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leide Maria Ofrante Nogueira" name=leidenogueira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luiz Angelo Pacheco Barbosa" name=luizbarbosa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elizangela Cabral de Oliveira da Silva Paes" disabled=yes name=\
+    elizangelapaes password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luciana de Souza Galaxe" name=lucianasousa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Celia Rodrigues Nascimento" disabled=yes name=celianascimento \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Durval Fernandes Benfeitos" name=durvalbenfeitos password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Maria Aparecida Cosme" name=mariacosme password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Cleber Peixoto Cruz" name=clebercruz password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="U.S. Jardim" name=jardimagropecuaria password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Ezio de Souza Silva" name=123eziosilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Flagni Santos da Silva 2 Ponto" name=flagnisantos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Marcio Peres Ferreira" name=marcioferreira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Paulo da Silva Paes" name=paulopaes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Francisco Souza Guindanha" name=franciscoguindanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Suelane Maria XAvier Menezes Oliveira Gomes" name=suelanegomes \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lidianara de Almeida Rodrigues" name=lidiamararodrigues \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Beatriz de Oliveira Freitas" name=119beatrizfreitas password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Oseias Valerio da Silva" name=oseiassilva password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Monaria Posia Silva da Fonseca" name=monariafonseca password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Liberalino Paulista Filho" name=liberalinofilho password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Gilvan Aleixo Santana" name=gilvansantana password=1221 profile=\
+    "15 - MEGAS FIBRA" service=pppoe
+add comment="Renilda Hilario Paulista" name=renildapaulista password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Monique Lopes da Silva" name=moniquesilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Rita de Cassia Oliveira" name=ritaoliveira password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Reginaldo da Silva de Oliveira" name=reginaldooliveira password=\
+    1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Geicimar de Almeida Rodrigues" name=geicimarrodrigues password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Pamela Mota de Almeida Oliveira" name=pamelaoliveira password=\
+    1221 profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Deividy de Oliveira Velasco" name=deividyvelasco password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Vera Lucia Cubas de Oliveira" name=veraluciacubas password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Claudia Santos Cruz" name=claudiacruz password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Joacyr Machado" name=joacyrmachado password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Luciana Barret de Carvalho" name=123lucianacarvalho password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana Izabel da Piedade Apolinario Andrade" name=\
+    anaizabelapolinario password=1221 profile="BJ 30MBPS CABO" service=pppoe
+add comment="Anderson Albino Lima" name=andersonlima password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Norma Lucia da Rocha Mota" name=normamota password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Sonia Etiene Areas da Silva" name=soniaareas password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Cristiane Custodio Braz" name=cristianebraz password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Adelaide Ramos da Costa" name=mariacosta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vilcimar Xavier Delgado" name=vilcimardelgado password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Paulo Sergio Rodrigues Faria" name=paulofaria password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Ricardo Ferreira de Oliveira" name=ricardooliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Geovane Fernandes da Silva" name=geovanesilva password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Amauri Mota da Rocha RECEBEU 1 MES" name=amaurirocha password=\
+    1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Josimar Rodrigues da Silva" name=josimarsilva password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Marlene Salustiano dos Santos" name=marlenesantos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria das Dores Areas Pessea Silva" name=mariasilva password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Meres Dias da Silva" name=meresdias password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Regina Celia Barreto da Silva" name=119reginasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ivone Alves Terra" name=111ivoneterra password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Celia Costa Macae" name=mariamacae password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Luciana Silva Souza Reis" name=lucianareis password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vanderley Rodrigues dos Santos" name=vanderleysantos password=\
+    1221 profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Colegio Estadual Jose Pereira Pinto" name=colegiopereirapinto \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Eliandra da Silva Tavares do Amaral" name=eliandraamaral \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="C.E Estefania Pereira Pinto" name=colegioestefaniapinto \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Eva Andrade da Silva" name=evasilva password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Antonio Areas Filho " name=antoniofilho password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcelo Torres Barreto" name=marcelotorres password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alaerce Mattos de Moraes" disabled=yes name=alaercemoraes \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Debora Cantarino Neiva" name=deboraneiva password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Colegio Estadual Maria da Conceicao Pereira Pinto- sala direcao" \
+    name=colegioestadualusm password=1221 profile="BJ 600MBPS FIBRA" service=\
+    pppoe
+add comment="Colegio Estadual Maria da Conceicao Pereira Pinto- patio" name=\
+    colegioestadualusm2 password=1221 profile="BJ 600MBPS FIBRA" service=\
+    pppoe
+add comment="Rogerio Rocha dos Santos" name=rogeriosantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Lucia Cruz Nunes" name=marianunes password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Valdete Nogueira da Silva" name=valdetenogueira password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Marco Rogerio Rodrigues" name=marcorodrigues password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jhon Leno Machado da Silva" name=jhonsilva password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Escola Municipal Edson Anamias" name=escolaedsonanamias \
+    password=1221 profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Tatiana Siqueira da Silva" name=tatianasiqueira password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Patricio Pinheiro de Moraes" name=121patriciomoraes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Itamar Alexandre de Souza" name=itamarsousa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Leidimar Etiene Rodrigues" name=leidimarrodrigues password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Fernanda Goncalves da Silva" name=fernandasilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Zelia Teixeira da Silva Mota" name=zeliamota password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Antonio Teixeira de Souza" name=antonioteixeira password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Valdeir da Silva Mota" name=valdeirmota password=1221 profile=\
+    "BJ 30MBPS CABO" service=pppoe
+add comment="Vera Lucia dos Santos Souza" name=verasouza password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Ana Paula Gomes Carlos Nogueira" name=115ananogueira password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Eliene Maria da Silva Vieira" name=elienevieira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Lorena Oliveira Correa" name=lorenacorrea password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Soraya Maria Calil Azeredo" name=sorayaazeredo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Priscla Gomes Oliveira" name=priscilaoliveira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Joana Palmeira Nunes" name=joananunes password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Jose Luiz Moreira Sampaio" name=joseluizsampaio password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Maria Carolina dos Santos" name=mariacarolina password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Tiago Rodrigues de Souza" name=tiagorodrigues password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Raila Rodrigues Cardoso da Silva" name=railasilva password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Joelma da Silva Ribeiro" name=joelmaribeiro password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Madalena Ribeiro Sardinha" name=110mariasardinha password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Felipe Barbosa Oliveira" name=114felipeoliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sonia Maria da Silva" name=soniasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Orlando Marinato Bicudo" name=orlandobicudo password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Maria da Penha Silva Telle" name=mariatelle password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Manoel Ramos Rodrigues da Silva" name=manoelsilva password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Marcos Santos de Souza" name=marcossantos password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Saldelita Barreto Pessanha" name=saldelitapessanha password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Edimilson Oliveira Quintanilha" name=112edimilsonquintanilha \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Osimar de Souza Guilherme" name=osimarguilherme password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Iris Ramada Nunes de Souza" disabled=yes name=irissouza \
+    password=1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Helio Siqueira" name=heliomoreira password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosane de Fatima Pereira dos Santos" name=rosanesantos password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Helena Silveira Albino" name=mariasilveira password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Denair Peres Gomes -2\B0 Ponto" name=denairperes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vanderlea de Souza Possole" name=vanderleapossole password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Amaro Carvalho Goncalves MA" name=amarogoncalves password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sonia Maria Araujo Mangaravite " name=soniamangaravite password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alcimar Vieia Lemos" name=alcimarlemos password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Antonio Cardoso Pinho" name=antoniopinho password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Rondilei da Silva Ferreira" name=rondileiferreira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alcy Lemos" disabled=yes name=alcylemos password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Sergio Araujo Rodrigues" name=sergioaraujo password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Helio Augusto Passigatti-1\B0 Ponto" name=heliopassigatti \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Rodrigo Santos Fernandes Barros" name=rodrigobarros password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Helio Augusto Passanatti-2\BA Ponto" name=helioaugusto password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Jocelmo Pontes Abreu" name=jocelmoabreu password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Acesso Total Comercio e Servi\E7o Internet Eirelli." name=\
+    acessototal password=1221 profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Rozimere Brandao da Silva" name=rozimerisilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Cremilse da Silva Abreu" name=cremilseabreu password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Celio Areas Lopes" name=celiolopes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Janilsa da Silva" name=janilsasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Roselio Retameiro de Oliveira" name=roseliooliveira password=\
+    1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Antonio Carlos Moura Barcelos" name=antoniobarcelos password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marcio Rodrigues de Souza" name=marciosouza password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Edneide Maria da Silva Alves" name=edneidealves password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marinete de Souza Campos" name=marinetecampos password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Eliani Marendaz Almeida da Silva" disabled=yes name=\
+    119elianisilva password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Neidilane da Conceicao Rocha" name=neidilanerocha password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Jose Ricardo da Costa Fernandes" name=josecosta password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Gilmar da Silva Pessanha" name=gilmarpessanha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Terezinha da Silva Barreto" name=terezinhabarreto password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Geceli Souza Nascimento" name=gecelinascimento password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Barbara Vitoriano Lima Guimaraes-1\B0 Ponto venc 15" name=\
+    barbaralima password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Dyrce Barbosa Machado Vasconcelos" name=dyrcevasconcelos \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rossana Maria Ofrante Mascarenhas" name=rossanamascarenhas \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Sergio da Silva Ferreira" name=sergioferreira password=1221 \
+    profile="20 - MEGAS FIBRA" service=pppoe
+add comment="Angelica Souza Machado" disabled=yes name=angelicamachado \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Antonio Jose Lopes Andrade" name=antoniolopes password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Thays da Silva Barreto Andrade" name=thaysandrade password=1221 \
+    profile="15 - MEGAS FIBRA" service=pppoe
+add comment="Maria Jose Possole Xavier" name=mariajosepossole password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Maria Cristina de Souza Machado Givigi" name=cristinamachado \
+    password=1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Savio Piedade Ferreira - 2\BA ponto" name=saviopiedade password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Savio Piedade Ferreira - 1\BA ponto" name=savioferreira \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Eduardo da Conceicao Silva" name=eduardosilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Edson Carlos Malaquias da Fonseca" name=edsonfonseca password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fernanda da Silva Abreu" name=fernandaabreu password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosilene da Silva Pinto" name=rosilenepinto password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Tania Maria da Silva Piedade" name=taniapiedade password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vanda Lucia Machado" name=vandamachado password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Raianny Aparecida Rodrigues Pinho" name=raiannypinho password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Thaynara de Fatima da Silva Ferreira Mercearia - 2 ponto Usina" \
+    name=thaynaradefatima password=1221 profile="BJ 80MBPS FIBRA" service=\
+    pppoe
+add comment="Maria Almeida Bernardo " name=mariabernardo password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Gisele Angelo de Oliveira" name=giseleoliveira password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Silvia Lucia dos Santos Silva" name=silviasilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fernando Aparecido da Silva Rosa" name=fernandorosa password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Iranilsa da Silva Ferreira moura" name=iranilsimoura password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Uochiton Pecanha" name=uochitonmata password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Neilson Borges da Silva" disabled=yes name=132neilsonsilva \
+    password=1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Auriceia Lima dos Santos" name=118auriceiasantos password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Sabino Mendes Peres" name=sabinoperes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Antonio Zavatario  Junior" name=antoniojunior password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Geane do Amaral Alves" name=geanealves password=1221 profile=\
+    "BJ 300MBPS FIBRA" service=pppoe
+add comment="Secretaria Municipal de Saude de Bom Jesus" name=ubsserrinha \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Miguel Domingos Pereira Rodrigues" disabled=yes name=\
+    118miguelrodrigues password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Andriel dos Santos Paes" name=124andrielpaes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Mery Lucy Barbosa Leal Melo" name=merymelo password=1221 \
+    profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Colegio Estadual Estefania Pereira Ponto-2\B0Ponto" name=\
+    colegioestefaniapinto2 password=1221 profile="BJ 600MBPS FIBRA" service=\
+    pppoe
+add comment="Heychilla Mota de Almeida" name=heychillaalmeida password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabiano da Silva" name=fabianosilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Colegio Estadual Jose Pereira Pinto sala 2" name=\
+    colegiopereirapinto2 password=1221 profile="BJ 600MBPS FIBRA" service=\
+    pppoe
+add comment="Jerusa Rodrigues Apolinario" name=jerusaapolinario password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Clezio Thadeu de Souza Dutra" name=cleziodutra password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Larine Pessanha da Silva Martins" name=larinemartins password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Generosa Pereira dos Santos" name=generosasantos password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Poliana Costa Alves" name=polianaalves password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Murilo de Souza dos Santos" name=murilosantos password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Sandra Fernandes Gomes Francisco" name=sandrafrancisco password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Fernando Jorge Gomes Fidelis da Silva" name=fernandogomes \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Secretaria de Saude BJI- Ubs Usina" name=ubssantamaria password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Simone Rodrigues Silveira" name=simonesilveira password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Selma de Almeida Delgado" name=selmaalmeida password=1221 \
+    profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Sergio Ricardo Coelho" name=sergiocoelho password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria da Conceicao Favares de Oliveira " name=\
+    mariaconceicaofavares password=1221 profile="30 - MEGAS FIBRA" service=\
+    pppoe
+add comment="Derli Goncalves Rabello" name=derlirabello password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Maria Jandira da Silva Reis Carvalho-VEN 25" disabled=yes name=\
+    116mariajandira password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Nelma Vilela" name=nelmavilela password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Blenda Maria Goncalves" name=alifcabral password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Denise Lopes Viana santos 2 ponto" name=deniseviana password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Buna Santos Silva" disabled=yes name=28brunasilva password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Escola Municipal Olimpio Peixoto" name=escolaolimpiosampaio \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Alberto Junior Balbino da Silva" disabled=yes name=albertosilva \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Ivanilson Alves dos Santos" name=ivanilsonsantos password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Eidilon da Silva" name=121eidilondasilva password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Elias Soares da Silva" name=eliassilva password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Denair Peres Gomes-Casa" name=denaircasa password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Joao Luiz Pessanha" name=119joaopessanha password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Maycon Ribeiro da Silva" name=120mayconsilva password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Nely Pecanha" name=mariapecanha password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Joao Batista Soares Mendes" name=joaomendes password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Luiz de Moura Pereira" name=luizpereira password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Valter Leal" name=valterleal password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Jheniffer Ferreira de Souza" name=jheniffersouza password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Carine de Oliveira Rocha" name=carinerocha password=1221 \
+    profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Thiago Gomes de Souza" name=thiagosouza password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add name=anaazeredo password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Gabrielly Vasconcelos dos Santos Ferreira" name=\
+    gabriellyferreira password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Rogerio Ferreira De Paula" name=rogeriodepaula password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Mariana Oliveira da Silva" name=marianasilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Joice Madeira da Silva" name=joicemadeira password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Marlene Rodrigues Picoli" name=marlenepicoli password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Eliedson Vicente Morini" name=eliedsonmorini password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Milena madeira dos santos" name=milenamadeira password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Pablo Nunes Rodrigues" disabled=yes name=122pablorodrigues \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alessandra monteiro Guimar\E3es " name=marcelogomes password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Rozilene Aguiar albino da Silva" name=rozilenesilva password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maria Aparecida Oliveira da Silva" name=mariaoliveira password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maxuel Coutinho Pereira" name=maxuelpereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Maxuel Coutinho Pereira-loja" name=maxuelloja password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Nilson Ferreira de Oliveira" name=nilsonoliveira password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Bruno Machado Campos" name=brunocampos password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Bruno Machado Campos" name=brunoloja password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Adilio da Costa Carvalho Junio" name=adiliojunior password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ariadne de Souza de Brito" name=ariadnebrito password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Bruno Machado Campos-3\B0 ponto" name=casabruno password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Edmilson Costa Pereira" name=edimilsonpereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Izamar da Costa Gomes" name=izamargomes password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add comment="Jose Romario Oscar" name=joseoscar password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Emerson de Souza Ferreira" name=emersonferreira password=1221 \
+    profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Maria Eliza Martins Monteiro" name=mariamonteiro password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jos\E9 Antonio da Silva Apolinario" name=joseapolinario \
+    password=1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Romenig Fonseca  da Silva-3\B0 Ponto" name=romenig password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Diana Alves de Oliveira" name=dianaalves password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Erly Lopes Monteiro" name=erlylopes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Alex Azevedo Da Silva" name=alexdasilva password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Josemar de Lima Luiz" name=josemarluiz password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Siandro maia Sampaio" name=siandromaia password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Michael da Silva Lopes" name=michaellopes password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Juliana Aparecida Oliveira  da Silva" name=julianasilva \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Josefina Dias Mangakuzhi" name=josefinamangakuzhi password=1221 \
+    profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Ashelly vit\F3ria de Oliveira Gomes" disabled=yes name=\
+    ashellygomes password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Evando Rangel reis" disabled=yes name=evandoreis password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jonas do Brado Silva" name=jonasprado password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Rosimeri Fontoura Dias Monteiro" name=rosimerimonteiro password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Let\EDcia Padr\E3o Rosa Lobato" name=leticialobato password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana Silvia Batista Tavares" disabled=yes name=anabatista \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Izaias da Silva Gomes Junio -2\B0 Ponto" name=izaiasgomes \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Dirceu Gomes de Resende- 2\B0 Ponto" name=dirceugomes password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Rita de Cassia Soares da Silva" name=ritasoares password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Thaison Fuly Gil" name=thaisongil password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Noemia Lopes Ribeiro" name=noemiaribeiro password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Beatriz Padr\E3o Flausino Pessanha" name=beatrizpessanha \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Juliano loterio Coelho de Azevedo" name=julianoazevedo password=\
+    1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Jo\E3o Marcos Coutinho Pereira" name=joaopereira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Vanessa Torres Moreira" name=vanessamoreira password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Rio PCH Pedra do Garrafao" name=essentia password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Renato Galaxe" name=renatogalaxe password=1221 profile=\
+    "BJ 300MBPS FIBRA" service=pppoe
+add comment="Monica Campos de Almeida" name=monicaalmeida password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Lucia Mara Ferreira de Souza" name=luciasouza password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Laldelino de Oliveira Souza" name=laldelinosouza password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Solange Batista Manhaes " disabled=yes name=solangemanhaes \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Luis Henrique Menezes Luiz" name=luismenezes password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Patricia Perdomes Mota" name=patriciamota password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Patricia de Oliveira Zanon" name=patriciazanon password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Vix Obra e Gerenciamento Ltda" name=vixplan password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Jorge de Oliveira Givigi" name=jorgegivigi password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Diane de Oliveira Custodio Rosa" name=dianerosa password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Joacil Rodrigues" name=joacilrodrigues password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Caique Ferreira Monteiro" name=caiquemonteiro password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Mauro Sergio Ribeiro da Silva" name=maurosilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Bianca Direitinho Rocha" name=biancarocha password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Lindaura de Souza Pessanha Silva" name=lindaurasilva password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Lasaro Ferreira Bento" name=lasarobento password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Waldehi Jose Faustino" name=waldehifaustino password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment=\
+    "Acesso Total Comercio e servico Internet Eirelli - Ubs Mata da Cruz" \
+    name=acessototalcruz password=1221 profile="BJ 400MBPS FIBRA" service=\
+    pppoe
+add comment="Fabiano de Souza silva" name=fabianosouza password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Ariana  Cunha Sa" name=arianasa password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Carlos Antonio da Silva" name=carlossilva password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Claudiney dos Reis Silva" name=claudineysilva password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Lucia Rodrigues de Souza" name=luciarodrigues password=1221 \
+    profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Magno Amaral Nunes" name=magnonunes password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Riquinho Sitio" name=riquinhositio password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Jorge Nunes Barreto" name=jorgebarreto password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Ranyel Areas Posea" name=ranyelposea password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Antonio Ares filho " name=antonioareas password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="VanessaTorres Moreira" name=vanessatorres password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Loja Santa Maria" name=lojasantamaria password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Vera Lucia custodio" name=veracustodio password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria Luzia Rodrigues Alves Inacio" name=mariainacio password=\
+    1221 profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Regis Oliveira da Conceicao" name=regisoliveira password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Ana Celia Santos Pereira" name=flaviopereira password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Etevaldo andrade de almeida" name=etevaldoalmeida password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Sara Ferreira Bento Velasco" name=saravelasco password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Ana Paula Sampaio de Oliveira" name=anapaulaoliveira password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Jocemar pontes da Silva posses-2 Ponto" name=jocemarsilva \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Carlos Dione Ramos de Paula" name=carlospaula password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Igreja assembleia de deus " disabled=yes name=assembleiadedeus \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="evento serrinha " disabled=yes name=eventoserrinha password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jose Carlos Areas Gil" name=areasgil password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Defesa Civil" name=defesacivil password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Sergio Cordeiro de Souza" disabled=yes name=sergiosouza \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jocelio de Oliveira Cota" name=joceliocota password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Nelci Souza de andrade" name=nelciandrade password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Layara Fiuza Coelho Mota" name=layaramota password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Rio pch pedra do garrafao 02" name=essentia02 password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Marcos Mangaravite " name=marcosmangaravite password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Secretaria Assist\EAncia Social " name=crasusm password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Antonio de Souza Almeida " name=antonioalmeida password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Ronaldo Patricio Almeida" name=ronaldoalmeida password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Antonio Jose Etiene" name=antonioetiene password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Wagner Pecanha " name=wagnerpecanha password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Edimar Pereira Barreto" name=edimarbarreto password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Nilcilene Macedo Rosa" name=nilcilenerosa password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Rosimeri Areas De Almeida" name=rosimerialmeida password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Daniel Gon\E7alves da Silva" name=danieldasilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Manoel da Silva araujo " name=manoelaraujo password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Debria Rodrigues Almeida Calixto- 2 Ponto" name=debriaalmeida \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Adriana Da cruz Silva" name=adrianadacruz password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Manoel Luiz De Freitas Souza" name=manoelluiz password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Neivison de Souza Correia" name=neivisoncorreia password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Elenice Leite de Oliveira-Poliana Ferreira" name=eleniceoliveira \
+    password=1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Samuel Danilo Ferreira Monteiro" name=samuelmonteiro password=\
+    1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ademilson Vargas Poses" name=ademilsonposes password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Marco Aurelio Correa Da Silva" name=marcoaurelio password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Alexandra de Oliveira Ferreira" name=alexandraos password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Adriana Nunes dos Santos" name=adrianasantos password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Tarcisio da Fonseca Delgado" name=tarcisiodelgado password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Claudia Marcia Ribeiro Marinato" name=claudiamarinato password=\
+    1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Eliane de Faria Silva Pimentel" name=elianepimentel password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Ana Claudia de Azevedo Oliveira" name=anaclaudia password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Rodrigo da Silva Fernandes" name=rodrigofernandes password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Jaqueline De Souza Barbosa" name=jaquelinebarbosa password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Elisimar Delgado Oliveira" name=elisimaroliveira password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Marcella Pinto De Oliveira-2  Ponto" name=marcelapinto password=\
+    1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Marcella Pinto De Oliveira -1Ponto" name=marcelaoliveira \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Maria Celia Delgado de Oliveira" name=mariadelgado password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Geilda Albino da Silva" name=geildasilva password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Jocelio Delgado de Oliveira" name=joceliodelgado password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Vanda da Silva Delgado" name=vandadelgado password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Joseli Licurgo Pereira" name=joselipereira password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Thalia Pinto de Oliveira Peixoto" name=thaliapeixoto password=\
+    1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Escola Municipal Luzia Gomes Freire" name=escolaluziafreire \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Luiz Claudio Almeida Delgado" name=luizdelgado password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Luciana de Souza Pereira" name=lucianapereira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rayane Macae da Rocha Barbosa" name=rayanebarbosa password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Mailde Velasco De Oliveira" name=maildivelasco password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Valmea Benfeito Rocha" name=valmearocha password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Edward Charles Mckenna" name=edwardmakenna password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Ana Paula da Silva delgado Figueredo" name=anapauladelgado \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Joaquim Sa Freire Junior" name=joaquimjunior password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Josiane Pereira de Assis" name=josianeassis password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Nilza Azevedo Pena Vila" name=nilzavila password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Prefeitura Bom Jesus Saude-Ubs Mutum" name=ubsmutum password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Elviana de Oliveira Delgado" name=elvianadelgado password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Marcela Oliveira de Azevedo Torquato" name=marcelatorquato \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Patr\EDcia Fernandes Torquato 2\B0ponto" name=patriciafernandes \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Patricia Torquato da Silva- 1\B0 ponto" name=patriciadasilva \
+    password=1221 profile="30 - MEGAS FIBRA" service=pppoe
+add comment="Kamila Goncalves de Souza" name=kamilasouza password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Fabiano Ribeiro Tavares Energia Mutum" name=fabianotavares \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Igor Fernandes Pereira " name=igorpereira password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Dirceu Gomes de Resende" name=dirseuresende password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Robert Figueiredo de Souza" name=robertsouza password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Dirceu Gomes de Resende-3\B0 Ponto" name=dirceugomesresende \
+    password=1221 profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Orcilene Oliveira Rocha" name=orcilenerocha password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Luiz de Azevedo oliveira" name=luizoliveira password=1221 \
+    profile="BJ 30MBPS CABO" service=pppoe
+add comment="Alessandro Fernandes Torquato-2\B0 Ponto" name=\
+    alessandrofernandes password=1221 profile="BJ 200MBPS FIBRA" service=\
+    pppoe
+add comment="Alessandro Fernanes Torquato" name=alessandrotorquato password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria Jose David Goncalves" name=mariagoncalves password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Danilo da Silva Delgado" name=danilodelgado password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rosemaire Maciel Ferreira" name=rosemairemaciel password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Juliana da Silva Goncalves Ruiz" name=julianaruiz password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Mariluce Cortes de Oliveira" name=mariluceoliveira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Lility Pinheiro da Silva" name=lilitypinheiro password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Mylena de Souza Barbosa" name=milenabarbosa password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Daniela Azevedo De Souza" name=danielaazevedo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Debria Rodrigues De Almeida Calisto" name=debriacalisto \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Braz Jose Francisco" name=brazfrancisco password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Marta Aparecida Milao Teixeira" name=martateixeira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Janete Nascimento da Silva Fernandes Torquato" name=\
+    janetetorquato password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Vilma de Souza Freitas" name=vilmafreitas password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria Vilma Pereira Ruis" name=mariaruis password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Antonio Marcos da Silva" name=antoniomarcos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Geronimo David Goncalves" name=jeronimogoncalves password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Angela Maria Cruz Oliveira Souza" name=angelasouza password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Geni de Almeida Loureiro" name=geniloureiro password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Igreja Batista de mutum " name=igrejabatista password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Denise Cortes Silves" name=denisesilveira password=1221 profile=\
+    "80 - MEGAS FIBRA" service=pppoe
+add name=vitorfernandes password=1221 profile="BJ 200MBPS FIBRA" service=\
+    pppoe
+add comment="Maria Luzia Silva Ferreira" name=marialuziaferreira password=\
+    1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Ivanilson Figueiredo Assis" disabled=yes name=ivanilsonassis \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Romildo de Araujo Lima Filho 1 ponto" name=romildoaraujo \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jose Carlos Area Gil " name=josegil password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Inelza  fatima dos Santos Henriques " name=inelzahenriques \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Daniel Goncalves Silva " name=danielgoncalves password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Ivanilton Marco da Silva Ferreira " name=ivaniltonsilva \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Alvacy da Silva Albino " name=alvacyalbino password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Adriano Fernandes Pereira " name=adrianofernandes password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Elias Pires da Silva " name=eliaspires password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Osvaldo fereira de Paulo " name=osvaldoferreira password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Wanderson Piedade Ferreira " name=wandersonpiedade password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Marlene Pereira dos Santos" name=marlenepereira password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="evento quadra " name=eventoquadra password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Roberto dos Santos " name=robertosantos password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Antonio Emanuel Povoa Monteiro" name=antoniopovoa password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Rodrigo da Silva Mesquita " name=rodrigosilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria da Conceicao Ribeiro de Sousa" name=mariasousa password=\
+    1221 profile="BJ 500MBPS FIBRA" service=pppoe
+add comment="Miria Amaral Damaceno Campos" name=miriacampos password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Felipe De Azevedo Torquato " name=felipetorquato password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Weverton Correia da Silva " name=wevertoncorrea password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="M C Madeiras Eireli" name=mcmadeiras password=1221 profile=\
+    "BJ 500MBPS FIBRA" service=pppoe
+add comment="Jaine marinho Rosa Reis" name=jainereis password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Anderson da Silva de Souza " name=andersonsouza password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Ozilmar Marques da Silva" name=ozilmasiva password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Tadeu Cortez de Oliveira" name=tadeucortez password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Josiane de Oliveira Queros Jardins " name=josianejardim \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Maria da Conceicao Tavares de pinho " name=mariapinho password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Octacilio Pereira Lacerda" name=octaciliolacerdo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Barbara Caroline do Nascimento Fernandes" name=barbarafernandes \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Ana Paula Silva de Oliveira " name=anapaulasilva password=1221 \
+    profile="40  SERRINHA - POSSE" service=pppoe
+add comment="Gustavo Pereira  Galax " name=gustavogalax password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Joao Vitor Robison" name=joaorobson password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Teste Reg" name=testesm password=1221 profile="BJ 600MBPS FIBRA" \
+    service=pppoe
+add comment="Tainara da Cruz Germano " name=tainaragermano password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Sebastiao Albino da costa " name=sebastiaoalbino password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jozimar Albino de Oliveira" name=jozimaralbino password=1221 \
+    profile="80 - MEGAS FIBRA" service=pppoe
+add comment="Carolaine Areas Coutinho" name=carolainecoutinho password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Cristiano da Silva Almeida" name=cristianoalmeida password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Janilma da silva Ribeiro" name=janilmadasilva password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Prefeitura BJI ( Saude )" name=ubsfprovidencia password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Lenine Ferreira Sampaio" name=lenineferreira password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Mrella Santos Canedo" name=mirellacanedo password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Angelica Avarenga de Souza Reis " name=angelicareis password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Ariosvaldo Barreto Martins" name=ariosvaldomartins password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Cleiton Biega Monteiro" disabled=yes name=cleitonmonteiro \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Diego Melo Zanardi" name=diegozanardi password=1221 profile=\
+    "30 - MEGAS FIBRA" service=pppoe
+add comment="Vilma da Silva Rocha " disabled=yes name=elsianepecanha \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Jose Macedo Reis" name=116josereis password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Marcio Antonio Santanna" name=marciosantanna password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Monitoramento de Energia Santa Maria" name=lojamonitoramentostm \
+    password=1221 profile="BJ 200MBPS FIBRA" remote-address=192.168.3.255 \
+    service=pppoe
+add comment="Fabricio Rdrigues Motta" name=fabriciomotta password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Cariny do Nascimento Correa dos Santos" name=carinysantos \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Luiz Antonio da Silva" name=luizantonio password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Rosilane Dias da Conseicao Cunha" name=rosilanicunha password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Luis Andre Calixto de Arruda " name=luizarruda password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Jose dos Reis" name=josereis password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Graciene Santos Teixeira" name=gracieneteixeira password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Thiago de Azevedo Oliveira" name=thiagoazevedo password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Eduardo da Conceicao Silva" name=eduardoconceicao password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="ONU TESTE" name=onuteste password=1221 profile=\
+    "BJ 1000MBPS FIBRA" service=pppoe
+add comment="Rio Vita Pescado" name=riovita password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Maria Zelia dos santos " name=mariazelia password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Gustavo Costa Pereira Licurgo" name=gustavolicurgo password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Robert Figueiredo de Souza " name=robertcasa password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Lorran Ronei Pessanha Marsoli" name=lorranmarsoli password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Adriana da Silva Reis" name=adrianareis password=1221 profile=\
+    "BJ 80MBPS FIBRA" service=pppoe
+add comment="Daniel Goncalves da Silva " name=danielsilva3 password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Gabriel  Moraes da Silva " name="gabrieldasilva " password=1221 \
+    profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Gabriel moraes da Silva " name=gabrielmoraes password=1221 \
+    profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Amariles oliveira" name=amarilesoliveira password=1221 profile=\
+    "50 - MEGAS FIBRA" service=pppoe
+add comment="Daniele Vasconcelos Bitencurt" name=danielevasconcelos password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Kaua Guimaraes Gomes" name=kauagomes password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Veronica correa Rangel De Lima " name=veronicalima password=1221 \
+    profile="BJ 800MBPS FIBRA" service=pppoe
+add comment="Magno Reis Rosa" name=magnorosa password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment="Jorge Araujo da Silva" name=jorgearaujo password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Jose de Rezende" name=joserezende password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Douglas Rosa Albino" name=douglasalbino password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Jo\E3o Batista Areas" name=joaoareas password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Debria Almeida Calixto" name=debriamercado password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Valdineia de souza pessanha Alves" name=valdineiaalves password=\
+    1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Guilherme da Silva Conceicao " name=guilhermeconceicao password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Sonia Santiago da Cruz " name=soniacruz password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Nvx fibra itda" name=nvxfibra password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Alessandra de Oliveir souza " name=alessandraoliveira password=\
+    1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="nvx Fibra itda " name=nvxstabarbara password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Willian Jose da Rocha Vilela" name=willianvilela password=1221 \
+    profile="40 - MEGAS FIBRA" service=pppoe
+add comment="Maria Aparecida Cruz de Oliveira Almeida " name=mariaalmeida \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Filipe Cawan da Silva Barreto" name=filipebarreto password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Penha Rernosti Alves" name=penhaalves password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Joemio Rangel Correa" disabled=yes name=joemiocorrea password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Zilda Oliveira da Rocha Oscar " name=zildaoscar password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Nilton Santos da Silva Junior " disabled=yes name=niltonjunior \
+    password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Edmilson de oliveira quintanilha" name=edmilsonoliveira \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Ana Paula da Silva Batista " disabled=yes name=anapaulabatista \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Fernando da Silva Costa " name=fernandocosta password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Jose Altiele Almeida areias" disabled=yes name=josealtiele \
+    password=1221 profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Michely da Silva Correa salles " name=michelysalles password=\
+    1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Marilha Ribeiro Saldanha Manhes Bernardo" disabled=yes name=\
+    marilhasaldanha password=1221 profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Maria Marinete Correa " name=mariacorrea password=1221 profile=\
+    "BJ 200MBPS FIBRA" service=pppoe
+add comment=JWS2 name=jws2 password=1221 profile="BJ 300MBPS FIBRA" service=\
+    pppoe
+add comment="Eduardo da Concei\E7\E3o silva" name=eduardocasa password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Carlos Henrique calixto de arruda" name=carlosarruda password=\
+    1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Paulo de Souza " name=paulodesouza password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Joao Vitor Barreto de Andrade " name=joaobarreto password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Simone Ferreira Velasco" name=simonevelasco password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Diego Veiga da Silva " name=diegoveiga password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Carlos de Almeida Campos" name=carloscampos password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Celma Raimundo Souza " name=celmasouza password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="Costrusul Costrutora ltda EPP" name=construsulltda password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Joselma de souza rosa" name=joselmarosa password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Joyce Pessanha de Oliveira " name=joycepessanha password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Thayna souza rosa Tamy" name=thaynatamy password=1221 profile=\
+    "BJ 400MBPS FIBRA" service=pppoe
+add comment="Moises ribeiro sardinha" name=115moisessardinha password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Millena Barbosa Jeronimo" name=millenajeronimo password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Karin fernanda oliveira de souza" name=karinsouza password=1221 \
+    profile="BJ 200MBPS FIBRA" service=pppoe
+add comment="Jocimar dos Reis Nascimento" name=jocimarnascimento password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Michaeul wady buchaul" name=michaeulbuchaul password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Carlos Tavares da silva" name=carlosdasilva password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Tatisuine Monteiro Pereira" name=tatisuinepereira password=1221 \
+    profile="50 - MEGAS FIBRA" service=pppoe
+add comment="Rafael de Oliveira Silva " name=rafaeloliveira password=1221 \
+    profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Prefeitura Municipal Bom Jesus do Itabapoana" name=clube \
+    password=1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Patrick nunes crespo" name=patricknunes password=1221 profile=\
+    "40 - MEGAS FIBRA" service=pppoe
+add comment="Willan dias da Concei\E7\E3o" name=willianconceicao password=\
+    1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Cleopatra oliveira ramos" name=cleopatraramos password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Regina Maria Lopes Anast\E1cio" name=reginalopes password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Posto Avan\E7ado de Santo Eduardo- Emater" name=\
+    postoavancadosantoeduardowifi password=1221 profile="BJ 600MBPS FIBRA" \
+    service=pppoe
+add comment="Lucas Borges de Oliveira Teixeira " name=lucasteixeira password=\
+    1221 profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Maria L\FAcia Nunes da  Silva" name=marianunessilva password=\
+    1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Orestes Carlos cortes de oliveira" name=orestesoliveira \
+    password=1221 profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Hudson Lourenco Paixao Anselme" name=hudsonanselme password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Graciela Alexandre de Souza" name=gracielasouza password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Maria Eduarda Almeida Bonfim" name=mariabonfim password=1221 \
+    profile="BJ 400MBPS FIBRA" service=pppoe
+add comment="Cassio Da Silva Sa" name=cassiodesa password=1221 profile=\
+    "BJ 300MBPS FIBRA" service=pppoe
+add comment="Teste reginaldo" name="teste " password=1221 profile=\
+    "BJ 1000MBPS FIBRA" service=pppoe
+add comment="Thulio  Cezar Ribeiro Manhaes2 pontos" name=131thulioribeiro \
+    password=1221 profile="BJ 80MBPS FIBRA" service=pppoe
+add comment="Ana J\FAlia Silva alves" name=anaalves password=1221 profile=\
+    "BJ 600MBPS FIBRA" service=pppoe
+add comment="PAULO JORGE AMICHI PI" name=paulojorgeamichi password=1221 \
+    profile="BJ 600MBPS FIBRA" service=pppoe
+add comment="Francisco Almeida de Araujo" name=franciscoalmeida password=1221 \
+    profile="BJ 300MBPS FIBRA" service=pppoe
+add comment="Francisco Alameida de Aeaujo ponto1" name=franciscoaraujo \
+    password=1221 profile="BJ 300MBPS FIBRA" service=pppoe
+/radius
+add address=45.71.242.123 comment="IXCProvedor configuracao radius" disabled=\
+    yes require-message-auth=no secret=radiusixcsoft service=\
+    ppp,login,hotspot,wireless src-address=192.168.0.54 timeout=3s
+/radius incoming
+set accept=yes
+/routing bfd configuration
+add disabled=yes interfaces=all min-rx=200ms min-tx=200ms multiplier=5
+/routing ospf interface-template
+add area=backbone-v2 auth-id=1 auth-key="" cost=10 interfaces="Vlan 1106" \
+    networks=192.168.0.240/29 priority=1 type=ptp use-bfd=no
+add area=backbone-v2 auth-id=1 auth-key="" cost=10 interfaces="Vlan 104" \
+    networks=192.168.0.52/30 priority=1 type=ptp use-bfd=no
+add area=backbone-v3 cost=10 disabled=no interfaces=loopback passive \
+    priority=1 use-bfd=no
+add area=backbone-v3 cost=10 disabled=no interfaces="Vlan 104" priority=1 \
+    type=ptp use-bfd=no
+/snmp
+set contact=Vision enabled=yes location=Italva trap-version=2
+/system clock
+set time-zone-autodetect=no time-zone-name=America/Sao_Paulo
+/system identity
+set name="PPPoE SANTA MARIA"
+/system leds
+set 2 interface=ether3
+/system ntp client
+set enabled=yes
+/system ntp client servers
+add address=45.71.240.10
+add address=200.160.7.193
+/system scheduler
+add interval=1d name=ftp on-event=ftp policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive start-date=\
+    2018-11-08 start-time=13:25:00
+/system script
+add dont-require-permissions=no name=ftp owner=leo policy=\
+    ftp,reboot,read,write,policy,test,password,sniff,sensitive source="# Set l\
+    ocal variables. Change the value in \"\" to reflect your environment.\r\
+    \n\r\
+    \n:local hostname [/system identity get value-name=name];\r\
+    \n:local password \"ftp\"\r\
+    \n:local username \"ftp\"\r\
+    \n:local ftpserver \"45.71.240.10\"\r\
+    \n\r\
+    \n# Set Filename variables. Do not change this unless you want to edit the\
+    \_format of the filename.\r\
+    \n\r\
+    \n:local time [/system clock get time];\r\
+    \n:local date ([:pick [/system clock get date] 0 3]  \\\r\
+    \n. [:pick [/system clock get date] 4 6] \\\r\
+    \n. [:pick [/system clock get date] 7 11]);\r\
+    \n:local filename \"\$hostname_\$date\";\r\
+    \n\r\
+    \n# Create backup file and export the config.\r\
+    \n\r\
+    \nexport compact file=\"\$filename\"\r\
+    \n/system backup save name=\"\$filename\"\r\
+    \n\r\
+    \n:log info \"Backup Created Successfully\"\r\
+    \n\r\
+    \n# Upload config file to FTP server.\r\
+    \n\r\
+    \ntool fetch address=\$ftpserver src-path=\"\$filename.rsc\" \\\r\
+    \nuser=\$username mode=ftp password=\$password \\\r\
+    \ndst-path=\"/\$filename.rsc\" upload=yes\r\
+    \n\r\
+    \n# Upload backup file to FTP server.\r\
+    \n\r\
+    \ntool fetch address=\$ftpserver src-path=\"\$filename.backup\" \\\r\
+    \nuser=\$username mode=ftp password=\$password \\\r\
+    \ndst-path=\"/\$filename.backup\" upload=yes\r\
+    \n\r\
+    \n:log info \"Backup Uploaded Successfully\"\r\
+    \n\r\
+    \n# Delete created backup files once they have been uploaded\r\
+    \n# so they don't accumulate and fill up storage space on the router.\r\
+    \n\r\
+    \n/file remove \"\$filename.rsc\"\r\
+    \n/file remove \"\$filename.backup\"\r\
+    \n\r\
+    \n:log info \"Local Backup Files Deleted Successfully\""
+/system watchdog
+set automatic-supout=no watchdog-timer=no
+/tool bandwidth-server
+set authenticate=no enabled=no
+/tool e-mail
+set certificate-verification=no from=backupconcentrador@gmail.com password=\
+    emanuel123 server=74.125.196.109 tls=starttls user=\
+    backupconcentrador@gmail.com
+/tool graphing interface
+add
+/tool graphing queue
+add
+/tool romon
+set enabled=yes secrets=102030
+/user aaa
+set use-radius=yes

@@ -1,0 +1,178 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<style>
+    /* Estilo Chat Moderno */
+    .chat-container {
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        background-color: #0f1012;
+        border-radius: 10px;
+        border: 1px solid #2c2f33;
+        overflow: hidden;
+    }
+    
+    .chat-header {
+        background: linear-gradient(90deg, #1a237e 0%, #0d47a1 100%);
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #333;
+    }
+    
+    .chat-messages {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background-image: radial-gradient(#222 1px, transparent 1px);
+        background-size: 20px 20px; /* Efeito Grid sutil */
+    }
+    
+    .message {
+        max-width: 80%;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        position: relative;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .message.user {
+        align-self: flex-end;
+        background-color: #2980b9;
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+    
+    .message.ai {
+        align-self: flex-start;
+        background-color: #2c2c2c;
+        color: #e0e0e0;
+        border: 1px solid #444;
+        border-bottom-left-radius: 2px;
+    }
+    
+    .chat-input-area {
+        padding: 20px;
+        background-color: #1a1a1a;
+        border-top: 1px solid #333;
+    }
+    
+    /* Code Blocks bonitos */
+    pre {
+        background: #000;
+        padding: 10px;
+        border-radius: 5px;
+        color: #00ff00;
+        overflow-x: auto;
+        border: 1px solid #333;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .typing-indicator {
+        font-style: italic;
+        color: #888;
+        font-size: 0.8rem;
+        margin-left: 10px;
+        display: none;
+    }
+</style>
+
+<div class="container-fluid p-0">
+    <div class="chat-container shadow-lg">
+        <div class="chat-header text-white">
+            <i class="fas fa-robot fa-2x mr-3"></i>
+            <div>
+                <h5 class="mb-0 font-weight-bold">LOR NOC AI</h5>
+                <small class="text-light opacity-75">Engenheiro Sênior de Redes & Telecom (Powered by Gemini)</small>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatBox">
+            <div class="message ai">
+                <i class="fas fa-robot mr-2"></i> Olá, Leonardo. Sou seu assistente de NOC.
+                <br>Posso ajudar com configurações de Mikrotik, Huawei, OLTs, scripts de automação ou análise de falhas.
+                <br>Como posso ajudar a manter a rede estável hoje?
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing">
+            <i class="fas fa-circle-notch fa-spin"></i> LOR AI está analisando...
+        </div>
+
+        <div class="chat-input-area">
+            <div class="input-group">
+                <input type="text" id="userInput" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Como configurar uma VLAN na OLT Fiberhome?" onkeypress="handleEnter(event)">
+                <div class="input-group-append">
+                    <button class="btn btn-primary px-4" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i> Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    
+    function handleEnter(e) {
+        if(e.key === 'Enter') sendMessage();
+    }
+
+    function scrollToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendMessage(text, sender) {
+        const div = document.createElement('div');
+        div.classList.add('message', sender);
+        if(sender === 'ai') {
+            div.innerHTML = `<i class="fas fa-robot mr-2 text-primary"></i> ${text}`;
+        } else {
+            div.textContent = text;
+        }
+        chatBox.appendChild(div);
+        scrollToBottom();
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if(!text) return;
+
+        // 1. Mostra pergunta do usuario
+        appendMessage(text, 'user');
+        input.value = '';
+        input.focus();
+
+        // 2. Mostra indicador de digitacao
+        document.getElementById('typing').style.display = 'block';
+
+        // 3. Envia para o Backend (Gemini)
+        fetch('/tools/ai/ask/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: text})
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('typing').style.display = 'none';
+            if(data.status === 'success') {
+                appendMessage(data.response, 'ai');
+            } else {
+                appendMessage(`❌ ${data.response}`, 'ai');
+            }
+        })
+        .catch(err => {
+            document.getElementById('typing').style.display = 'none';
+            appendMessage("Erro de conexão com o servidor.", 'ai');
+        });
+    }
+</script>
+{% endblock %}

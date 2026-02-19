@@ -1,0 +1,32 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<h4 style="color: #ff2a2a; margin-bottom: 20px;">AUDITORIA DE LOGS</h4>
+
+<div style="background: #111; padding: 20px; border: 1px solid #333; border-radius: 8px;">
+    {% if logs %}
+        <table class="table table-borderless text-light">
+            <thead style="border-bottom: 1px solid #333; color: #666;">
+                <tr><th>ARQUIVO</th><th>DATA</th><th>TAMANHO</th><th>AÇÃO</th></tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr style="border-bottom: 1px solid #1a1a1a;">
+                    <td style="font-family: monospace; color: var(--neon-blue);">{{ log.name }}</td>
+                    <td>{{ log.date|date:"d/m/Y H:i" }}</td>
+                    <td>{{ log.size }} KB</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-dark border-secondary"><i class="fas fa-download"></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-history fa-3x mb-3"></i><br>
+            Nenhum log de auditoria encontrado.<br>
+            <small>(A pasta foi recriada. Novos logs aparecerão aqui)</small>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

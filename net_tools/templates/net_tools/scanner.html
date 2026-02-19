@@ -1,0 +1,150 @@
+{% extends 'core_system/base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card card-dark">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-search-location"></i> Scanner de Rede Inteligente</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-key"></i> O Scanner testará automaticamente todas as <strong>Credenciais SNMP</strong> cadastradas no menu Admin.
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Faixa de IP para Varredura (CIDR)</label>
+                        <input type="text" id="cidr" class="form-control" placeholder="Ex: 192.168.88.0/24">
+                        <small class="text-muted">O sistema fará Ping + Teste de Múltiplas Communities.</small>
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex align-items-center">
+                    <button onclick="startScan()" class="btn btn-primary btn-block mt-3" id="btnScan">
+                        <i class="fas fa-radar"></i> Iniciar Scan
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="bg-secondary">
+            
+            <div id="scan-results" style="display: none;">
+                <h4>Dispositivos Encontrados</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover table-dark">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th>IP</th>
+                                <th>Nome Detectado</th>
+                                <th>Fabricante</th>
+                                <th>Credencial Usada</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            </tbody>
+                    </table>
+                </div>
+                <button onclick="importSelected()" class="btn btn-success mt-3">
+                    <i class="fas fa-file-import"></i> Importar Selecionados
+                </button>
+            </div>
+            
+            <div id="loading" class="text-center mt-5" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Carregando...</span>
+                </div>
+                <p class="mt-2">Testando credenciais na rede... Aguarde.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let foundDevices = [];
+
+    function startScan() {
+        const cidr = document.getElementById('cidr').value;
+        if(!cidr) { alert("Digite uma faixa de IP!"); return; }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('scan-results').style.display = 'none';
+        document.getElementById('btnScan').disabled = true;
+
+        fetch('/tools/scanner/run/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: `cidr=${encodeURIComponent(cidr)}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnScan').disabled = false;
+            
+            if(data.error) {
+                alert("Erro: " + data.error);
+            } else {
+                foundDevices = data.devices;
+                renderTable(data.devices);
+            }
+        });
+    }
+
+    function renderTable(devices) {
+        const tbody = document.getElementById('results-body');
+        tbody.innerHTML = '';
+        
+        if(devices.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Nenhum dispositivo vivo encontrado.</td></tr>';
+        }
+
+        devices.forEach((dev, index) => {
+            let statusBadge = dev.exists ? '<span class="badge badge-warning">Já Cadastrado</span>' : '<span class="badge badge-success">Novo</span>';
+            let checkbox = dev.exists ? '' : `<input type="checkbox" class="dev-check" value="${index}">`;
+            let snmpInfo = dev.snmp_found ? `<span class="text-success">${dev.snmp_found} (${dev.snmp_ver})</span>` : '<span class="text-danger">Falha SNMP</span>';
+            
+            let row = `
+                <tr>
+                    <td>${checkbox}</td>
+                    <td>${dev.ip}</td>
+                    <td>${dev.name}</td>
+                    <td>${dev.brand.toUpperCase()}</td>
+                    <td>${snmpInfo}</td>
+                    <td>${statusBadge}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+        
+        document.getElementById('scan-results').style.display = 'block';
+    }
+
+    document.getElementById('selectAll').addEventListener('change', function() {
+        document.querySelectorAll('.dev-check').forEach(c => c.checked = this.checked);
+    });
+
+    function importSelected() {
+        let toImport = [];
+        document.querySelectorAll('.dev-check:checked').forEach(c => {
+            toImport.push(foundDevices[c.value]);
+        });
+
+        if(toImport.length === 0) { alert("Selecione pelo menos um dispositivo novo."); return; }
+
+        fetch('/tools/scanner/import/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: `devices=${JSON.stringify(toImport)}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.status === 'ok') {
+                alert(`${data.count} dispositivos importados! As credenciais SNMP corretas foram salvas.`);
+                window.location.href = '/'; 
+            } else {
+                alert("Erro ao importar.");
+            }
+        });
+    }
+</script>
+{% endblock %}
