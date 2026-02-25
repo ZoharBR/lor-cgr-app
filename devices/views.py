@@ -64,6 +64,7 @@ def api_list_devices(request):
             'snmp_port': d.snmp_port, 
             'snmp_version': d.snmp_version or 'v2c', 
             'is_bras': d.is_bras,
+            'is_online': d.is_online,
             'backup_enabled': d.backup_enabled, 
             'backup_frequency': d.backup_frequency or 'daily',
             'backup_time': d.backup_time.strftime('%H:%M') if d.backup_time else '03:00'

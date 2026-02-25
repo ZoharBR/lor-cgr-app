@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('api/ai/', include('ai_assistant.urls')),
+    path('api/settings/', include('core_system.api_urls')),
     path('admin/', admin.site.urls),
     # Rotas da API de Dispositivos
     path('devices/', include('devices.urls')),

@@ -1,35 +1,47 @@
 from django.db import models
 
 class SystemSettings(models.Model):
-    # === 1. MONITORAMENTO ===
-    cpu_warning_threshold = models.IntegerField(default=80, verbose_name="Alerta CPU Alta (%)")
-    cpu_critical_threshold = models.IntegerField(default=95, verbose_name="Crítico CPU (%)")
-    
-    pppoe_drop_alert = models.IntegerField(default=50, verbose_name="Alerta Queda PPPoE (Qtd)")
-    ping_timeout = models.IntegerField(default=2, verbose_name="Timeout Ping (segundos)")
-
-    # === 2. NOTIFICAÇÕES (TELEGRAM) ===
-    telegram_enabled = models.BooleanField(default=False, verbose_name="Ativar Telegram")
-    telegram_bot_token = models.CharField(max_length=200, blank=True, verbose_name="Bot Token")
-    telegram_chat_id = models.CharField(max_length=100, blank=True, verbose_name="Chat ID")
-
-    # === 3. MANUTENÇÃO (LIMPEZA) ===
-    keep_logs_days = models.IntegerField(default=30, verbose_name="Manter Logs por (dias)")
-    keep_backups_days = models.IntegerField(default=90, verbose_name="Manter Backups por (dias)")
-    
-    # === 4. SISTEMA ===
-    system_name = models.CharField(max_length=50, default="LOR CGR", verbose_name="Nome do Sistema")
-    maintenance_mode = models.BooleanField(default=False, verbose_name="Modo Manutenção")
+    cpu_warning_threshold = models.IntegerField(default=80)
+    cpu_critical_threshold = models.IntegerField(default=95)
+    pppoe_drop_alert = models.IntegerField(default=50)
+    ping_timeout = models.IntegerField(default=2)
+    telegram_enabled = models.BooleanField(default=False)
+    telegram_bot_token = models.CharField(max_length=200, blank=True)
+    telegram_chat_id = models.CharField(max_length=100, blank=True)
+    keep_logs_days = models.IntegerField(default=30)
+    keep_backups_days = models.IntegerField(default=90)
+    system_name = models.CharField(max_length=50, default="LOR CGR")
+    maintenance_mode = models.BooleanField(default=False)
+    librenms_enabled = models.BooleanField(default=True)
+    librenms_url = models.CharField(max_length=255, default="http://localhost:8081")
+    librenms_api_token = models.CharField(max_length=100, blank=True)
+    phpipam_enabled = models.BooleanField(default=True)
+    phpipam_url = models.CharField(max_length=255, default="http://localhost:9100")
+    phpipam_app_id = models.CharField(max_length=50, blank=True)
+    phpipam_app_key = models.CharField(max_length=100, blank=True)
+    phpipam_user = models.CharField(max_length=50, blank=True)
+    phpipam_password = models.CharField(max_length=100, blank=True)
+    ai_enabled = models.BooleanField(default=True)
+    ai_provider = models.CharField(max_length=50, default="groq")
+    groq_api_key = models.CharField(max_length=200, blank=True)
+    groq_model = models.CharField(max_length=100, default="llama-3.3-70b-versatile")
+    ai_temperature = models.FloatField(default=0.7)
+    ai_max_tokens = models.IntegerField(default=4096)
+    ai_system_prompt = models.TextField(default="Voce e um assistente especializado em redes e infraestrutura de TI.")
+    git_enabled = models.BooleanField(default=False)
+    git_repo_url = models.CharField(max_length=255, blank=True)
+    git_branch = models.CharField(max_length=50, default="main")
+    git_auto_backup = models.BooleanField(default=False)
+    git_backup_frequency = models.CharField(max_length=20, default="daily")
 
     def __str__(self):
-        return "Configurações Globais"
+        return "Configuracoes"
 
-    # Garante que só exista 1 configuração (ID=1)
     def save(self, *args, **kwargs):
         self.pk = 1
-        super(SystemSettings, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @classmethod
     def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
+        obj, _ = cls.objects.get_or_create(pk=1)
         return obj
