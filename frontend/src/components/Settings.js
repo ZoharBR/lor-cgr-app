@@ -1,143 +1,161 @@
 import React, { useState, useEffect } from 'react';
+import { settingsApi } from '../lib/api';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('apis');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  // API Settings
-  const [apiSettings, setApiSettings] = useState({
-    libreNms: { url: '', apiKey: '', enabled: false },
-    phpIpam: { url: '', appId: '', appKey: '', enabled: false }
+  // Settings from backend
+  const [settings, setSettings] = useState({
+    librenms_enabled: true,
+    librenms_url: '',
+    librenms_api_token: '',
+    phpipam_enabled: true,
+    phpipam_url: '',
+    phpipam_app_id: '',
+    phpipam_app_key: '',
+    phpipam_user: '',
+    phpipam_password: '',
+    ai_enabled: true,
+    ai_provider: 'groq',
+    groq_api_key: '',
+    groq_model: 'llama-3.3-70b-versatile',
+    ai_temperature: 0.7,
+    ai_max_tokens: 4096,
+    ai_system_prompt: '',
+    git_enabled: false,
+    git_repo_url: '',
+    git_branch: 'main',
+    git_auto_backup: false,
+    git_backup_frequency: 'daily',
+    git_status: null,
   });
 
-  // Users - Mock data since no backend endpoint
-  const [users, setUsers] = useState([
-    { id: 1, username: 'admin', email: 'admin@lorcgr.local', role: 'admin', isActive: true, lastLogin: '2024-02-15 10:30' },
+  // Users mock
+  const [users] = useState([
+    { id: 1, username: 'admin', email: 'admin@lorcgr.local', role: 'admin', isActive: true }
   ]);
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [userForm, setUserForm] = useState({ username: '', email: '', password: '', role: 'viewer', isActive: true });
-
-  // Theme
-  const [theme, setTheme] = useState({ mode: 'dark', primaryColor: 'blue' });
-
-  // AI Settings
-  const [aiSettings, setAiSettings] = useState({ enabled: true, provider: 'openai', apiKey: '' });
 
   const tabs = [
     { id: 'apis', label: 'APIs Externas', icon: '🔌' },
+    { id: 'ai', label: 'IA (Groq)', icon: '🤖' },
+    { id: 'git', label: 'Git/Backup', icon: '📦' },
     { id: 'users', label: 'Usuários', icon: '👥' },
-    { id: 'theme', label: 'Aparência', icon: '🎨' },
-    { id: 'ai', label: 'IA', icon: '🤖' }
   ];
 
   useEffect(() => {
     loadSettings();
   }, []);
 
-  const loadSettings = () => {
-    const saved = localStorage.getItem('lorcgr-settings');
-    if (saved) {
-      const data = JSON.parse(saved);
-      if (data.apis) setApiSettings(data.apis);
-      if (data.theme) setTheme(data.theme);
-      if (data.ai) setAiSettings(data.ai);
-    }
-  };
-
-  const saveSettings = (key, value) => {
-    const saved = JSON.parse(localStorage.getItem('lorcgr-settings') || '{}');
-    saved[key] = value;
-    localStorage.setItem('lorcgr-settings', JSON.stringify(saved));
-  };
-
-  const testConnection = async (system) => {
-    setLoading(true);
-    setMessage({ type: '', text: '' });
-    
+  const loadSettings = async () => {
     try {
-      const config = apiSettings[system];
-      
-      if (system === 'libreNms') {
-        const res = await fetch(`${config.url}/api/v0/system`, {
-          headers: { 'X-Auth-Token': config.apiKey }
-        });
-        const data = await res.json();
-        if (data.system) {
-          setMessage({ type: 'success', text: `✅ LibreNMS ${data.system.version} conectado!` });
-          setApiSettings(prev => ({ ...prev, libreNms: { ...prev.libreNms, enabled: true } }));
-        }
-      } else if (system === 'phpIpam') {
-        const res = await fetch(`${config.url}/api/${config.appId}/user/`, {
-          headers: { 'Authorization': 'Basic ' + btoa('admin:' + config.appKey) }
-        });
-        const data = await res.json();
-        if (data.data?.token) {
-          setMessage({ type: 'success', text: '✅ phpIPAM conectado!' });
-          setApiSettings(prev => ({ ...prev, phpIpam: { ...prev.phpIpam, enabled: true } }));
-        }
+      const res = await settingsApi.get();
+      if (res.success && res.data) {
+        setSettings(prev => ({ ...prev, ...res.data }));
       }
     } catch (error) {
-      setMessage({ type: 'error', text: `❌ Erro: ${error.message}` });
+      setMessage({ type: 'error', text: 'Erro ao carregar configurações: ' + error.message });
     }
-    
+  };
+
+  const saveSettings = async () => {
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+    try {
+      const res = await settingsApi.save(settings);
+      if (res.success) {
+        setMessage({ type: 'success', text: '✅ Configurações salvas com sucesso!' });
+      } else {
+        setMessage({ type: 'error', text: '❌ Erro: ' + res.error });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + error.message });
+    }
     setLoading(false);
   };
 
-  const saveApiSettings = () => {
-    saveSettings('apis', apiSettings);
-    setMessage({ type: 'success', text: '✅ Configurações de API salvas!' });
-  };
-
-  // Users
-  const handleUserSubmit = (e) => {
-    e.preventDefault();
-    if (editingUser) {
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, ...userForm } : u));
-      setMessage({ type: 'success', text: 'Usuário atualizado!' });
-    } else {
-      setUsers(prev => [...prev, { ...userForm, id: Date.now(), lastLogin: '-' }]);
-      setMessage({ type: 'success', text: 'Usuário criado com sucesso!' });
+  const testLibreNMS = async () => {
+    setLoading(true);
+    try {
+      const res = await settingsApi.testLibreNMS();
+      setMessage({ type: res.success ? 'success' : 'error', text: res.success ? '✅ ' + res.message : '❌ ' + res.error });
+    } catch (e) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + e.message });
     }
-    setShowUserForm(false);
-    setEditingUser(null);
-    setUserForm({ username: '', email: '', password: '', role: 'viewer', isActive: true });
+    setLoading(false);
   };
 
-  const editUser = (user) => {
-    setUserForm({ ...user, password: '' });
-    setEditingUser(user);
-    setShowUserForm(true);
+  const testPhpIPAM = async () => {
+    setLoading(true);
+    try {
+      const res = await settingsApi.testPhpIPAM();
+      setMessage({ type: res.success ? 'success' : 'error', text: res.success ? '✅ ' + res.message : '❌ ' + res.error });
+    } catch (e) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + e.message });
+    }
+    setLoading(false);
   };
 
-  const deleteUser = (id) => {
-    if (window.confirm('Excluir este usuário?')) {
-      setUsers(prev => prev.filter(u => u.id !== id));
-      setMessage({ type: 'success', text: 'Usuário excluído!' });
+  const testGroq = async () => {
+    setLoading(true);
+    try {
+      const res = await settingsApi.testGroq();
+      setMessage({ type: res.success ? 'success' : 'error', text: res.success ? '✅ ' + res.message : '❌ ' + res.error });
+    } catch (e) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + e.message });
+    }
+    setLoading(false);
+  };
+
+  const loadGitStatus = async () => {
+    try {
+      const res = await settingsApi.gitStatus();
+      if (res.success) {
+        setSettings(prev => ({ ...prev, git_status: res }));
+      }
+    } catch (e) {
+      console.error('Erro ao carregar status Git:', e);
     }
   };
 
-  // Theme
-  const saveThemeSettings = () => {
-    saveSettings('theme', theme);
-    localStorage.setItem('lorcgr-theme', JSON.stringify(theme));
-    setMessage({ type: 'success', text: '✅ Tema salvo!' });
+  const runGitBackup = async () => {
+    setLoading(true);
+    setMessage({ type: 'success', text: '📦 Enviando backup para GitHub...' });
+    try {
+      const res = await settingsApi.gitBackup();
+      setMessage({ type: res.success ? 'success' : 'error', text: res.success ? '✅ ' + res.message : '❌ ' + res.error });
+      loadGitStatus();
+    } catch (e) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + e.message });
+    }
+    setLoading(false);
   };
 
-  // AI
-  const saveAiSettings = () => {
-    saveSettings('ai', aiSettings);
-    setMessage({ type: 'success', text: '✅ Configurações de IA salvas!' });
+  const initGit = async () => {
+    if (!settings.git_repo_url) {
+      setMessage({ type: 'error', text: '❌ Informe a URL do repositório' });
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await settingsApi.gitInit(settings.git_repo_url);
+      setMessage({ type: res.success ? 'success' : 'error', text: res.success ? '✅ ' + res.message : '❌ ' + res.error });
+      loadGitStatus();
+    } catch (e) {
+      setMessage({ type: 'error', text: '❌ Erro: ' + e.message });
+    }
+    setLoading(false);
   };
 
-  const roleLabels = { admin: 'Administrador', operator: 'Operador', viewer: 'Visualizador' };
-  const roleColors = { admin: 'bg-purple-600', operator: 'bg-blue-600', viewer: 'bg-gray-600' };
+  const updateSetting = (key, value) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
+  };
 
   return (
     <div className="space-y-6">
       {message.text && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-600/20 text-green-400 border border-green-600' : 'bg-red-600/20 text-red-400 border border-red-600'}`}>
+        <div className={'p-4 rounded-lg ' + (message.type === 'success' ? 'bg-green-600/20 text-green-400 border border-green-600' : 'bg-red-600/20 text-red-400 border border-red-600')}>
           {message.text}
         </div>
       )}
@@ -146,7 +164,7 @@ const Settings = () => {
       <div className="flex space-x-1 bg-gray-800 rounded-lg p-1">
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-700'}`}>
+            className={'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ' + (activeTab === tab.id ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-700')}>
             <span>{tab.icon}</span><span>{tab.label}</span>
           </button>
         ))}
@@ -165,16 +183,17 @@ const Settings = () => {
                   <p className="text-sm text-gray-400">Monitoramento de rede</p>
                 </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs ${apiSettings.libreNms.enabled ? 'bg-green-600/20 text-green-400' : 'bg-gray-600/20 text-gray-400'}`}>
-                {apiSettings.libreNms.enabled ? 'Conectado' : 'Desconectado'}
-              </span>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={settings.librenms_enabled} onChange={(e) => updateSetting('librenms_enabled', e.target.checked)} className="w-5 h-5 rounded" />
+                <span className="text-gray-300">Ativo</span>
+              </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input type="url" value={apiSettings.libreNms.url} onChange={(e) => setApiSettings(prev => ({ ...prev, libreNms: { ...prev.libreNms, url: e.target.value } }))} placeholder="http://librenms.example.com" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-              <input type="password" value={apiSettings.libreNms.apiKey} onChange={(e) => setApiSettings(prev => ({ ...prev, libreNms: { ...prev.libreNms, apiKey: e.target.value } }))} placeholder="API Token" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="url" value={settings.librenms_url} onChange={(e) => updateSetting('librenms_url', e.target.value)} placeholder="URL do LibreNMS" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="password" value={settings.librenms_api_token} onChange={(e) => updateSetting('librenms_api_token', e.target.value)} placeholder="API Token" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
             </div>
             <div className="mt-4 flex space-x-3">
-              <button onClick={() => testConnection('libreNms')} disabled={loading} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition">Testar</button>
+              <button onClick={testLibreNMS} disabled={loading} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition">Testar</button>
             </div>
           </div>
 
@@ -188,123 +207,25 @@ const Settings = () => {
                   <p className="text-sm text-gray-400">Gerenciamento de IPs</p>
                 </div>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs ${apiSettings.phpIpam.enabled ? 'bg-green-600/20 text-green-400' : 'bg-gray-600/20 text-gray-400'}`}>
-                {apiSettings.phpIpam.enabled ? 'Conectado' : 'Desconectado'}
-              </span>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={settings.phpipam_enabled} onChange={(e) => updateSetting('phpipam_enabled', e.target.checked)} className="w-5 h-5 rounded" />
+                <span className="text-gray-300">Ativo</span>
+              </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input type="url" value={apiSettings.phpIpam.url} onChange={(e) => setApiSettings(prev => ({ ...prev, phpIpam: { ...prev.phpIpam, url: e.target.value } }))} placeholder="http://phpipam.example.com" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-              <input type="text" value={apiSettings.phpIpam.appId} onChange={(e) => setApiSettings(prev => ({ ...prev, phpIpam: { ...prev.phpIpam, appId: e.target.value } }))} placeholder="App ID" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-              <input type="password" value={apiSettings.phpIpam.appKey} onChange={(e) => setApiSettings(prev => ({ ...prev, phpIpam: { ...prev.phpIpam, appKey: e.target.value } }))} placeholder="App Key" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input type="url" value={settings.phpipam_url} onChange={(e) => updateSetting('phpipam_url', e.target.value)} placeholder="URL do phpIPAM" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="text" value={settings.phpipam_app_id} onChange={(e) => updateSetting('phpipam_app_id', e.target.value)} placeholder="App ID" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="password" value={settings.phpipam_app_key} onChange={(e) => updateSetting('phpipam_app_key', e.target.value)} placeholder="App Key" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="text" value={settings.phpipam_user} onChange={(e) => updateSetting('phpipam_user', e.target.value)} placeholder="Usuário" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="password" value={settings.phpipam_password} onChange={(e) => updateSetting('phpipam_password', e.target.value)} placeholder="Senha" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
             </div>
             <div className="mt-4 flex space-x-3">
-              <button onClick={() => testConnection('phpIpam')} disabled={loading} className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition">Testar</button>
+              <button onClick={testPhpIPAM} disabled={loading} className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition">Testar</button>
             </div>
           </div>
 
-          <button onClick={saveApiSettings} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition">
+          <button onClick={saveSettings} disabled={loading} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition">
             Salvar Configurações de API
-          </button>
-        </div>
-      )}
-
-      {/* Users Tab */}
-      {activeTab === 'users' && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-white">Usuários do Sistema</h3>
-            <button onClick={() => { setEditingUser(null); setUserForm({ username: '', email: '', password: '', role: 'viewer', isActive: true }); setShowUserForm(true); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition">+ Novo Usuário</button>
-          </div>
-
-          {showUserForm && (
-            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-              <h4 className="text-white font-medium mb-4">{editingUser ? 'Editar' : 'Novo'} Usuário</h4>
-              <form onSubmit={handleUserSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input type="text" value={userForm.username} onChange={(e) => setUserForm(prev => ({ ...prev, username: e.target.value }))} required placeholder="Usuário" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-                  <input type="email" value={userForm.email} onChange={(e) => setUserForm(prev => ({ ...prev, email: e.target.value }))} required placeholder="Email" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-                  <input type="password" value={userForm.password} onChange={(e) => setUserForm(prev => ({ ...prev, password: e.target.value }))} required={!editingUser} placeholder="Senha" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-                  <select value={userForm.role} onChange={(e) => setUserForm(prev => ({ ...prev, role: e.target.value }))} className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
-                    <option value="viewer">Visualizador</option>
-                    <option value="operator">Operador</option>
-                    <option value="admin">Administrador</option>
-                  </select>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" checked={userForm.isActive} onChange={(e) => setUserForm(prev => ({ ...prev, isActive: e.target.checked }))} className="w-4 h-4 rounded" />
-                    <span className="text-gray-300">Usuário ativo</span>
-                  </label>
-                </div>
-                <div className="flex space-x-3">
-                  <button type="submit" className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition">Salvar</button>
-                  <button type="button" onClick={() => { setShowUserForm(false); setEditingUser(null); }} className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition">Cancelar</button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Usuário</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Email</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Função</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Status</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-300">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {users.map(user => (
-                  <tr key={user.id} className="hover:bg-gray-700/50">
-                    <td className="px-4 py-3 text-white">{user.username}</td>
-                    <td className="px-4 py-3 text-gray-300">{user.email}</td>
-                    <td className="px-4 py-3"><span className={`px-2 py-1 rounded text-xs ${roleColors[user.role]}`}>{roleLabels[user.role]}</span></td>
-                    <td className="px-4 py-3"><span className={`px-2 py-1 rounded text-xs ${user.isActive ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'}`}>{user.isActive ? 'Ativo' : 'Inativo'}</span></td>
-                    <td className="px-4 py-3 text-right">
-                      <button onClick={() => editUser(user)} className="text-blue-400 hover:text-blue-300 mr-3 text-sm">Editar</button>
-                      <button onClick={() => deleteUser(user.id)} className="text-red-400 hover:text-red-300 text-sm">Excluir</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Theme Tab */}
-      {activeTab === 'theme' && (
-        <div className="space-y-6">
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-4">Modo do Tema</h3>
-            <div className="flex space-x-4">
-              <button onClick={() => setTheme(prev => ({ ...prev, mode: 'dark' }))} className={`flex-1 p-6 rounded-lg border-2 transition ${theme.mode === 'dark' ? 'border-blue-500 bg-gray-700' : 'border-gray-600'}`}>
-                <div className="text-3xl mb-2">🌙</div>
-                <div className="text-white font-medium">Escuro</div>
-              </button>
-              <button onClick={() => setTheme(prev => ({ ...prev, mode: 'light' }))} className={`flex-1 p-6 rounded-lg border-2 transition ${theme.mode === 'light' ? 'border-blue-500 bg-gray-700' : 'border-gray-600'}`}>
-                <div className="text-3xl mb-2">☀️</div>
-                <div className="text-white font-medium">Claro</div>
-              </button>
-            </div>
-          </div>
-
-          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-4">Cor Principal</h3>
-            <div className="flex space-x-3">
-              {['blue', 'purple', 'green', 'red', 'orange', 'pink'].map(color => (
-                <button key={color} onClick={() => setTheme(prev => ({ ...prev, primaryColor: color }))}
-                  className={`w-12 h-12 rounded-full border-2 transition ${theme.primaryColor === color ? 'border-white scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: color === 'blue' ? '#3b82f6' : color === 'purple' ? '#8b5cf6' : color === 'green' ? '#10b981' : color === 'red' ? '#ef4444' : color === 'orange' ? '#f97316' : '#ec4899' }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <button onClick={saveThemeSettings} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition">
-            Salvar Tema
           </button>
         </div>
       )}
@@ -317,29 +238,179 @@ const Settings = () => {
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-xl">🤖</div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">Inteligência Artificial</h3>
-                  <p className="text-sm text-gray-400">Análise automatizada de infraestrutura</p>
+                  <h3 className="text-lg font-semibold text-white">Inteligência Artificial (Groq)</h3>
+                  <p className="text-sm text-gray-400">Assistente de NOC especializado</p>
                 </div>
               </div>
               <label className="flex items-center space-x-2">
-                <input type="checkbox" checked={aiSettings.enabled} onChange={(e) => setAiSettings(prev => ({ ...prev, enabled: e.target.checked }))} className="w-5 h-5 rounded" />
+                <input type="checkbox" checked={settings.ai_enabled} onChange={(e) => updateSetting('ai_enabled', e.target.checked)} className="w-5 h-5 rounded" />
                 <span className="text-gray-300">Ativar</span>
               </label>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select value={aiSettings.provider} onChange={(e) => setAiSettings(prev => ({ ...prev, provider: e.target.value }))} className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
-                <option value="openai">OpenAI (GPT-4)</option>
-                <option value="anthropic">Anthropic (Claude)</option>
-                <option value="local">Modelo Local</option>
-              </select>
-              <input type="password" value={aiSettings.apiKey} onChange={(e) => setAiSettings(prev => ({ ...prev, apiKey: e.target.value }))} placeholder="API Key" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Provedor</label>
+                <select value={settings.ai_provider} onChange={(e) => updateSetting('ai_provider', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                  <option value="groq">Groq (Llama 3.3 70B)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Modelo</label>
+                <select value={settings.groq_model} onChange={(e) => updateSetting('groq_model', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                  <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</option>
+                  <option value="llama-3.1-70b-versatile">Llama 3.1 70B Versatile</option>
+                  <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant</option>
+                  <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">API Key do Groq</label>
+                <input type="password" value={settings.groq_api_key} onChange={(e) => updateSetting('groq_api_key', e.target.value)} placeholder="gsk_..." className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Temperatura (0.0 - 1.0)</label>
+                <input type="number" step="0.1" min="0" max="1" value={settings.ai_temperature} onChange={(e) => updateSetting('ai_temperature', parseFloat(e.target.value))} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Max Tokens</label>
+                <input type="number" value={settings.ai_max_tokens} onChange={(e) => updateSetting('ai_max_tokens', parseInt(e.target.value))} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm text-gray-400 mb-1">Prompt do Sistema (Personalidade da IA)</label>
+              <textarea 
+                value={settings.ai_system_prompt} 
+                onChange={(e) => updateSetting('ai_system_prompt', e.target.value)} 
+                placeholder="Você é um assistente especializado em redes e infraestrutura de TI..."
+                rows={5}
+                className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">Define como a IA deve se comportar e responder</p>
+            </div>
+
+            <div className="mt-4 flex space-x-3">
+              <button onClick={testGroq} disabled={loading} className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition">Testar Conexão</button>
             </div>
           </div>
 
-          <button onClick={saveAiSettings} className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition">
+          <button onClick={saveSettings} disabled={loading} className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition">
             Salvar Configurações de IA
           </button>
+        </div>
+      )}
+
+      {/* Git Tab */}
+      {activeTab === 'git' && (
+        <div className="space-y-6">
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-xl">📦</div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Backup no GitHub</h3>
+                  <p className="text-sm text-gray-400">Sincronize configurações e códigos</p>
+                </div>
+              </div>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={settings.git_enabled} onChange={(e) => updateSetting('git_enabled', e.target.checked)} className="w-5 h-5 rounded" />
+                <span className="text-gray-300">Ativar</span>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm text-gray-400 mb-1">URL do Repositório</label>
+                <input type="text" value={settings.git_repo_url} onChange={(e) => updateSetting('git_repo_url', e.target.value)} placeholder="https://github.com/usuario/repo.git" className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Branch</label>
+                <input type="text" value={settings.git_branch} onChange={(e) => updateSetting('git_branch', e.target.value)} placeholder="main" className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Frequência de Backup</label>
+                <select value={settings.git_backup_frequency} onChange={(e) => updateSetting('git_backup_frequency', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
+                  <option value="hourly">A cada hora</option>
+                  <option value="daily">Diário</option>
+                  <option value="weekly">Semanal</option>
+                  <option value="manual">Manual</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" checked={settings.git_auto_backup} onChange={(e) => updateSetting('git_auto_backup', e.target.checked)} className="w-5 h-5 rounded" />
+                  <span className="text-gray-300">Backup automático</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Git Status */}
+          {settings.git_status && settings.git_status.is_repo && (
+            <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4">Status do Repositório</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-gray-700/50 rounded-lg p-4 text-center">
+                  <div className="text-2xl mb-1">🌿</div>
+                  <div className="text-gray-400 text-sm">Branch</div>
+                  <div className="text-white font-medium">{settings.git_status.branch || '-'}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-lg p-4 text-center">
+                  <div className="text-2xl mb-1">📝</div>
+                  <div className="text-gray-400 text-sm">Arquivos Modificados</div>
+                  <div className="text-white font-medium">{settings.git_status.modified_files || 0}</div>
+                </div>
+                <div className="bg-gray-700/50 rounded-lg p-4 text-center col-span-2">
+                  <div className="text-2xl mb-1">💾</div>
+                  <div className="text-gray-400 text-sm">Último Commit</div>
+                  <div className="text-white font-medium text-sm">{settings.git_status.last_commit || '-'}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex space-x-3">
+            <button onClick={loadGitStatus} className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-medium transition">
+              Verificar Status
+            </button>
+            <button onClick={runGitBackup} disabled={loading} className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition">
+              Fazer Backup Agora
+            </button>
+          </div>
+
+          <button onClick={saveSettings} disabled={loading} className="w-full py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition">
+            Salvar Configurações Git
+          </button>
+        </div>
+      )}
+
+      {/* Users Tab */}
+      {activeTab === 'users' && (
+        <div className="space-y-6">
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <h3 className="text-lg font-semibold text-white mb-4">Usuários do Sistema</h3>
+            <table className="w-full">
+              <thead className="bg-gray-700">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Usuário</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Email</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Função</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-300">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-700">
+                {users.map(user => (
+                  <tr key={user.id} className="hover:bg-gray-700/50">
+                    <td className="px-4 py-3 text-white">{user.username}</td>
+                    <td className="px-4 py-3 text-gray-300">{user.email}</td>
+                    <td className="px-4 py-3"><span className="px-2 py-1 rounded text-xs bg-purple-600">Admin</span></td>
+                    <td className="px-4 py-3"><span className="px-2 py-1 rounded text-xs bg-green-600/20 text-green-400">Ativo</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
