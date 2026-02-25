@@ -66,7 +66,11 @@ def api_test_librenms(request):
         h = {"X-Auth-Token": s.librenms_api_token}
         r = requests.get(s.librenms_url + "/api/v1/devices", headers=h, timeout=10)
         if r.status_code == 200:
-            return JsonResponse({"success": True, "message": "OK! " + str(r.json().get("count",0)) + " dispositivos"})
+            try:
+                data = r.json()
+                return JsonResponse({"success": True, "message": "OK! " + str(data.get("count",0)) + " dispositivos"})
+            except:
+                return JsonResponse({"success": True, "message": "Conectado!"})
         return JsonResponse({"success": False, "error": "HTTP " + str(r.status_code)})
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)})
@@ -78,7 +82,8 @@ def api_test_phpipam(request):
         import requests
         s = SystemSettings.load()
         url = s.phpipam_url + "/api/" + s.phpipam_app_id + "/user/"
-        r = requests.post(url, auth=(s.phpipam_user, s.phpipam_password), timeout=10)
+        h = {"Content-Type": "application/json"}
+        r = requests.post(url, auth=(s.phpipam_user, s.phpipam_password), headers=h, timeout=10)
         if r.status_code == 200: return JsonResponse({"success": True, "message": "phpIPAM OK!"})
         return JsonResponse({"success": False, "error": "HTTP " + str(r.status_code)})
     except Exception as e: return JsonResponse({"success": False, "error": str(e)})
@@ -101,12 +106,12 @@ def api_test_groq(request):
 def api_git_status(request):
     try:
         os.chdir("/opt/lorcgr")
-        r = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        r = subprocess.run(["/usr/bin/git", "status", "--porcelain"], capture_output=True, text=True)
         if r.returncode != 0: return JsonResponse({"success": True, "is_repo": False})
         lines = r.stdout.strip().split(chr(10)) if r.stdout.strip() else []
         modified = len([l for l in lines if l])
-        br = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
-        cmt = subprocess.run(["git", "log", "-1", "--format=%h - %s (%cr)"], capture_output=True, text=True)
+        br = subprocess.run(["/usr/bin/git", "branch", "--show-current"], capture_output=True, text=True)
+        cmt = subprocess.run(["/usr/bin/git", "log", "-1", "--format=%h - %s (%cr)"], capture_output=True, text=True)
         return JsonResponse({"success": True, "is_repo": True, "branch": br.stdout.strip(), "modified_files": modified, "last_commit": cmt.stdout.strip()})
     except Exception as e: return JsonResponse({"success": False, "error": str(e)})
 
@@ -117,10 +122,10 @@ def api_git_backup(request):
         os.chdir("/opt/lorcgr")
         s = SystemSettings.load()
         import datetime
-        subprocess.run(["git", "add", "-A"], check=True)
+        subprocess.run(["/usr/bin/git", "add", "-A"], check=True)
         msg = "Backup " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        subprocess.run(["git", "commit", "-m", msg], check=True)
-        subprocess.run(["git", "push", "origin", s.git_branch or "main"], check=True)
+        subprocess.run(["/usr/bin/git", "commit", "-m", msg], check=True)
+        subprocess.run(["/usr/bin/git", "push", "origin", s.git_branch or "main"], check=True)
         return JsonResponse({"success": True, "message": "Backup OK: " + msg})
     except Exception as e: return JsonResponse({"success": False, "error": str(e)})
 
@@ -131,10 +136,10 @@ def api_git_init(request):
         data = json.loads(request.body.decode("utf-8"))
         os.chdir("/opt/lorcgr")
         if os.path.exists(".git"): return JsonResponse({"success": True, "message": "Ja existe"})
-        subprocess.run(["git", "init"], check=True)
-        subprocess.run(["git", "config", "user.email", "lorcgr@local"], check=True)
-        subprocess.run(["git", "config", "user.name", "LOR CGR"], check=True)
-        if data.get("repo_url"): subprocess.run(["git", "remote", "add", "origin", data["repo_url"]], check=True)
+        subprocess.run(["/usr/bin/git", "init"], check=True)
+        subprocess.run(["/usr/bin/git", "config", "user.email", "lorcgr@local"], check=True)
+        subprocess.run(["/usr/bin/git", "config", "user.name", "LOR CGR"], check=True)
+        if data.get("repo_url"): subprocess.run(["/usr/bin/git", "remote", "add", "origin", data["repo_url"]], check=True)
         with open(".gitignore", "w") as f: f.write("venv/\n*.pyc\n__pycache__/\n*.log\ndb.sqlite3\n.env\nbackups/\nstaticfiles/\n")
         return JsonResponse({"success": True, "message": "Git iniciado!"})
     except Exception as e: return JsonResponse({"success": False, "error": str(e)})
