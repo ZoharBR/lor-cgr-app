@@ -10,4 +10,8 @@ urlpatterns = [
     path('git/status/', api_views.api_git_status, name='api_git_status'),
     path('git/backup/', api_views.api_git_backup, name='api_git_backup'),
     path('git/init/', api_views.api_git_init, name='api_git_init'),
+    path('git/pull/', api_views.api_git_pull, name='api_git_pull'),
+    path('git/restore/', api_views.api_git_restore, name='api_git_restore'),
+    path('git/logs/', api_views.api_git_logs, name='api_git_logs'),
+    path('git/checkout/', api_views.api_git_checkout, name='api_git_checkout'),
 ]

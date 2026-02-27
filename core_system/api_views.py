@@ -143,3 +143,68 @@ def api_git_init(request):
         with open(".gitignore", "w") as f: f.write("venv/\n*.pyc\n__pycache__/\n*.log\ndb.sqlite3\n.env\nbackups/\nstaticfiles/\n")
         return JsonResponse({"success": True, "message": "Git iniciado!"})
     except Exception as e: return JsonResponse({"success": False, "error": str(e)})
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def api_git_pull(request):
+    """Baixa atualizações do GitHub"""
+    try:
+        os.chdir('/opt/lorcgr')
+        result = subprocess.run(['/usr/bin/git', 'pull', 'origin', 'main'], capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            return JsonResponse({'success': True, 'message': 'Atualizado com sucesso!', 'output': result.stdout})
+        return JsonResponse({'success': False, 'error': result.stderr})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def api_git_restore(request):
+    """Restaura arquivos do GitHub (git reset --hard)"""
+    try:
+        os.chdir('/opt/lorcgr')
+        # Buscar últimas alterações
+        subprocess.run(['/usr/bin/git', 'fetch', 'origin'], capture_output=True, timeout=30)
+        # Resetar para o remote
+        result = subprocess.run(['/usr/bin/git', 'reset', '--hard', 'origin/main'], capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            return JsonResponse({'success': True, 'message': 'Arquivos restaurados do GitHub!', 'output': result.stdout})
+        return JsonResponse({'success': False, 'error': result.stderr})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@require_http_methods(['GET'])
+def api_git_logs(request):
+    """Retorna histórico de commits"""
+    try:
+        os.chdir('/opt/lorcgr')
+        result = subprocess.run(['/usr/bin/git', 'log', '--oneline', '-20'], capture_output=True, text=True)
+        if result.returncode == 0:
+            commits = []
+            for line in result.stdout.strip().split('\n'):
+                if line:
+                    parts = line.split(' ', 1)
+                    commits.append({'hash': parts[0], 'message': parts[1] if len(parts) > 1 else ''})
+            return JsonResponse({'success': True, 'commits': commits})
+        return JsonResponse({'success': False, 'error': result.stderr})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def api_git_checkout(request):
+    """Restaura para um commit específico"""
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        commit_hash = data.get('hash')
+        if not commit_hash:
+            return JsonResponse({'success': False, 'error': 'Hash não informado'})
+        
+        os.chdir('/opt/lorcgr')
+        result = subprocess.run(['/usr/bin/git', 'checkout', commit_hash], capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            return JsonResponse({'success': True, 'message': f'Restaurado para commit {commit_hash}'})
+        return JsonResponse({'success': False, 'error': result.stderr})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

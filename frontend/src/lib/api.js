@@ -47,6 +47,10 @@ export const settingsApi = {
   gitStatus: () => fetchAPI(SETTINGS_API + '/git/status/', { method: 'POST' }),
   gitBackup: () => fetchAPI(SETTINGS_API + '/git/backup/', { method: 'POST' }),
   gitInit: (repoUrl) => fetchAPI(SETTINGS_API + '/git/init/', { method: 'POST', body: JSON.stringify({ repo_url: repoUrl }) }),
+  gitPull: () => fetchAPI(SETTINGS_API + '/git/pull/', { method: 'POST' }),
+  gitRestore: () => fetchAPI(SETTINGS_API + '/git/restore/', { method: 'POST' }),
+  gitLogs: () => fetchAPI(SETTINGS_API + '/git/logs/'),
+  gitCheckout: (hash) => fetchAPI(SETTINGS_API + '/git/checkout/', { method: 'POST', body: JSON.stringify({ hash }) }),
 };
 
 export default { devicesApi, backupsApi, auditApi, terminalApi, settingsApi };

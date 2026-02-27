@@ -1,342 +1,216 @@
+"""
+LOR CGR - AI Tools para Network Management
+"""
+import requests
+import paramiko
 import json
-from netmiko import ConnectHandler
-from pysnmp.hlapi import *
-from devices.models import Device, TerminalLog
-from datetime import datetime
+import logging
+from typing import Dict, Any
+from dataclasses import dataclass
 
-class AITools:
-    """Ferramentas que a IA pode usar para interagir com o sistema"""
-    
-    def get_tool_definitions(self):
-        """Define as ferramentas disponíveis para o Claude"""
-        return [
-            {
-                "name": "list_devices",
-                "description": "Lista todos os equipamentos cadastrados no sistema com status online/offline",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "vendor": {
-                            "type": "string",
-                            "description": "Filtrar por fabricante (opcional): Huawei, Mikrotik, Cisco"
-                        },
-                        "online_only": {
-                            "type": "boolean",
-                            "description": "Mostrar apenas equipamentos online"
-                        }
-                    }
-                }
-            },
-            {
-                "name": "get_device_info",
-                "description": "Obtém informações detalhadas de um equipamento específico pelo nome ou IP",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "identifier": {
-                            "type": "string",
-                            "description": "Nome ou IP do equipamento"
-                        }
-                    },
-                    "required": ["identifier"]
-                }
-            },
-            {
-                "name": "execute_ssh_command",
-                "description": "Executa um comando SSH em um equipamento. Suporta Huawei, Mikrotik e Cisco. SEMPRE use confirm=false primeiro para simular!",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "device_id": {
-                            "type": "integer",
-                            "description": "ID do equipamento"
-                        },
-                        "command": {
-                            "type": "string",
-                            "description": "Comando a ser executado (ex: 'display pppoe-user online', '/ppp active print')"
-                        },
-                        "confirm": {
-                            "type": "boolean",
-                            "description": "Se true, executa de verdade. Se false, apenas simula (SEMPRE comece com false!)"
-                        }
-                    },
-                    "required": ["device_id", "command"]
-                }
-            },
-            {
-                "name": "get_pppoe_sessions",
-                "description": "Obtém informações sobre sessões PPPoE ativas em um equipamento BRAS (Huawei ou Mikrotik)",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "device_id": {
-                            "type": "integer",
-                            "description": "ID do equipamento BRAS"
-                        }
-                    },
-                    "required": ["device_id"]
-                }
-            },
-            {
-                "name": "get_interface_status",
-                "description": "Obtém status de interfaces de um equipamento",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "device_id": {
-                            "type": "integer",
-                            "description": "ID do equipamento"
-                        }
-                    },
-                    "required": ["device_id"]
-                }
-            }
-        ]
-    
-    def execute_tool(self, tool_name, tool_input):
-        """Executa a ferramenta solicitada pela IA"""
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class SystemConfig:
+    librenms_enabled: bool = False
+    librenms_url: str = ""
+    librenms_api_token: str = ""
+    phpipam_enabled: bool = False
+    phpipam_url: str = ""
+    phpipam_app_id: str = ""
+    phpipam_app_key: str = ""
+    phpipam_user: str = ""
+    phpipam_password: str = ""
+    ai_enabled: bool = False
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
+    ai_system_prompt: str = ""
+
+
+def get_system_config() -> SystemConfig:
+    from core_system.models import SystemSettings
+    try:
+        settings = SystemSettings.objects.first()
+        if settings:
+            return SystemConfig(
+                librenms_enabled=settings.librenms_enabled,
+                librenms_url=settings.librenms_url or "",
+                librenms_api_token=settings.librenms_api_token or "",
+                phpipam_enabled=settings.phpipam_enabled,
+                phpipam_url=settings.phpipam_url or "",
+                phpipam_app_id=settings.phpipam_app_id or "",
+                phpipam_app_key=settings.phpipam_app_key or "",
+                phpipam_user=settings.phpipam_user or "",
+                phpipam_password=settings.phpipam_password or "",
+                ai_enabled=settings.ai_enabled,
+                groq_api_key=settings.groq_api_key or "",
+                groq_model=settings.groq_model or "llama-3.3-70b-versatile",
+                ai_system_prompt=settings.ai_system_prompt or "",
+            )
+    except Exception as e:
+        logger.error(f"Error loading config: {e}")
+    return SystemConfig()
+
+
+def tool_list_devices(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    from devices.models import Device
+    try:
+        queryset = Device.objects.all()
+        filter_type = args.get("filter", "all")
+        if filter_type == "online":
+            queryset = queryset.filter(is_online=True)
+        elif filter_type == "offline":
+            queryset = queryset.filter(is_online=False)
         
-        try:
-            if tool_name == "list_devices":
-                return self._list_devices(tool_input)
-            elif tool_name == "get_device_info":
-                return self._get_device_info(tool_input)
-            elif tool_name == "execute_ssh_command":
-                return self._execute_ssh_command(tool_input)
-            elif tool_name == "get_pppoe_sessions":
-                return self._get_pppoe_sessions(tool_input)
-            elif tool_name == "get_interface_status":
-                return self._get_interface_status(tool_input)
-            else:
-                return {"error": f"Ferramenta '{tool_name}' não encontrada"}
-                
-        except Exception as e:
-            return {"error": f"Erro ao executar {tool_name}: {str(e)}"}
-    
-    # ===== IMPLEMENTAÇÃO DAS FERRAMENTAS =====
-    
-    def _list_devices(self, params):
-        """Lista equipamentos"""
-        vendor = params.get('vendor')
-        online_only = params.get('online_only', False)
-        
-        query = Device.objects.all()
-        
-        if vendor:
-            query = query.filter(vendor__icontains=vendor)
-        if online_only:
-            query = query.filter(is_online=True)
-        
-        devices = []
-        for d in query:
-            devices.append({
-                "id": d.id,
-                "name": d.name,
-                "ip": d.ip,
-                "vendor": d.vendor,
-                "model": d.model,
-                "is_online": d.is_online,
-                "is_bras": d.is_bras,
-                "protocol": d.protocol,
-                "port": d.port
-            })
-        
+        devices = [{
+            "id": d.id,
+            "name": d.name,
+            "ip": d.ip,
+            "vendor": d.vendor,
+            "model": d.model,
+            "is_online": d.is_online,
+        } for d in queryset]
+        return {"success": True, "data": devices, "count": len(devices)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def tool_get_device(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    from devices.models import Device
+    try:
+        device = None
+        if args.get("device_id"):
+            device = Device.objects.filter(id=args["device_id"]).first()
+        elif args.get("hostname"):
+            from django.db.models import Q
+            device = Device.objects.filter(Q(name=args["hostname"]) | Q(ip=args["hostname"])).first()
+        if not device:
+            return {"success": False, "error": "Dispositivo nao encontrado"}
         return {
-            "total": len(devices),
-            "devices": devices
-        }
-    
-    def _get_device_info(self, params):
-        """Obtém informações de um equipamento"""
-        identifier = params.get('identifier')
-        
-        try:
-            device = Device.objects.filter(name__icontains=identifier).first() or \
-                     Device.objects.filter(ip=identifier).first()
-            
-            if not device:
-                return {"error": f"Equipamento '{identifier}' não encontrado"}
-            
-            return {
+            "success": True,
+            "data": {
                 "id": device.id,
                 "name": device.name,
                 "ip": device.ip,
                 "vendor": device.vendor,
                 "model": device.model,
-                "os_version": device.os_version,
-                "serial_number": device.serial_number,
                 "is_online": device.is_online,
-                "protocol": device.protocol,
                 "port": device.port,
-                "is_bras": device.is_bras,
                 "username": device.username,
-                "librenms_id": device.librenms_id
             }
-        except Exception as e:
-            return {"error": str(e)}
-    
-    def _execute_ssh_command(self, params):
-        """Executa comando SSH"""
-        device_id = params.get('device_id')
-        command = params.get('command')
-        confirm = params.get('confirm', False)
-        
-        if not confirm:
-            return {
-                "simulated": True,
-                "message": "⚠️ Comando NÃO executado (confirm=false)",
-                "command": command,
-                "device_id": device_id,
-                "warning": "Para executar de verdade, use confirm=true"
-            }
-        
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def tool_librenms_query(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    if not config.librenms_enabled or not config.librenms_url:
+        return {"success": False, "error": "LibreNMS nao configurado"}
+    try:
+        endpoint = args.get("endpoint", "devices")
+        device_id = args.get("device_id")
+        params = args.get("params", "")
+        if device_id:
+            url = f"{config.librenms_url}/api/v0/devices/{device_id}/{endpoint}"
+        else:
+            url = f"{config.librenms_url}/api/v0/{endpoint}"
+        if params:
+            url += f"?{params}"
+        response = requests.get(url, headers={"X-Auth-Token": config.librenms_api_token}, timeout=30)
+        if response.status_code != 200:
+            return {"success": False, "error": f"Erro: {response.status_code}"}
+        return {"success": True, "data": response.json()}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def tool_phpipam_query(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    if not config.phpipam_enabled or not config.phpipam_url:
+        return {"success": False, "error": "phpIPAM nao configurado"}
+    try:
+        endpoint = args.get("endpoint", "subnets")
+        resource_id = args.get("id")
+        action = args.get("action")
+        search = args.get("search")
+        app_id = config.phpipam_app_id or "lorcgr"
+        url = f"{config.phpipam_url}/api/{app_id}/{endpoint}"
+        if resource_id:
+            url += f"/{resource_id}"
+        if action:
+            url += f"/{action}"
+        if search and endpoint == "search":
+            url += f"/{search}"
+        response = requests.get(url, headers={"token": config.phpipam_app_key}, timeout=30)
+        if response.status_code != 200:
+            return {"success": False, "error": f"Erro: {response.status_code}"}
+        data = response.json()
+        if data.get("code") != 200:
+            return {"success": False, "error": data.get("message", "Erro na API")}
+        return {"success": True, "data": data.get("data")}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def tool_ssh_command(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    from devices.models import Device
+    import time
+    try:
+        device = None
+        if args.get("device_id"):
+            device = Device.objects.filter(id=args["device_id"]).first()
+        elif args.get("hostname"):
+            from django.db.models import Q
+            device = Device.objects.filter(Q(name=args["hostname"]) | Q(ip=args["hostname"])).first()
+        if not device:
+            return {"success": False, "error": "Dispositivo nao encontrado"}
+        if not device.username or not device.password:
+            return {"success": False, "error": "Credenciais SSH nao configuradas"}
+        command = args.get("command", "")
+        start_time = time.time()
         try:
-            device = Device.objects.get(id=device_id)
-            
-            # Mapear vendor para device_type do Netmiko
-            vendor_map = {
-                'Huawei': 'huawei',
-                'Mikrotik': 'mikrotik_routeros',
-                'Cisco': 'cisco_ios',
-                'Juniper': 'juniper_junos',
-            }
-            
-            device_type = vendor_map.get(device.vendor, 'generic_termserver')
-            
-            device_params = {
-                'device_type': device_type,
-                'host': device.ip,
-                'username': device.username,
-                'password': device.password,
-                'port': device.port,
-                'timeout': 30,
-                'session_timeout': 30,
-            }
-            
-            connection = ConnectHandler(**device_params)
-            
-            # Comandos específicos por vendor
-            if device.vendor == 'Huawei':
-                connection.send_command("screen-length 0 temporary")
-            
-            output = connection.send_command(command, read_timeout=30)
-            connection.disconnect()
-            
-            # Salvar log
-            TerminalLog.objects.create(
-                device=device,
-                command=command,
-                output=output
-            )
-            
-            return {
-                "success": True,
-                "device": device.name,
-                "command": command,
-                "output": output
-            }
-            
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname=device.ip, port=device.port or 22, username=device.username, password=device.password, timeout=30, look_for_keys=False)
+            stdin, stdout, stderr = client.exec_command(command, timeout=60)
+            output = stdout.read().decode("utf-8", errors="ignore")
+            error = stderr.read().decode("utf-8", errors="ignore")
+            client.close()
+            return {"success": True, "data": {"device": device.name, "ip": device.ip, "command": command, "output": output, "error": error if error else None, "execution_time_ms": round((time.time() - start_time) * 1000)}}
+        except paramiko.AuthenticationException:
+            return {"success": False, "error": "Falha na autenticacao SSH"}
         except Exception as e:
-            return {"error": f"Erro ao executar comando: {str(e)}"}
-    
-    def _get_pppoe_sessions(self, params):
-        """Obtém sessões PPPoE"""
-        device_id = params.get('device_id')
-        
-        try:
-            device = Device.objects.get(id=device_id)
-            
-            # Comando baseado no vendor
-            if device.vendor == 'Huawei':
-                command = "display access-user"
-            elif device.vendor == 'Mikrotik':
-                command = "/ppp active print detail"
-            else:
-                return {"error": f"Vendor {device.vendor} não suportado para PPPoE"}
-            
-            vendor_map = {
-                'Huawei': 'huawei',
-                'Mikrotik': 'mikrotik_routeros',
-            }
-            
-            device_params = {
-                'device_type': vendor_map[device.vendor],
-                'host': device.ip,
-                'username': device.username,
-                'password': device.password,
-                'port': device.port,
-                'timeout': 30,
-            }
-            
-            connection = ConnectHandler(**device_params)
-            
-            if device.vendor == 'Huawei':
-                connection.send_command("screen-length 0 temporary")
-            
-            output = connection.send_command(command, read_timeout=30)
-            connection.disconnect()
-            
-            # Parsear output para contar sessões
-            import re
-            if device.vendor == 'Mikrotik':
-                # Contar linhas com "name=" (cada linha é uma sessão)
-                sessions = len(re.findall(r'name=', output))
-            else:
-                # Huawei - contar linhas com usuários
-                sessions = len(re.findall(r'\d+\.\d+\.\d+\.\d+', output))
-            
-            return {
-                "success": True,
-                "device": device.name,
-                "vendor": device.vendor,
-                "total_sessions": sessions,
-                "output": output
-            }
-            
-        except Exception as e:
-            return {"error": f"Erro ao obter sessões PPPoE: {str(e)}"}
-    
-    def _get_interface_status(self, params):
-        """Obtém status de interfaces"""
-        device_id = params.get('device_id')
-        
-        try:
-            device = Device.objects.get(id=device_id)
-            
-            vendor_map = {
-                'Huawei': 'huawei',
-                'Mikrotik': 'mikrotik_routeros',
-                'Cisco': 'cisco_ios',
-            }
-            
-            device_params = {
-                'device_type': vendor_map.get(device.vendor, 'generic_termserver'),
-                'host': device.ip,
-                'username': device.username,
-                'password': device.password,
-                'port': device.port,
-                'timeout': 30,
-            }
-            
-            connection = ConnectHandler(**device_params)
-            
-            # Comando baseado no vendor
-            if device.vendor == 'Huawei':
-                connection.send_command("screen-length 0 temporary")
-                command = 'display interface brief'
-            elif device.vendor == 'Mikrotik':
-                command = '/interface print brief'
-            else:
-                command = 'show ip interface brief'
-            
-            output = connection.send_command(command, read_timeout=30)
-            connection.disconnect()
-            
-            return {
-                "success": True,
-                "device": device.name,
-                "interfaces": output
-            }
-            
-        except Exception as e:
-            return {"error": f"Erro ao obter interfaces: {str(e)}"}
+            return {"success": False, "error": f"Erro: {str(e)}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def tool_dashboard_stats(args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    from devices.models import Device
+    try:
+        total = Device.objects.count()
+        online = Device.objects.filter(is_online=True).count()
+        offline = Device.objects.filter(is_online=False).count()
+        return {"success": True, "data": {"total_devices": total, "online": online, "offline": offline, "health_score": round((online / total) * 100) if total > 0 else 0}}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+AVAILABLE_TOOLS = {
+    "list_devices": {"function": tool_list_devices, "description": "Lista dispositivos de rede. Filtros: online, offline", "parameters": {"type": "object", "properties": {"filter": {"type": "string", "enum": ["online", "offline", "all"]}, "search": {"type": "string"}}, "required": []}},
+    "get_device": {"function": tool_get_device, "description": "Obtem detalhes de um dispositivo", "parameters": {"type": "object", "properties": {"device_id": {"type": "string"}, "hostname": {"type": "string"}}, "required": []}},
+    "librenms_query": {"function": tool_librenms_query, "description": "Consulta LibreNMS", "parameters": {"type": "object", "properties": {"endpoint": {"type": "string"}, "device_id": {"type": "string"}, "params": {"type": "string"}}, "required": ["endpoint"]}},
+    "phpipam_query": {"function": tool_phpipam_query, "description": "Consulta phpIPAM", "parameters": {"type": "object", "properties": {"endpoint": {"type": "string"}, "id": {"type": "string"}, "search": {"type": "string"}}, "required": ["endpoint"]}},
+    "ssh_command": {"function": tool_ssh_command, "description": "Executa comando SSH", "parameters": {"type": "object", "properties": {"device_id": {"type": "string"}, "hostname": {"type": "string"}, "command": {"type": "string"}}, "required": ["command"]}},
+    "dashboard_stats": {"function": tool_dashboard_stats, "description": "Estatisticas do dashboard", "parameters": {"type": "object", "properties": {}, "required": []}}
+}
+
+
+def get_tools_for_ai():
+    return [{"type": "function", "function": {"name": name, "description": info["description"], "parameters": info["parameters"]}} for name, info in AVAILABLE_TOOLS.items()]
+
+
+def execute_tool(tool_name: str, args: Dict[str, Any], config: SystemConfig) -> Dict[str, Any]:
+    if tool_name not in AVAILABLE_TOOLS:
+        return {"success": False, "error": f"Tool {tool_name} nao encontrada"}
+    return AVAILABLE_TOOLS[tool_name]["function"](args, config)

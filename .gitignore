@@ -1,1 +1,10 @@
 venv/
+# Backups grandes
+backups/*.sql
+backups/full_backup*/
+*.pyc
+__pycache__/
+node_modules/.cache/
+frontend/node_modules/.cache/
+staticfiles/
+celerybeat-schedule.db
