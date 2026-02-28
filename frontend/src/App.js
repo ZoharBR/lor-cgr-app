@@ -8,6 +8,7 @@ import AuditLogs from './components/AuditLogs';
 import Settings from './components/Settings';
 import Integrations from './components/Integrations';
 import AIAssistant from './components/AIAssistant';
+import UsersManagement from './components/UsersManagement';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -21,6 +22,7 @@ function App() {
       case 'audit': return <AuditLogs />;
       case 'integrations': return <Integrations />;
       case 'ai': return <AIAssistant />;
+      case 'users': return <UsersManagement />;
       case 'settings': return <Settings />;
       default: return <Dashboard />;
     }
@@ -28,13 +30,14 @@ function App() {
 
   const pageTitle = {
     dashboard: 'Dashboard',
-    inventory: 'Inventário de Dispositivos',
+    inventory: 'Inventario de Dispositivos',
     terminal: 'Terminal SSH',
     backups: 'Gerenciamento de Backups',
     audit: 'Logs de Auditoria',
-    integrations: 'Integrações Externas',
+    integrations: 'Integracoes Externas',
     ai: 'Assistente IA NOC',
-    settings: 'Configurações'
+    users: 'Gerenciar Usuarios',
+    settings: 'Configuracoes'
   };
 
   return (

@@ -37,7 +37,6 @@ const Settings = () => {
     { id: 'apis', label: 'APIs Externas', icon: '🔌' },
     { id: 'ai', label: 'IA (Groq)', icon: '🤖' },
     { id: 'git', label: 'Git/Backup', icon: '📦' },
-    { id: 'users', label: 'Usuários', icon: '👥' },
   ];
 
   useEffect(() => {
@@ -238,7 +237,7 @@ const Settings = () => {
               <input type="url" value={settings.phpipam_url} onChange={(e) => updateSetting('phpipam_url', e.target.value)} placeholder="URL phpIPAM" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
               <input type="text" value={settings.phpipam_app_id} onChange={(e) => updateSetting('phpipam_app_id', e.target.value)} placeholder="App ID" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
               <input type="password" value={settings.phpipam_app_key} onChange={(e) => updateSetting('phpipam_app_key', e.target.value)} placeholder="App Key" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
-              <input type="text" value={settings.phpipam_user} onChange={(e) => updateSetting('phpipam_user', e.target.value)} placeholder="Usuário" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <input type="text" value={settings.phpipam_user} onChange={(e) => updateSetting('phpipam_user', e.target.value)} placeholder="Usuario" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
               <input type="password" value={settings.phpipam_password} onChange={(e) => updateSetting('phpipam_password', e.target.value)} placeholder="Senha" className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
             </div>
             <div className="mt-4 flex space-x-3">
@@ -294,7 +293,7 @@ const Settings = () => {
 
             <div className="mt-4">
               <label className="block text-sm text-gray-400 mb-1">Prompt do Sistema (Personalidade)</label>
-              <textarea value={settings.ai_system_prompt} onChange={(e) => updateSetting('ai_system_prompt', e.target.value)} rows={5} placeholder="Você é um assistente..." className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
+              <textarea value={settings.ai_system_prompt} onChange={(e) => updateSetting('ai_system_prompt', e.target.value)} rows={5} placeholder="Voce e um assistente..." className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
             </div>
 
             <div className="mt-4 flex space-x-3">
@@ -313,7 +312,7 @@ const Settings = () => {
             <h3 className="text-lg font-semibold text-white mb-4">📦 Backup no GitHub</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-sm text-gray-400 mb-1">URL do Repositório</label>
+                <label className="block text-sm text-gray-400 mb-1">URL do Repositorio</label>
                 <input type="text" value={settings.git_repo_url} onChange={(e) => updateSetting('git_repo_url', e.target.value)} placeholder="https://github.com/user/repo.git" className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
               </div>
               <div>
@@ -321,17 +320,16 @@ const Settings = () => {
                 <input type="text" value={settings.git_branch} onChange={(e) => updateSetting('git_branch', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white" />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Backup Automático</label>
+                <label className="block text-sm text-gray-400 mb-1">Backup Automatico</label>
                 <select value={settings.git_backup_frequency} onChange={(e) => updateSetting('git_backup_frequency', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white">
                   <option value="manual">Manual</option>
-                  <option value="daily">Diário</option>
+                  <option value="daily">Diario</option>
                   <option value="weekly">Semanal</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Status */}
           {settings.git_status && settings.git_status.is_repo && (
             <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
               <h4 className="text-white font-medium mb-4">Status Atual</h4>
@@ -348,25 +346,23 @@ const Settings = () => {
                 </div>
                 <div className="bg-gray-700/50 rounded-lg p-4">
                   <div className="text-2xl">💾</div>
-                  <div className="text-gray-400 text-sm">Último Commit</div>
+                  <div className="text-gray-400 text-sm">Ultimo Commit</div>
                   <div className="text-white font-medium text-xs">{settings.git_status.last_commit?.split(' ').slice(0, 3).join(' ')}</div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Ações */}
           <div className="grid grid-cols-2 gap-4">
             <button onClick={loadGitStatus} className="py-3 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-medium transition">🔄 Atualizar Status</button>
             <button onClick={runGitBackup} disabled={loading} className="py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition">📤 Backup para GitHub</button>
-            <button onClick={runGitPull} disabled={loading} className="py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition">📥 Baixar Atualizações</button>
+            <button onClick={runGitPull} disabled={loading} className="py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition">📥 Baixar Atualizacoes</button>
             <button onClick={runGitRestore} disabled={loading} className="py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition">🔄 Restaurar do GitHub</button>
           </div>
 
-          {/* Histórico */}
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-white font-medium">📜 Histórico de Commits</h4>
+              <h4 className="text-white font-medium">📜 Historico de Commits</h4>
               <button onClick={loadGitLogs} className="text-blue-400 text-sm hover:text-blue-300">Carregar</button>
             </div>
             {gitLogs.length > 0 ? (
@@ -379,25 +375,11 @@ const Settings = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm">Clique em "Carregar" para ver o histórico</p>
+              <p className="text-gray-500 text-sm">Clique em "Carregar" para ver o historico</p>
             )}
           </div>
 
           <button onClick={saveSettings} disabled={loading} className="w-full py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition">Salvar Config Git</button>
-        </div>
-      )}
-
-      {/* Users Tab */}
-      {activeTab === 'users' && (
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Usuários</h3>
-          <div className="bg-gray-700/50 rounded-lg p-4 flex justify-between items-center">
-            <div>
-              <span className="text-white font-medium">admin</span>
-              <span className="ml-2 px-2 py-1 bg-purple-600 rounded text-xs">Admin</span>
-            </div>
-            <span className="text-green-400 text-sm">Ativo</span>
-          </div>
         </div>
       )}
     </div>

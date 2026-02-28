@@ -10,4 +10,6 @@ urlpatterns = [
     path('manual/', TemplateView.as_view(template_name='manual_usuario.html'), name='manual'),
     path('ai-chat/', TemplateView.as_view(template_name='ai_fullscreen.html'), name='ai_fullscreen'),
     path('', TemplateView.as_view(template_name='index.html')),
+
+    path('api/', include('users.urls')),
 ]

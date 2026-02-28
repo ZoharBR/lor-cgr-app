@@ -3,13 +3,14 @@ import React from 'react';
 const Sidebar = ({ currentPage, setCurrentPage }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'inventory', label: 'Inventário', icon: '🖥️' },
+    { id: 'inventory', label: 'Inventario', icon: '🖥️' },
     { id: 'terminal', label: 'Terminal SSH', icon: '💻' },
     { id: 'backups', label: 'Backups', icon: '💾' },
     { id: 'audit', label: 'Logs', icon: '📋' },
-    { id: 'integrations', label: 'Integrações', icon: '🔗' },
+    { id: 'integrations', label: 'Integracoes', icon: '🔗' },
     { id: 'ai', label: 'Assistente IA', icon: '🤖' },
-    { id: 'settings', label: 'Configurações', icon: '⚙️' },
+    { id: 'users', label: 'Usuarios', icon: '👤' },
+    { id: 'settings', label: 'Configuracoes', icon: '⚙️' },
   ];
 
   return (

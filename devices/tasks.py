@@ -1,148 +1,260 @@
 """
-Task Celery para verificar status online dos equipamentos
+Task Celery para LOR CGR
+- PING para verificar status online
+- SNMP para coletar informacoes (so se PING responder)
+- SSH apenas para backups agendados
 """
 from celery import shared_task
-from .models import Device
+from .models import Device, DeviceHistory, DeviceBackup
+import subprocess
 import socket
-import paramiko
 from datetime import datetime
+import os
+
+# SNMP imports
+try:
+    from pysnmp.hlapi import getCmd, SnmpEngine, CommunityData, UdpTransportTarget, ContextData, ObjectType, ObjectIdentity
+    HAS_SNMP = True
+except ImportError:
+    HAS_SNMP = False
+
+
+def ping_device(ip, count=1, timeout=2):
+    """
+    Verifica se equipamento responde PING (ICMP)
+    Retorna True se responder, False caso contrario
+    """
+    try:
+        result = subprocess.run(
+            ['ping', '-c', str(count), '-W', str(timeout), str(ip)],
+            capture_output=True,
+            timeout=timeout * count + 3
+        )
+        return result.returncode == 0
+    except subprocess.TimeoutExpired:
+        return False
+    except Exception as e:
+        print(f"[PING] Erro {ip}: {e}")
+        return False
+
+
+def snmp_get(ip, community, oid, port=161, timeout=3):
+    """
+    Consulta SNMP GET - so chamado se PING responder
+    """
+    if not HAS_SNMP:
+        return None
+    
+    try:
+        iterator = getCmd(
+            SnmpEngine(),
+            CommunityData(community),
+            UdpTransportTarget((ip, port), timeout=timeout, retries=1),
+            ContextData(),
+            ObjectType(ObjectIdentity(oid))
+        )
+        
+        errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+        
+        if errorIndication or errorStatus:
+            return None
+        
+        for varBind in varBinds:
+            return str(varBind[1])
+        
+        return None
+    except Exception as e:
+        print(f"[SNMP] Erro {ip}: {e}")
+        return None
+
 
 @shared_task
 def check_devices_status():
     """
-    Verifica status de todos os equipamentos via SSH
+    Verifica status via PING apenas
     Roda a cada 30 segundos
+    NAO TENTA SSH ou SNMP se PING falhar!
     """
     devices = Device.objects.all()
+    online_count = 0
+    offline_count = 0
     
     for device in devices:
-        is_reachable = check_device_online(device)
+        # APENAS PING - nada mais!
+        is_reachable = ping_device(str(device.ip))
         
-        # Atualizar status no banco
+        # Atualizar status
         if device.is_online != is_reachable:
             device.is_online = is_reachable
             device.save(update_fields=['is_online'])
             
-            # Log de mudança de status
-            from .models import DeviceHistory
+            # Log de mudanca
             DeviceHistory.objects.create(
                 device=device,
                 event_type='STATUS_CHANGE',
-                description=f'Equipamento {"ONLINE" if is_reachable else "OFFLINE"} em {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+                description=f'Equipamento {"ONLINE" if is_reachable else "OFFLINE"}'
             )
+            
+            status_msg = "ONLINE" if is_reachable else "OFFLINE"
+            print(f"[STATUS] {device.name} ({device.ip}): {status_msg}")
+        
+        if is_reachable:
+            online_count += 1
+        else:
+            offline_count += 1
     
-    return f"Verificados {devices.count()} equipamentos"
-
-
-def check_device_online(device):
-    """
-    Verifica se equipamento está acessível via SSH
-    Retorna True se conseguir conectar, False caso contrário
-    """
-    try:
-        # Primeiro tenta ping na porta SSH
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)
-        result = sock.connect_ex((device.ip, device.port))
-        sock.close()
-        
-        if result != 0:
-            return False
-        
-        # Se porta aberta, tenta SSH
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        
-        ssh.connect(
-            device.ip,
-            port=device.port,
-            username=device.username,
-            password=device.password,
-            timeout=5,
-            banner_timeout=5,
-            auth_timeout=5,
-            look_for_keys=False,
-            allow_agent=False
-        )
-        
-        ssh.close()
-        return True
-        
-    except Exception as e:
-        print(f"[{device.name}] Erro ao verificar: {str(e)}")
-        return False
+    return f"Verificados: {online_count} online, {offline_count} offline"
 
 
 @shared_task
-def update_device_info():
+def collect_device_info_snmp():
     """
-    Atualiza informações detalhadas dos equipamentos online
+    Coleta informacoes via SNMP
+    IMPORTANTE: So processa equipamentos que respondem ao PING!
     Roda a cada 5 minutos
     """
-    from .discovery import discover_device_details
-    
     devices = Device.objects.filter(is_online=True)
     updated = 0
+    skipped = 0
     
     for device in devices:
+        # VERIFICAR PING PRIMEIRO - mesmo que is_online=True
+        if not ping_device(str(device.ip)):
+            skipped += 1
+            continue
+        
+        # Equipamento responde PING, tentar SNMP
+        if not device.snmp_community:
+            continue
+        
         try:
-            details = discover_device_details(device)
-            if details:
-                device.model = details.get('model', device.model)
-                device.os_version = details.get('os_version', device.os_version)
-                device.serial_number = details.get('serial_number', device.serial_number)
-                device.save()
-                updated += 1
+            # SysDescr - Descricao do sistema
+            sys_descr = snmp_get(
+                str(device.ip), 
+                device.snmp_community, 
+                '1.3.6.1.2.1.1.1.0', 
+                device.snmp_port or 161
+            )
+            
+            # SysName - Nome
+            sys_name = snmp_get(
+                str(device.ip), 
+                device.snmp_community, 
+                '1.3.6.1.2.1.1.5.0', 
+                device.snmp_port or 161
+            )
+            
+            # Uptime
+            sys_uptime = snmp_get(
+                str(device.ip), 
+                device.snmp_community, 
+                '1.3.6.1.2.1.1.3.0', 
+                device.snmp_port or 161
+            )
+            
+            # Atualizar se obteve dados
+            if sys_descr:
+                device.os_version = sys_descr[:200]
+            
+            if sys_name and (not device.name or device.name == str(device.ip)):
+                device.name = sys_name
+            
+            if sys_uptime:
+                # Converter timeticks para legivel
+                try:
+                    ticks = int(sys_uptime)
+                    days = ticks // 8640000
+                    hours = (ticks % 8640000) // 360000
+                    device.uptime = f"{days}d {hours}h"
+                except:
+                    pass
+            
+            device.save()
+            updated += 1
+            
         except Exception as e:
-            print(f"Erro ao atualizar {device.name}: {e}")
+            print(f"[SNMP] Erro {device.name}: {e}")
     
-    return f"Atualizados {updated} equipamentos"
+    return f"SNMP: {updated} atualizados, {skipped} offline/skipped"
 
 
 @shared_task
-def run_auto_backups():
+def backup_device_configs():
     """
-    Executa backup automático dos equipamentos configurados
-    Roda às 03:00 da manhã
+    Backup de configuracoes via SSH
+    IMPORTANTE: So executa se PING responder!
     """
-    from netmiko import ConnectHandler
-    import os
-    from django.conf import settings
-    
     devices = Device.objects.filter(backup_enabled=True, is_online=True)
     success = 0
+    failed = 0
+    skipped = 0
     
     for device in devices:
+        # VERIFICAR PING PRIMEIRO
+        if not ping_device(str(device.ip)):
+            print(f"[BACKUP] {device.name} nao responde PING - pulando")
+            skipped += 1
+            continue
+        
+        # Equipamento online via PING, pode tentar SSH
         try:
-            cmd = "/export verbose" if 'mikrotik' in device.vendor.lower() else "display current-configuration"
+            from netmiko import ConnectHandler
+            
+            vendor_drivers = {
+                'huawei': 'huawei',
+                'cisco': 'cisco_ios',
+                'mikrotik': 'mikrotik_routeros',
+                'juniper': 'juniper_junos',
+            }
+            
+            device_type = vendor_drivers.get(
+                device.vendor.lower() if device.vendor else '', 
+                'cisco_ios'
+            )
+            
             conn = {
-                'device_type': 'huawei' if 'huawei' in device.vendor.lower() else 'mikrotik_routeros',
-                'host': device.ip,
+                'device_type': device_type,
+                'host': str(device.ip),
+                'port': device.port or 22,
                 'username': device.username,
                 'password': device.password,
-                'port': device.port
+                'timeout': 30,
             }
             
             with ConnectHandler(**conn) as ssh:
-                if 'huawei' in device.vendor.lower():
+                if 'huawei' in (device.vendor or '').lower():
                     ssh.send_command("screen-length 0 temporary")
-                config = ssh.send_command(cmd)
+                    config = ssh.send_command("display current-configuration")
+                elif 'mikrotik' in (device.vendor or '').lower():
+                    config = ssh.send_command("/export verbose")
+                else:
+                    config = ssh.send_command("show running-config")
             
-            # Salvar backup
-            backup_dir = os.path.join(settings.BASE_DIR, 'backups', device.name)
+            # Salvar arquivo
+            backup_dir = f"/opt/lorcgr/backups/{device.name}"
             os.makedirs(backup_dir, exist_ok=True)
             
-            import datetime
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"backup_{device.name}_{timestamp}.cfg"
-            filepath = os.path.join(backup_dir, filename)
+            filename = f"{backup_dir}/backup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.cfg"
             
-            with open(filepath, 'w') as f:
+            with open(filename, 'w') as f:
                 f.write(config)
             
+            DeviceBackup.objects.create(
+                device=device,
+                file_path=filename,
+                status='success'
+            )
+            
+            print(f"[BACKUP] {device.name}: OK")
             success += 1
             
         except Exception as e:
-            print(f"Erro no backup de {device.name}: {e}")
+            print(f"[BACKUP] {device.name}: ERRO - {e}")
+            DeviceBackup.objects.create(
+                device=device,
+                file_path='',
+                status='failed'
+            )
+            failed += 1
     
-    return f"Backups realizados: {success}/{devices.count()}"
+    return f"Backups: {success} ok, {failed} erro, {skipped} pulados"
