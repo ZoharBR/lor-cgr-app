@@ -6,6 +6,22 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+# Usuário atual (será definido pela view)
+_current_user = None
+_current_ip = None
+
+def set_current_user(user, ip_address=None):
+    """Define o usuário atual para logs"""
+    global _current_user, _current_ip
+    _current_user = user
+    _current_ip = ip_address
+
+def get_current_user():
+    return _current_user
+
+def get_current_ip():
+    return _current_ip
+
 def ping_device(ip, count=1, timeout=2):
     try:
         r = subprocess.run(['ping', '-c', str(count), '-W', str(timeout), str(ip)], capture_output=True, timeout=timeout*count+3)
@@ -21,10 +37,30 @@ def ssh_exec(hostname, username, password, command, port=22, timeout=30):
         client.connect(hostname, port=port, username=username, password=password, timeout=timeout)
         stdin, stdout, stderr = client.exec_command(command, timeout=timeout)
         output = stdout.read().decode('utf-8', errors='ignore')
+        error = stderr.read().decode('utf-8', errors='ignore')
         client.close()
-        return {'success': True, 'output': output}
+        return {'success': True, 'output': output, 'error': error}
     except Exception as e:
-        return {'success': False, 'error': str(e)}
+        return {'success': False, 'output': '', 'error': str(e)}
+
+def log_ssh_command(device, command, output, success):
+    """Registra comando SSH no log de auditoria"""
+    try:
+        from users.log_helper import log_ssh
+        user = get_current_user()
+        ip = get_current_ip()
+        if user and user.is_authenticated:
+            log_ssh(
+                user=user,
+                device_ip=device.ip_address,
+                device_name=device.name,
+                command=command,
+                output=output,
+                success=success,
+                ip_address=ip
+            )
+    except Exception as e:
+        logger.error(f"Erro ao registrar log SSH: {e}")
 
 def tool_list_devices(filters=None):
     from devices.models import Device
@@ -34,6 +70,16 @@ def tool_list_devices(filters=None):
     devices = []
     for d in qs[:50]:
         devices.append({'id': d.id, 'name': d.name, 'hostname': d.hostname, 'ip_address': d.ip_address, 'device_type': d.device_type, 'status': 'Online' if d.is_online else 'Offline', 'location': d.location or 'N/A'})
+    
+    # Log da ação
+    try:
+        from users.log_helper import log_action
+        user = get_current_user()
+        if user and user.is_authenticated:
+            log_action(user=user, action='DEVICE_LIST', description=f'Listou {len(devices)} dispositivos', ip_address=get_current_ip())
+    except:
+        pass
+    
     return {'total': qs.count(), 'devices': devices}
 
 def tool_get_device(device_id=None, ip_address=None, hostname=None):
@@ -47,6 +93,16 @@ def tool_get_device(device_id=None, ip_address=None, hostname=None):
             d = Device.objects.get(hostname=hostname)
         else:
             return {'error': 'Forneça device_id, ip_address ou hostname'}
+        
+        # Log da ação
+        try:
+            from users.log_helper import log_action
+            user = get_current_user()
+            if user and user.is_authenticated:
+                log_action(user=user, action='DEVICE_VIEW', description=f'Visualizou dispositivo {d.name} ({d.ip_address})', ip_address=get_current_ip(), metadata={'device_id': d.id, 'device_name': d.name})
+        except:
+            pass
+        
         return {'id': d.id, 'name': d.name, 'hostname': d.hostname, 'ip_address': d.ip_address, 'device_type': d.device_type, 'vendor': d.vendor, 'model': d.model, 'status': 'Online' if d.is_online else 'Offline', 'location': d.location}
     except Device.DoesNotExist:
         return {'error': 'Dispositivo nao encontrado'}
@@ -61,8 +117,24 @@ def tool_ssh_command(device_id=None, ip_address=None, command=None):
             return {'error': 'Dispositivo offline'}
         if not d.ssh_username or not d.ssh_password:
             return {'error': 'Sem credenciais SSH'}
+        
         result = ssh_exec(d.ip_address, d.ssh_username, d.ssh_password, command)
+        
+        # Log detalhado do SSH
+        full_output = result.get('output', '')
+        if result.get('error'):
+            full_output += '\n[ERRO]: ' + result.get('error')
+        
+        log_ssh_command(
+            device=d,
+            command=command,
+            output=full_output,
+            success=result.get('success', False)
+        )
+        
+        # History antigo (mantém compatibilidade)
         DeviceHistory.objects.create(device=d, action='ssh_command', description='Comando: ' + command, details=json.dumps(result))
+        
         return result
     except Device.DoesNotExist:
         return {'error': 'Dispositivo nao encontrado'}

@@ -5,12 +5,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from core_system.models import ChatSession, ChatMessage
-from .tools import get_all_tools, execute_tool
+from .tools import get_all_tools, execute_tool, set_current_user, get_current_user, get_current_ip
 
 logger = logging.getLogger(__name__)
 GROQ_API_KEY = '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'
 GROQ_MODEL = 'llama-3.3-70b-versatile'
 GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+
+def get_client_ip(request):
+    x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded:
+        return x_forwarded.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR')
 
 def call_groq_api(messages, tools=None):
     import requests
@@ -67,15 +73,22 @@ def api_get_session(request, session_id):
 @csrf_exempt
 @require_http_methods(['POST'])
 def api_chat(request):
+    # Define usuário atual para logs
+    user = request.user if request.user.is_authenticated else None
+    ip_address = get_client_ip(request)
+    set_current_user(user, ip_address)
+    
     try:
         data = json.loads(request.body)
     except:
         return JsonResponse({'error': 'JSON invalido'}, status=400)
     user_message = data.get('message', '').strip()
     session_id = data.get('session_id')
-    username = request.user.username if request.user.is_authenticated else 'anonimo'
+    username = user.username if user and user.is_authenticated else 'anonimo'
+    
     if not user_message:
         return JsonResponse({'error': 'Mensagem vazia'}, status=400)
+    
     if session_id:
         try:
             session = ChatSession.objects.get(id=session_id, is_active=True)
@@ -85,15 +98,33 @@ def api_chat(request):
             session = ChatSession.objects.create()
     else:
         session = ChatSession.objects.create()
+    
     ChatMessage.objects.create(session=session, role='user', content=user_message)
+    
+    # Log do chat
+    try:
+        from users.log_helper import log_action
+        if user and user.is_authenticated:
+            log_action(
+                user=user,
+                action='AI_CHAT',
+                description=f'Chat IA: {user_message[:100]}',
+                ip_address=ip_address,
+                metadata={'session_id': str(session.id), 'message': user_message}
+            )
+    except Exception as e:
+        logger.error(f"Erro ao logar chat: {e}")
+    
     history = ChatMessage.objects.filter(session=session).order_by('created_at')
     system = 'Voce e o assistente de IA do LOR CGR. Usuario: ' + username + '. Responda em portugues do Brasil. Use as ferramentas disponiveis para ajudar.'
     messages = [{'role': 'system', 'content': system}]
     for m in list(history)[-10:]:
         messages.append({'role': m.role, 'content': m.content})
+    
     groq_tools = format_tools_for_groq()
     tools_executed = []
     final_response = None
+    
     for _ in range(5):
         resp = call_groq_api(messages, groq_tools)
         if 'error' in resp:
@@ -112,8 +143,10 @@ def api_chat(request):
         else:
             final_response = msg.get('content', 'Sem resposta')
             break
+    
     if final_response is None:
         final_response = 'Erro ao processar'
+    
     ChatMessage.objects.create(session=session, role='assistant', content=final_response, tools_executed=tools_executed)
     return JsonResponse({'message': final_response, 'session_id': str(session.id), 'tools_executed': tools_executed})
 

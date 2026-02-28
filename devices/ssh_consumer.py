@@ -4,6 +4,8 @@ import paramiko
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from datetime import datetime
+from django.contrib.auth.models import User
+
 
 class SSHConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -14,6 +16,30 @@ class SSHConsumer(AsyncWebsocketConsumer):
         self.session_log = []
         self.device_id = None
         self.device_name = ''
+        self.db_user = None
+        self.username = 'Anonymous'
+        self.command_buffer = ''
+        
+        # Capturar usuario do LOR CGR
+        user = self.scope.get('user')
+        if user and user.is_authenticated:
+            self.db_user = user
+            self.username = user.username
+        else:
+            # Tentar pegar da sessao
+            session = self.scope.get('session')
+            if session:
+                user_id = session.get('_auth_user_id')
+                if user_id:
+                    try:
+                        self.db_user = await self.get_user(user_id)
+                        self.username = self.db_user.username
+                    except:
+                        pass
+
+    @database_sync_to_async
+    def get_user(self, user_id):
+        return User.objects.get(id=user_id)
 
     async def disconnect(self, close_code):
         self.running = False
@@ -36,22 +62,48 @@ class SSHConsumer(AsyncWebsocketConsumer):
     def save_session_log(self):
         try:
             from devices.models import Device, TerminalSession, DeviceHistory
+            from users.models import UserAccessLog
             
             device = Device.objects.get(id=self.device_id)
+            
+            # Contar comandos
+            commands = [l for l in self.session_log if l.get('type') == 'command']
+            command_count = len(commands)
+            
+            # Formatar output completo
+            output_text = ""
+            for item in self.session_log:
+                if item['type'] == 'command':
+                    output_text += f"\n[COMANDO]: {item['content']}\n"
+                elif item['type'] == 'output':
+                    output_text += item['content']
             
             # Criar registro da sessao
             session = TerminalSession.objects.create(
                 device=device,
-                user='admin',
+                user=self.username,
                 log_content=json.dumps(self.session_log, indent=2, ensure_ascii=False)
             )
             
-            # Registrar no historico
+            # Registrar no historico do dispositivo
             DeviceHistory.objects.create(
                 device=device,
                 event_type='SSH_DISCONNECT',
-                description=f'Sessao SSH finalizada. ID: {session.id}. Comandos executados: {len([l for l in self.session_log if l.get("type") == "command"])}'
+                description=f'Usuario {self.username} desconectou. Sessao ID: {session.id}. Comandos: {command_count}'
             )
+            
+            # Registrar no UserAccessLog com usuario do LOR CGR
+            if self.db_user:
+                UserAccessLog.objects.create(
+                    user=self.db_user,
+                    action='SSH_DISCONNECT',
+                    description=f'Sessao SSH finalizada em {device.name}. Comandos executados: {command_count}',
+                    ip_address=self.scope.get('client', [''])[0] if self.scope.get('client') else None,
+                    ssh_device=f'{device.name} ({device.ip})',
+                    ssh_command='\n'.join([c['content'] for c in commands]),
+                    ssh_output=output_text[:50000],
+                    ssh_success=True
+                )
         except Exception as e:
             print(f"Erro ao salvar log: {e}")
 
@@ -67,19 +119,19 @@ class SSHConsumer(AsyncWebsocketConsumer):
                 if self.channel and not self.channel.closed:
                     self.channel.send(char)
                     
-                    # Log de comandos
+                    # Capturar comandos completos
                     if char in ['\r', '\n']:
-                        self.session_log.append({
-                            'timestamp': datetime.now().isoformat(),
-                            'type': 'command',
-                            'content': '[ENTER]'
-                        })
-                    elif char == '\t':
-                        self.session_log.append({
-                            'timestamp': datetime.now().isoformat(),
-                            'type': 'key',
-                            'content': '[TAB]'
-                        })
+                        if self.command_buffer.strip():
+                            self.session_log.append({
+                                'timestamp': datetime.now().isoformat(),
+                                'type': 'command',
+                                'content': self.command_buffer.strip()
+                            })
+                        self.command_buffer = ''
+                    elif char == '\x7f' or char == '\x08':  # Backspace
+                        self.command_buffer = self.command_buffer[:-1]
+                    elif char not in ['\x1b', '\t']:  # Ignorar ESC e TAB
+                        self.command_buffer += char
                         
         except Exception as e:
             await self.send(json.dumps({
@@ -93,22 +145,34 @@ class SSHConsumer(AsyncWebsocketConsumer):
         return Device.objects.get(id=device_id)
 
     @database_sync_to_async
-    def log_connection(self, device, status, message):
+    def log_connection(self, device, status, message, user=None):
         from devices.models import DeviceHistory
+        from users.models import UserAccessLog
+        
         DeviceHistory.objects.create(
             device=device,
             event_type=status,
             description=message
         )
+        
+        # Log no UserAccessLog
+        if user and status == 'SSH_CONNECT':
+            UserAccessLog.objects.create(
+                user=user,
+                action='SSH_CONNECT',
+                description=f'SSH conectado em {device.name} ({device.ip})',
+                ip_address=None,
+                ssh_device=f'{device.name} ({device.ip})',
+                ssh_command='[SESSAO INICIADA]',
+                ssh_output='',
+                ssh_success=True
+            )
 
     async def connect_ssh(self, data):
         try:
             # Buscar dispositivo (async)
             device = await self.get_device(self.device_id)
             self.device_name = device.name
-            
-            # Determinar tipo de dispositivo
-            vendor = (device.vendor or '').lower()
             
             await self.send(json.dumps({
                 'type': 'status',
@@ -140,18 +204,19 @@ class SSHConsumer(AsyncWebsocketConsumer):
             self.channel.setblocking(0)
 
             # Log de conexao
-            await self.log_connection(device, 'SSH_CONNECT', f'Conectado via terminal SSH')
+            await self.log_connection(device, 'SSH_CONNECT', f'Usuario {self.username} conectou via terminal SSH', self.db_user)
             
             self.session_log.append({
                 'timestamp': datetime.now().isoformat(),
                 'type': 'connect',
+                'user': self.username,
                 'device': device.name,
                 'ip': device.ip
             })
 
             await self.send(json.dumps({
                 'type': 'connected',
-                'data': f'\r\n[OK] Conectado a {device.name}\r\n\r\n'
+                'data': f'\r\n[OK] Conectado a {device.name}\r\n[Usuario LOR CGR: {self.username}]\r\n\r\n'
             }))
 
             # Iniciar leitura de output
@@ -174,8 +239,6 @@ class SSHConsumer(AsyncWebsocketConsumer):
 
     async def read_output(self):
         """Le output do SSH continuamente"""
-        buffer = ''
-        
         while self.running and self.channel and not self.channel.closed:
             try:
                 if self.channel.recv_ready():
