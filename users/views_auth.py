@@ -3,7 +3,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from .models import UserProfile, UserRole, UserAccessLog
 
 def get_client_ip(request):
@@ -15,7 +17,7 @@ def get_client_ip(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def check_auth(request):
-    """Verifica se usuário está logado"""
+    """Verifica se usuario esta logado"""
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
         return Response({
@@ -34,25 +36,23 @@ def check_auth(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    """Login do usuário"""
+    """Login do usuario"""
     username = request.data.get('username', '')
     password = request.data.get('password', '')
     
     if not username or not password:
-        return Response({'success': False, 'error': 'Usuário e senha são obrigatórios'}, status=400)
+        return Response({'success': False, 'error': 'Usuario e senha sao obrigatorios'}, status=400)
     
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
         if not user.is_active:
-            return Response({'success': False, 'error': 'Usuário inativo'}, status=403)
+            return Response({'success': False, 'error': 'Usuario inativo'}, status=403)
         
         login(request, user)
         
-        # Criar profile se não existir
         profile, created = UserProfile.objects.get_or_create(user=user)
         
-        # Registrar log de login
         UserAccessLog.objects.create(
             user=user,
             action='USER_LOGIN',
@@ -73,13 +73,13 @@ def login_view(request):
             }
         })
     
-    return Response({'success': False, 'error': 'Usuário ou senha incorretos'}, status=401)
+    return Response({'success': False, 'error': 'Usuario ou senha incorretos'}, status=401)
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    """Logout do usuário"""
-    # Registrar log de logout
+    """Logout do usuario - Limpa sessao completamente"""
     UserAccessLog.objects.create(
         user=request.user,
         action='USER_LOGOUT',
@@ -88,11 +88,22 @@ def logout_view(request):
     )
     
     logout(request)
-    return Response({'success': True})
+    
+    from django.contrib.sessions.models import Session
+    try:
+        Session.objects.filter(session_key=request.session.session_key).delete()
+    except:
+        pass
+    
+    response = Response({'success': True, 'clear_storage': True})
+    response.delete_cookie('sessionid', path='/')
+    response.delete_cookie('csrftoken', path='/')
+    
+    return response
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
 def get_csrf(request):
-    """Obtém token CSRF"""
+    """Obtem token CSRF"""
     return Response({'success': True})

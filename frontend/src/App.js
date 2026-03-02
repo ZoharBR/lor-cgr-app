@@ -37,11 +37,22 @@ function App() {
   const handleLogin = (userData) => setUser(userData);
 
   const handleLogout = async () => {
+    console.log('=== BOTAO LOGOUT CLICADO ===');
     try {
-      await fetch('/api/auth/logout/', { method: 'POST', credentials: 'include' });
-    } catch (err) {}
+      console.log('Chamando API de logout...');
+      const response = await fetch('/api/auth/logout/', { 
+        method: 'POST', 
+        credentials: 'include' 
+      });
+      const data = await response.json();
+      console.log('Resposta do logout:', data);
+    } catch (err) {
+      console.error('ERRO no logout:', err);
+    }
     setUser(null);
     setCurrentPage('dashboard');
+    localStorage.clear();
+    console.log('Logout finalizado no frontend');
   };
 
   const renderPage = () => {
