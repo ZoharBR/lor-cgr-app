@@ -9,6 +9,7 @@ import Settings from './Settings';
 import Integrations from './Integrations';
 import AIAssistant from './AIAssistant';
 import UsersManagement from './UsersManagement';
+import MassCommands from './MassCommands';
 import { Button } from './ui/button';
 import { LogOut } from 'lucide-react';
 
@@ -25,6 +26,7 @@ function MainApp({ user, onLogout }) {
       case 'integrations': return <Integrations user={user} />;
       case 'ai': return <AIAssistant user={user} />;
       case 'users': return <UsersManagement user={user} />;
+      case 'mass-commands': return <MassCommands user={user} />;
       case 'settings': return <Settings user={user} />;
       default: return <Dashboard user={user} />;
     }

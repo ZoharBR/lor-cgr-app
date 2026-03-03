@@ -1,10 +1,11 @@
 import React from 'react';
 
-const Sidebar = ({ currentPage, setCurrentPage }) => {
+const Sidebar = ({ currentPage, setCurrentPage, user }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'inventory', label: 'Inventario', icon: '🖥️' },
     { id: 'terminal', label: 'Terminal SSH', icon: '💻' },
+    { id: 'mass-commands', label: 'Comandos em Massa', icon: '⚡' },
     { id: 'backups', label: 'Backups', icon: '💾' },
     { id: 'audit', label: 'Logs', icon: '📋' },
     { id: 'integrations', label: 'Integracoes', icon: '🔗' },
