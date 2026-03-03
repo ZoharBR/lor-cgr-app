@@ -258,3 +258,109 @@ def backup_device_configs():
             failed += 1
     
     return f"Backups: {success} ok, {failed} erro, {skipped} pulados"
+
+
+import time
+import paramiko
+from celery import shared_task
+from django.utils import timezone
+
+from .models import MassCommandExecution, MassCommandResult, Device
+
+
+@shared_task
+def execute_mass_command(execution_id, variables=None):
+    """Executa comandos em massa em multiplos equipamentos"""
+    variables = variables or {}
+    
+    try:
+        execution = MassCommandExecution.objects.get(id=execution_id)
+    except MassCommandExecution.DoesNotExist:
+        return
+    
+    execution.status = 'running'
+    execution.started_at = timezone.now()
+    execution.save()
+    
+    script = execution.script
+    commands = script.commands
+    timeout = script.timeout
+    
+    # Substituir variaveis nos comandos
+    for key, value in variables.items():
+        commands = commands.replace(f'{{{key}}}', str(value))
+    
+    success_count = 0
+    failed_count = 0
+    
+    for device in execution.devices.all():
+        result = execute_on_device(device, commands, timeout)
+        
+        MassCommandResult.objects.create(
+            execution=execution,
+            device=device,
+            success=result['success'],
+            output=result['output'],
+            error_message=result['error'],
+            execution_time=result['time'],
+        )
+        
+        if result['success']:
+            success_count += 1
+        else:
+            failed_count += 1
+    
+    # Definir status final
+    if failed_count == 0:
+        execution.status = 'completed'
+    elif success_count == 0:
+        execution.status = 'failed'
+    else:
+        execution.status = 'partial'
+    
+    execution.finished_at = timezone.now()
+    execution.save()
+
+
+def execute_on_device(device, commands, timeout=30):
+    """Executa comandos em um dispositivo"""
+    start_time = time.time()
+    
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        
+        client.connect(
+            hostname=device.ip,
+            port=device.port,
+            username=device.username,
+            password=device.password,
+            timeout=timeout,
+            look_for_keys=False,
+            allow_agent=False,
+        )
+        
+        # Executar comandos
+        stdin, stdout, stderr = client.exec_command(commands, timeout=timeout)
+        output = stdout.read().decode('utf-8', errors='ignore')
+        error = stderr.read().decode('utf-8', errors='ignore')
+        
+        client.close()
+        
+        execution_time = time.time() - start_time
+        
+        return {
+            'success': True,
+            'output': output or error,
+            'error': '',
+            'time': round(execution_time, 2),
+        }
+        
+    except Exception as e:
+        execution_time = time.time() - start_time
+        return {
+            'success': False,
+            'output': '',
+            'error': str(e),
+            'time': round(execution_time, 2),
+        }

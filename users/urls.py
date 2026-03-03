@@ -7,6 +7,7 @@ urlpatterns = [
     path('auth/check/', views_auth.check_auth, name='api_check_auth'),
     path('auth/login/', views_auth.login_view, name='api_login'),
     path('auth/logout/', views_auth.logout_view, name='api_logout'),
+    path('auth/logout/simple/', views_auth.logout_view_simple, name='logout_simple'),
     path('auth/csrf/', views_auth.get_csrf, name='api_csrf'),
     
     # Usuários

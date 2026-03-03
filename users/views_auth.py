@@ -107,3 +107,37 @@ def logout_view(request):
 def get_csrf(request):
     """Obtem token CSRF"""
     return Response({'success': True})
+
+
+# Logout view sem DRF - Django puro para evitar problemas de CSRF
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+
+@require_POST
+@csrf_exempt
+def logout_view_simple(request):
+    """Logout sem DRF - apenas Django"""
+    from django.contrib.auth import logout as django_logout
+    from django.contrib.sessions.models import Session
+    
+    try:
+        UserAccessLog.objects.create(
+            user=request.user,
+            action='USER_LOGOUT',
+            description='Logout realizado',
+            ip_address=get_client_ip(request),
+        )
+    except:
+        pass
+    
+    django_logout(request)
+    
+    try:
+        Session.objects.filter(session_key=request.session.session_key).delete()
+    except:
+        pass
+    
+    response = JsonResponse({'success': True, 'clear_storage': True})
+    response.delete_cookie('sessionid', path='/')
+    response.delete_cookie('csrftoken', path='/')
+    return response
