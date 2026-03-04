@@ -63,6 +63,7 @@ function MassCommands({ user }) {
     return true;
   });
 
+  // ========== CRIAR SCRIPT ==========
   const handleCreateScript = async () => {
     if (!formData.name.trim()) {
       alert('Nome do script e obrigatorio');
@@ -92,6 +93,7 @@ function MassCommands({ user }) {
     }
   };
 
+  // ========== EDITAR SCRIPT ==========
   const openEditModal = (script) => {
     setEditingScript(script);
     setEditFormData({
@@ -133,6 +135,7 @@ function MassCommands({ user }) {
     }
   };
 
+  // ========== EXCLUIR SCRIPT ==========
   const handleDeleteScript = async (scriptId) => {
     if (!confirm('Tem certeza que deseja excluir este script?')) return;
     try {
@@ -149,6 +152,7 @@ function MassCommands({ user }) {
     }
   };
 
+  // ========== EXECUTAR SCRIPT ==========
   const handleExecute = async () => {
     if (selectedDevices.length === 0) {
       alert('Selecione pelo menos um equipamento');
@@ -224,7 +228,7 @@ function MassCommands({ user }) {
     return labels[status] || status;
   };
 
-  const isAdmin = user && (user.role === 'ADMIN' || user.role === 'admin');
+  const isAdmin = user && (user.role === 'ADMIN');
 
   return (
     <div className="space-y-6">
@@ -237,6 +241,7 @@ function MassCommands({ user }) {
         )}
       </div>
 
+      {/* Scripts */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-white mb-4">Scripts</h3>
         {scripts.length === 0 ? (
@@ -280,6 +285,7 @@ function MassCommands({ user }) {
         )}
       </div>
 
+      {/* Historico de Execucoes */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-white mb-4">Historico de Execucoes</h3>
         {executions.length === 0 ? (
@@ -324,6 +330,7 @@ function MassCommands({ user }) {
         )}
       </div>
 
+      {/* Modal Criar Script */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-lg">
@@ -402,6 +409,7 @@ function MassCommands({ user }) {
         </div>
       )}
 
+      {/* Modal Editar Script */}
       {showEditModal && editingScript && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-lg">
@@ -477,6 +485,7 @@ function MassCommands({ user }) {
         </div>
       )}
 
+      {/* Modal Executar */}
       {showExecuteModal && selectedScript && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-auto">
@@ -490,6 +499,7 @@ function MassCommands({ user }) {
               </button>
             </div>
             
+            {/* Preview dos comandos */}
             <div className="bg-zinc-800 rounded-lg p-3 mb-4">
               <p className="text-zinc-400 text-xs mb-2">Comandos que serao executados:</p>
               <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap">{selectedScript.commands}</pre>
@@ -559,6 +569,7 @@ function MassCommands({ user }) {
         </div>
       )}
 
+      {/* Modal Resultados */}
       {showResultsModal && selectedExecution && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-4xl max-h-[85vh] overflow-auto">
@@ -577,6 +588,7 @@ function MassCommands({ user }) {
               </button>
             </div>
             
+            {/* Comandos executados */}
             {selectedExecution.execution?.script_commands && (
               <div className="bg-zinc-800 rounded-lg p-3 mb-4">
                 <p className="text-zinc-400 text-xs mb-2">Comandos:</p>
