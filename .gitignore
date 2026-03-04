@@ -1,26 +1,46 @@
-# Credenciais e senhas
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+
+# Node.js
+node_modules/
+frontend/node_modules/
+frontend/build/
+.npm
+
+# Secrets
 .env
-*.env
-credentials.json
-cookies.txt
-CREDENCIAIS.txt
+.env.local
 *.pem
 *.key
 
-# Banco de dados
-*.sqlite3
-*.db
-db.sqlite3
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Arquivos sensíveis
-backups/
-media/
-logs/
-*.log
-__pycache__/
-*.pyc
-venv/
-node_modules/
+# OS
+.DS_Store
+Thumbs.db
 
-# Configurações locais
-settings_local.py
+# Backups locais
+backups_correcoes_*/
+*.bak
+
+# Static files (gerado automaticamente)
+staticfiles/
