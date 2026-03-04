@@ -1,7 +1,6 @@
 import paramiko
 import time
 from django.utils import timezone
-from django.core.files.base import ContentFile
 from devices.models import Device, DeviceBackup
 
 def run_device_backup(device_id):
@@ -10,17 +9,18 @@ def run_device_backup(device_id):
     com o nome: NomeDoEquipamento_ANO-MES-DIA_HORA-MINUTO.extensao
     
     CORRIGIDO: device.user -> device.username
+    CORRIGIDO: Removido campo 'size' que nao existe no modelo
     """
     try:
         device = Device.objects.get(id=device_id)
         
-        # Configura SSH - CORRIGIDO: usar device.username (nao device.user)
+        # Configura SSH
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
             device.ip, 
             port=device.port, 
-            username=device.username,  # CORRIGIDO: era device.user
+            username=device.username,
             password=device.password, 
             timeout=15,
             look_for_keys=False,
@@ -32,17 +32,16 @@ def run_device_backup(device_id):
 
         # === LOGICA MIKROTIK ===
         if device.vendor and 'mikrotik' in device.vendor.lower():
-            file_extension = "rsc" # Script RouterOS
+            file_extension = "rsc"
             stdin, stdout, stderr = ssh.exec_command('/export verbose')
             config_output = stdout.read().decode('utf-8', 'ignore')
 
         # === LOGICA HUAWEI ===
         elif device.vendor and 'huawei' in device.vendor.lower():
-            file_extension = "cfg" # Config Huawei
+            file_extension = "cfg"
             channel = ssh.invoke_shell()
             channel.settimeout(10)
             
-            # Comandos para exibir configuracao sem pausas
             commands = [
                 'screen-length 0 temporary', 
                 'display current-configuration'
@@ -52,14 +51,10 @@ def run_device_backup(device_id):
                 channel.send(cmd + '\n')
                 time.sleep(0.5)
             
-            # Aguarda o buffer encher
             time.sleep(3)
             
             while channel.recv_ready():
                 config_output += channel.recv(9999).decode('utf-8', 'ignore')
-            
-            # Limpeza basica do output (opcional, remove prompts)
-            # config_output = config_output.replace('More...', '')
         
         # === LOGICA CISCO ===
         elif device.vendor and 'cisco' in device.vendor.lower():
@@ -87,49 +82,51 @@ def run_device_backup(device_id):
             stdin, stdout, stderr = ssh.exec_command('show configuration | display set')
             config_output = stdout.read().decode('utf-8', 'ignore')
 
-        # === LOGICA GENERICA (LINUX/OUTROS) ===
+        # === LOGICA GENERICA ===
         else:
             file_extension = "txt"
-            # Tentar comandos comuns
             try:
-                stdin, stdout, stderr = ssh.exec_command('cat /etc/config/* 2>/dev/null || show running-config 2>/dev/null || export verbose 2>/dev/null')
+                stdin, stdout, stderr = ssh.exec_command('cat /etc/config/* 2>/dev/null || show running-config 2>/dev/null')
                 config_output = stdout.read().decode('utf-8', 'ignore')
             except:
                 pass
 
         ssh.close()
 
-        # Verifica se veio algo vazio
         if not config_output or len(config_output) < 50:
             raise Exception("O equipamento retornou um arquivo vazio ou muito curto.")
 
-        # === NOMEACAO DO ARQUIVO ===
-        # Formato: Nome_YYYY-MM-DD_HH-MM-SS.ext
+        # Salvar arquivo
         timestamp = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
-        safe_name = device.name.replace(" ", "_") # Remove espacos do nome
+        safe_name = device.name.replace(" ", "_")
+        
+        backup_dir = f"/opt/lorcgr/backups/{safe_name}"
+        import os
+        os.makedirs(backup_dir, exist_ok=True)
+        
         filename = f"{safe_name}_{timestamp}.{file_extension}"
+        filepath = os.path.join(backup_dir, filename)
+        
+        with open(filepath, 'w') as f:
+            f.write(config_output)
 
-        # Salva no Banco de Dados
-        backup = DeviceBackup(
+        # Salvar no banco - SEM o campo size
+        DeviceBackup.objects.create(
             device=device,
-            status="Sucesso: Configuracao extraida com exito.",
-            size=f"{len(config_output)/1024:.2f} KB"
+            file_path=filepath,
+            status='success'
         )
-        # O Django salva automaticamente na pasta /media/backups/
-        backup.file.save(filename, ContentFile(config_output))
-        backup.save()
 
         return True, f"Backup de {device.name} realizado com sucesso!"
 
     except Exception as e:
-        # Registra a falha no banco tambem
         try:
             device = Device.objects.get(id=device_id)
             DeviceBackup.objects.create(
                 device=device,
-                status=f"Erro: {str(e)}",
-                size="0 KB"
+                file_path='',
+                status='failed'
             )
         except: pass
         
-        return False, f"Erro ao fazer backup de {device.name}: {str(e)}"
+        return False, f"Erro ao fazer backup: {str(e)}"

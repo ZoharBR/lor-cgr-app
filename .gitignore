@@ -1,10 +1,26 @@
-venv/
-# Backups grandes
-backups/*.sql
-backups/full_backup*/
-*.pyc
+# Credenciais e senhas
+.env
+*.env
+credentials.json
+cookies.txt
+CREDENCIAIS.txt
+*.pem
+*.key
+
+# Banco de dados
+*.sqlite3
+*.db
+db.sqlite3
+
+# Arquivos sensíveis
+backups/
+media/
+logs/
+*.log
 __pycache__/
-node_modules/.cache/
-frontend/node_modules/.cache/
-staticfiles/
-celerybeat-schedule.db
+*.pyc
+venv/
+node_modules/
+
+# Configurações locais
+settings_local.py

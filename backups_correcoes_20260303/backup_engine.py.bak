@@ -6,21 +6,19 @@ from devices.models import Device, DeviceBackup
 
 def run_device_backup(device_id):
     """
-    Conecta no equipamento via SSH, extrai a configuracao e salva
+    Conecta no equipamento via SSH, extrai a configuração e salva
     com o nome: NomeDoEquipamento_ANO-MES-DIA_HORA-MINUTO.extensao
-    
-    CORRIGIDO: device.user -> device.username
     """
     try:
         device = Device.objects.get(id=device_id)
         
-        # Configura SSH - CORRIGIDO: usar device.username (nao device.user)
+        # Configura SSH
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(
             device.ip, 
             port=device.port, 
-            username=device.username,  # CORRIGIDO: era device.user
+            username=device.user, 
             password=device.password, 
             timeout=15,
             look_for_keys=False,
@@ -30,19 +28,19 @@ def run_device_backup(device_id):
         config_output = ""
         file_extension = "txt"
 
-        # === LOGICA MIKROTIK ===
-        if device.vendor and 'mikrotik' in device.vendor.lower():
+        # === LÓGICA MIKROTIK ===
+        if device.vendor == 'MikroTik':
             file_extension = "rsc" # Script RouterOS
             stdin, stdout, stderr = ssh.exec_command('/export verbose')
             config_output = stdout.read().decode('utf-8', 'ignore')
 
-        # === LOGICA HUAWEI ===
-        elif device.vendor and 'huawei' in device.vendor.lower():
+        # === LÓGICA HUAWEI ===
+        elif device.vendor == 'Huawei':
             file_extension = "cfg" # Config Huawei
             channel = ssh.invoke_shell()
             channel.settimeout(10)
             
-            # Comandos para exibir configuracao sem pausas
+            # Comandos para exibir configuração sem pausas
             commands = [
                 'screen-length 0 temporary', 
                 'display current-configuration'
@@ -58,44 +56,8 @@ def run_device_backup(device_id):
             while channel.recv_ready():
                 config_output += channel.recv(9999).decode('utf-8', 'ignore')
             
-            # Limpeza basica do output (opcional, remove prompts)
+            # Limpeza básica do output (opcional, remove prompts)
             # config_output = config_output.replace('More...', '')
-        
-        # === LOGICA CISCO ===
-        elif device.vendor and 'cisco' in device.vendor.lower():
-            file_extension = "cfg"
-            channel = ssh.invoke_shell()
-            channel.settimeout(10)
-            
-            commands = [
-                'terminal length 0',
-                'show running-config'
-            ]
-            
-            for cmd in commands:
-                channel.send(cmd + '\n')
-                time.sleep(0.5)
-            
-            time.sleep(3)
-            
-            while channel.recv_ready():
-                config_output += channel.recv(9999).decode('utf-8', 'ignore')
-
-        # === LOGICA JUNIPER ===
-        elif device.vendor and 'juniper' in device.vendor.lower():
-            file_extension = "conf"
-            stdin, stdout, stderr = ssh.exec_command('show configuration | display set')
-            config_output = stdout.read().decode('utf-8', 'ignore')
-
-        # === LOGICA GENERICA (LINUX/OUTROS) ===
-        else:
-            file_extension = "txt"
-            # Tentar comandos comuns
-            try:
-                stdin, stdout, stderr = ssh.exec_command('cat /etc/config/* 2>/dev/null || show running-config 2>/dev/null || export verbose 2>/dev/null')
-                config_output = stdout.read().decode('utf-8', 'ignore')
-            except:
-                pass
 
         ssh.close()
 
@@ -103,16 +65,16 @@ def run_device_backup(device_id):
         if not config_output or len(config_output) < 50:
             raise Exception("O equipamento retornou um arquivo vazio ou muito curto.")
 
-        # === NOMEACAO DO ARQUIVO ===
+        # === NOMEAÇÃO DO ARQUIVO (AQUI ESTÁ A MUDANÇA) ===
         # Formato: Nome_YYYY-MM-DD_HH-MM-SS.ext
         timestamp = timezone.now().strftime('%Y-%m-%d_%H-%M-%S')
-        safe_name = device.name.replace(" ", "_") # Remove espacos do nome
+        safe_name = device.name.replace(" ", "_") # Remove espaços do nome
         filename = f"{safe_name}_{timestamp}.{file_extension}"
 
         # Salva no Banco de Dados
         backup = DeviceBackup(
             device=device,
-            status="Sucesso: Configuracao extraida com exito.",
+            status="Sucesso: Configuração extraída com êxito.",
             size=f"{len(config_output)/1024:.2f} KB"
         )
         # O Django salva automaticamente na pasta /media/backups/
@@ -122,9 +84,8 @@ def run_device_backup(device_id):
         return True, f"Backup de {device.name} realizado com sucesso!"
 
     except Exception as e:
-        # Registra a falha no banco tambem
+        # Registra a falha no banco também
         try:
-            device = Device.objects.get(id=device_id)
             DeviceBackup.objects.create(
                 device=device,
                 status=f"Erro: {str(e)}",
