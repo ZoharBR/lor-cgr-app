@@ -51,6 +51,7 @@ def api_list_devices(request):
             'hostname': d.name, 
             'ip_address': d.ip, 
             'vendor': d.vendor or '',
+            'device_type': d.device_type or 'Router',
             'model': d.model or '', 
             'os_version': d.os_version or '', 
             'serial_number': d.serial_number or '',
@@ -65,6 +66,10 @@ def api_list_devices(request):
             'snmp_version': d.snmp_version or 'v2c', 
             'is_bras': d.is_bras,
             'is_online': d.is_online,
+            'icmp_status': d.icmp_status or 'unknown',
+            'icmp_latency': d.icmp_latency or 0,
+            'icmp_packet_loss': d.icmp_packet_loss or 0,
+            'last_icmp_check': d.last_icmp_check.isoformat() if d.last_icmp_check else None,
             'backup_enabled': d.backup_enabled, 
             'backup_frequency': d.backup_frequency or 'daily',
             'backup_time': d.backup_time.strftime('%H:%M') if d.backup_time else '03:00'
@@ -89,6 +94,7 @@ def api_save_device(request):
                 if data.get('hostname'): device.name = data.get('hostname')
                 if data.get('ip_address'): device.ip = data.get('ip_address')
                 if data.get('vendor') is not None: device.vendor = data.get('vendor')
+                if data.get('device_type') is not None: device.device_type = data.get('device_type')
                 if data.get('model') is not None: device.model = data.get('model')
                 if data.get('os_version') is not None: device.os_version = data.get('os_version')
                 if data.get('serial_number') is not None: device.serial_number = data.get('serial_number')
@@ -119,6 +125,7 @@ def api_save_device(request):
                     name=data.get('hostname'),
                     ip=data.get('ip_address'),
                     vendor=data.get('vendor', ''),
+                    device_type=data.get('device_type', 'Router'),
                     port=int(data.get('port', 22)),
                     username=data.get('username', ''),
                     password=data.get('password', ''),
@@ -309,3 +316,323 @@ def api_delete_backup(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     return JsonResponse({'status': 'error'}, status=400)
+
+
+# ============================================
+# NOVAS APIs - ICMP, LIBRENMS, INTERFACES
+# ============================================
+
+@csrf_exempt
+def api_icmp_check(request, device_id=None):
+    """Executa verificacao ICMP em um dispositivo ou todos"""
+    from .icmp_service import ICMPChecker
+    from .models import Device
+    
+    try:
+        if device_id:
+            # Verificar dispositivo especifico
+            device = Device.objects.get(id=device_id)
+            result = ICMPChecker.check_device(device)
+            return JsonResponse({'status': 'success', 'result': result})
+        else:
+            # Verificar todos
+            results = ICMPChecker.check_all_devices()
+            return JsonResponse({'status': 'success', 'results': results, 'count': len(results)})
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def api_device_types(request):
+    """Retorna os tipos de dispositivo disponiveis para cada vendor"""
+    from .models import Device
+    
+    vendor = request.GET.get('vendor', '')
+    
+    if vendor:
+        types = Device.get_vendor_types(vendor)
+        type_choices = dict(Device.TYPE_CHOICES)
+        result = [{'value': t, 'label': type_choices.get(t, t)} for t in types]
+    else:
+        # Retornar todos
+        result = {}
+        for vendor_code, vendor_name in Device.VENDOR_CHOICES:
+            types = Device.get_vendor_types(vendor_code)
+            type_choices = dict(Device.TYPE_CHOICES)
+            result[vendor_code] = {
+                'name': vendor_name,
+                'types': [{'value': t, 'label': type_choices.get(t, t)} for t in types]
+            }
+    
+    return JsonResponse(result)
+
+
+@csrf_exempt
+def api_librenms_sync(request):
+    """Sincroniza dispositivos do LibreNMS"""
+    from .models import Device
+    from core_system.models import SystemSettings
+    
+    try:
+        settings = SystemSettings.load()
+        if not settings.librenms_enabled:
+            return JsonResponse({'status': 'error', 'message': 'LibreNMS desabilitado'}, status=400)
+        
+        import requests
+        headers = {'X-Auth-Token': settings.librenms_api_token}
+        
+        # Buscar dispositivos do LibreNMS
+        response = requests.get(
+            f"{settings.librenms_url}/api/v0/devices",
+            headers=headers,
+            timeout=10
+        )
+        data = response.json()
+        
+        if data.get('status') != 'ok':
+            return JsonResponse({'status': 'error', 'message': 'Erro na API LibreNMS'}, status=500)
+        
+        librenms_devices = data.get('devices', [])
+        created = 0
+        updated = 0
+        
+        # Mapear OS para vendor
+        os_to_vendor = {
+            'routeros': 'Mikrotik', 'mikrotik': 'Mikrotik',
+            'vrp': 'Huawei', 'huawei': 'Huawei',
+            'ios': 'Cisco', 'iosxe': 'Cisco', 'iosxr': 'Cisco', 'nxos': 'Cisco',
+            'junos': 'Juniper',
+            'fiberhome': 'FiberHome', 'fh': 'FiberHome',
+            'linux': 'Linux', 'ubuntu': 'Linux', 'debian': 'Linux',
+            'edgeos': 'Ubiquiti', 'unifi': 'Ubiquiti',
+            'fortios': 'Fortinet',
+            'procurve': 'HP/Aruba', 'arubaos': 'HP/Aruba',
+            'tplink': 'TP-Link',
+        }
+        
+        # Mapear OS para tipo de dispositivo
+        os_to_type = {
+            'routeros': 'Router', 'mikrotik': 'Router',
+            'vrp': 'Router', 'huawei': 'Router',
+            'ios': 'Router', 'iosxe': 'Router', 'iosxr': 'Router',
+            'junos': 'Router',
+            'linux': 'Server', 'ubuntu': 'Server', 'debian': 'Server',
+            'edgeos': 'Router', 'unifi': 'Wireless',
+            'fortios': 'Router',
+        }
+        
+        for dev in librenms_devices:
+            os_type = dev.get('os', 'unknown').lower()
+            ip_addr = dev.get('ip', dev.get('hostname', ''))
+            
+            if not ip_addr:
+                continue
+            
+            vendor = os_to_vendor.get(os_type, 'Outro')
+            device_type = os_to_type.get(os_type, 'Outro')
+            
+            device_data = {
+                'name': dev.get('sysName') or dev.get('hostname', 'Unknown'),
+                'vendor': vendor,
+                'device_type': device_type,
+                'is_online': dev.get('status', 0) == 1,
+                'librenms_id': dev.get('device_id'),
+                'model': dev.get('hardware', '') or '',
+                'os_version': dev.get('version', '') or '',
+                'serial_number': dev.get('serial', '') or '',
+                'snmp_community': dev.get('community', 'public'),
+            }
+            
+            device, is_new = Device.objects.update_or_create(
+                ip=ip_addr,
+                defaults=device_data
+            )
+            
+            if is_new:
+                created += 1
+            else:
+                updated += 1
+        
+        return JsonResponse({
+            'status': 'success',
+            'created': created,
+            'updated': updated,
+            'total': len(librenms_devices)
+        })
+        
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_sync_interfaces(request, device_id):
+    """Sincroniza interfaces de um dispositivo do LibreNMS"""
+    from .models import Device, DeviceInterface
+    from core_system.models import SystemSettings
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        
+        if not device.librenms_id:
+            return JsonResponse({'status': 'error', 'message': 'Dispositivo nao tem LibreNMS ID'}, status=400)
+        
+        settings = SystemSettings.load()
+        if not settings.librenms_enabled:
+            return JsonResponse({'status': 'error', 'message': 'LibreNMS desabilitado'}, status=400)
+        
+        import requests
+        headers = {'X-Auth-Token': settings.librenms_api_token}
+        
+        # Buscar ports do LibreNMS
+        response = requests.get(
+            f"{settings.librenms_url}/api/v0/devices/{device.librenms_id}/ports",
+            headers=headers,
+            params={'columns': 'port_id,ifIndex,ifName,ifAlias,ifDescr,ifAdminStatus,ifOperStatus,ifSpeed,ifMtu,ifType,ifInOctets_rate,ifOutOctets_rate'},
+            timeout=15
+        )
+        data = response.json()
+        
+        if data.get('status') != 'ok':
+            return JsonResponse({'status': 'error', 'message': 'Erro ao buscar ports'}, status=500)
+        
+        ports = data.get('ports', [])
+        synced = 0
+        
+        for port in ports:
+            # Pular interfaces virtuais/loopback
+            if_name = port.get('ifName', '')
+            if not if_name or 'Vlan' in if_name or 'Loop' in if_name or 'Null' in if_name:
+                continue
+            
+            interface, created = DeviceInterface.objects.update_or_create(
+                device=device,
+                if_index=port.get('ifIndex', 0),
+                defaults={
+                    'if_name': if_name,
+                    'if_alias': port.get('ifAlias', ''),
+                    'if_descr': port.get('ifDescr', ''),
+                    'if_admin_status': port.get('ifAdminStatus', 'down'),
+                    'if_oper_status': port.get('ifOperStatus', 'down'),
+                    'if_speed': int(port.get('ifSpeed', 0)),
+                    'if_mtu': port.get('ifMtu', 1500),
+                    'if_type': port.get('ifType', ''),
+                    'traffic_in': int(port.get('ifInOctets_rate', 0) or 0) * 8,  # bits/s
+                    'traffic_out': int(port.get('ifOutOctets_rate', 0) or 0) * 8,
+                    'librenms_port_id': port.get('port_id'),
+                }
+            )
+            synced += 1
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'interfaces_synced': synced
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+def api_device_interfaces(request, device_id):
+    """Lista interfaces de um dispositivo"""
+    from .models import Device, DeviceInterface
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        interfaces = DeviceInterface.objects.filter(device=device)
+        
+        result = []
+        for iface in interfaces:
+            result.append({
+                'id': iface.id,
+                'if_index': iface.if_index,
+                'if_name': iface.if_name,
+                'if_alias': iface.if_alias or '',
+                'if_descr': iface.if_descr or '',
+                'admin_status': iface.if_admin_status,
+                'oper_status': iface.if_oper_status,
+                'speed': iface.if_speed,
+                'mtu': iface.if_mtu,
+                'traffic_in': iface.traffic_in,
+                'traffic_out': iface.traffic_out,
+                'has_gbic': iface.has_gbic,
+                'gbic_type': iface.gbic_type or '',
+                'gbic_vendor': iface.gbic_vendor or '',
+                'gbic_serial': iface.gbic_serial or '',
+                'rx_power': iface.rx_power,
+                'tx_power': iface.tx_power,
+                'optical_status': iface.get_optical_status(),
+                'last_updated': iface.last_updated.isoformat() if iface.last_updated else None,
+            })
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'interfaces': result
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+
+
+@csrf_exempt
+def api_sync_optical(request, device_id):
+    """Sincroniza dados opticos (GBIC/SFP) via SNMP"""
+    from .models import Device, DeviceInterface
+    import subprocess
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        interfaces = DeviceInterface.objects.filter(device=device, has_gbic=True)
+        
+        if not interfaces.exists():
+            # Tentar detectar interfaces opticas
+            interfaces = DeviceInterface.objects.filter(device=device)
+        
+        synced = 0
+        for iface in interfaces:
+            try:
+                # OIDs para niveis opticos (padrao SFF-8472)
+                # Rx power: 1.3.6.1.4.1.9.9.91.1.1.1.1.4.{ifIndex}
+                # Tx power: 1.3.6.1.4.1.9.9.91.1.1.1.1.5.{ifIndex}
+                
+                # Usar OIDs genericos
+                rx_oid = f"1.3.6.1.4.1.9.9.91.1.1.1.1.4.{iface.if_index}"
+                tx_oid = f"1.3.6.1.4.1.9.9.91.1.1.1.1.5.{iface.if_index}"
+                
+                # SNMP get
+                cmd = f"snmpget -v2c -c {device.snmp_community} -Oqv {device.ip} {rx_oid} {tx_oid}"
+                result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=5)
+                
+                output = result.stdout.strip().split('\n')
+                if len(output) >= 2:
+                    try:
+                        # Valores em centésimos de dBm
+                        rx = float(output[0]) / 100 if output[0] and output[0] != 'No Such Instance' else None
+                        tx = float(output[1]) / 100 if output[1] and output[1] != 'No Such Instance' else None
+                        
+                        if rx is not None and tx is not None:
+                            iface.rx_power = rx
+                            iface.tx_power = tx
+                            iface.has_gbic = True
+                            iface.save()
+                            synced += 1
+                    except:
+                        pass
+                        
+            except Exception as e:
+                continue
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'optical_synced': synced
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

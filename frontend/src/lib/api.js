@@ -1,4 +1,4 @@
-const API_BASE = '/devices/api';
+const API_BASE = '/api/devices';
 const SETTINGS_API = '/api/settings';
 
 const fetchAPI = async (endpoint, options = {}) => {

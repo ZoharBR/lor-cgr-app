@@ -33,7 +33,7 @@ export default function Terminal() {
   }, [settings]);
 
   useEffect(() => {
-    fetch('/devices/api/list/')
+    fetch('/api/devices/list/')
       .then(res => res.json())
       .then(data => {
         const list = data.devices || data || [];
