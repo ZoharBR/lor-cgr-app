@@ -19,7 +19,10 @@ urlpatterns = [
     # LibreNMS Sync
     path('librenms/sync/', views.api_librenms_sync, name='api_librenms_sync'),
     path('librenms/sync-interfaces/<int:device_id>/', views.api_sync_interfaces, name='api_sync_interfaces'),
+    path('librenms/sync-transceivers/<int:device_id>/', views.api_sync_transceivers, name='api_sync_transceivers'),
+    path('librenms/sync-all/<int:device_id>/', views.api_sync_all_interfaces, name='api_sync_all_interfaces'),
     path('librenms/sync-optical/<int:device_id>/', views.api_sync_optical, name='api_sync_optical'),
+    path('librenms/sync-ddm/<int:device_id>/', views.api_sync_ddm_sensors, name='api_sync_ddm_sensors'),
     
     # Interfaces
     path('device/<int:device_id>/interfaces/', views.api_device_interfaces, name='api_device_interfaces'),

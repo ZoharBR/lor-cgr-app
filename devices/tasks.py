@@ -392,3 +392,115 @@ def execute_on_device(device, commands, timeout=30):
             'error': str(e),
             'time': round(execution_time, 2),
         }
+
+
+@shared_task
+def sync_all_interfaces_ddm():
+    """
+    Sincroniza interfaces e DDM de todos os dispositivos com LibreNMS
+    Roda a cada 1 minuto
+    """
+    from .models import Device
+    from core_system.models import SystemSettings
+    import requests
+    
+    settings = SystemSettings.load()
+    if not settings.librenms_enabled:
+        return "LibreNMS desabilitado"
+    
+    devices = Device.objects.filter(librenms_id__isnull=False)
+    synced_interfaces = 0
+    synced_ddm = 0
+    errors = []
+    
+    headers = {'X-Auth-Token': settings.librenms_api_token}
+    base_url = settings.librenms_url
+    
+    for device in devices:
+        try:
+            # Sync interfaces
+            ports_resp = requests.get(
+                f"{base_url}/api/v0/devices/{device.librenms_id}/ports",
+                headers=headers,
+                params={'columns': 'port_id,ifIndex,ifName,ifAlias,ifAdminStatus,ifOperStatus,ifSpeed,ifInOctets_rate,ifOutOctets_rate'},
+                timeout=10
+            )
+            ports_data = ports_resp.json()
+            
+            if ports_data.get('status') == 'ok':
+                from .models import DeviceInterface
+                for port in ports_data.get('ports', []):
+                    if_name = port.get('ifName', '')
+                    if not if_name or 'Vlan' in if_name or 'Loop' in if_name or 'Null' in if_name:
+                        continue
+                    
+                    DeviceInterface.objects.update_or_create(
+                        device=device,
+                        if_index=port.get('ifIndex', 0),
+                        defaults={
+                            'if_name': if_name,
+                            'if_alias': port.get('ifAlias', ''),
+                            'if_admin_status': port.get('ifAdminStatus', 'down'),
+                            'if_oper_status': port.get('ifOperStatus', 'down'),
+                            'if_speed': int(port.get('ifSpeed', 0) or 0),
+                            'traffic_in': int(port.get('ifInOctets_rate', 0) or 0) * 8,
+                            'traffic_out': int(port.get('ifOutOctets_rate', 0) or 0) * 8,
+                            'librenms_port_id': port.get('port_id'),
+                        }
+                    )
+                    synced_interfaces += 1
+            
+            # Sync DDM (dBm, temperatura, corrente)
+            interfaces = DeviceInterface.objects.filter(device=device, has_gbic=True)
+            if interfaces.exists():
+                # dBm
+                dbm_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/dbm", headers=headers, timeout=10)
+                if dbm_resp.json().get('status') == 'ok':
+                    for sensor in dbm_resp.json().get('graphs', []):
+                        sensor_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/dbm/{sensor['sensor_id']}", headers=headers, timeout=5)
+                        if sensor_resp.json().get('status') == 'ok' and sensor_resp.json().get('graphs'):
+                            info = sensor_resp.json()['graphs'][0]
+                            val = info.get('sensor_current')
+                            desc = info.get('sensor_descr', '').lower()
+                            for iface in interfaces:
+                                if iface.if_name.split('.')[0] in info.get('sensor_descr', ''):
+                                    if 'rx' in desc: iface.rx_power = val
+                                    elif 'tx' in desc: iface.tx_power = val
+                                    iface.save()
+                                    synced_ddm += 1
+                                    break
+                
+                # Temperatura
+                temp_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/temperature", headers=headers, timeout=10)
+                if temp_resp.json().get('status') == 'ok':
+                    for sensor in temp_resp.json().get('graphs', []):
+                        sensor_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/temperature/{sensor['sensor_id']}", headers=headers, timeout=5)
+                        if sensor_resp.json().get('status') == 'ok' and sensor_resp.json().get('graphs'):
+                            info = sensor_resp.json()['graphs'][0]
+                            if info.get('group') == 'transceiver':
+                                val = info.get('sensor_current')
+                                for iface in interfaces:
+                                    if iface.if_name.split('.')[0] in info.get('sensor_descr', ''):
+                                        iface.gbic_temperature = val
+                                        iface.save()
+                                        break
+                
+                # Corrente/Bias
+                curr_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/current", headers=headers, timeout=10)
+                if curr_resp.json().get('status') == 'ok':
+                    for sensor in curr_resp.json().get('graphs', []):
+                        sensor_resp = requests.get(f"{base_url}/api/v0/devices/{device.librenms_id}/health/current/{sensor['sensor_id']}", headers=headers, timeout=5)
+                        if sensor_resp.json().get('status') == 'ok' and sensor_resp.json().get('graphs'):
+                            info = sensor_resp.json()['graphs'][0]
+                            if info.get('group') == 'transceiver':
+                                val = info.get('sensor_current')
+                                for iface in interfaces:
+                                    if iface.if_name.split('.')[0] in info.get('sensor_descr', ''):
+                                        iface.gbic_bias_current = val
+                                        iface.save()
+                                        break
+                                        
+        except Exception as e:
+            errors.append(f"{device.name}: {str(e)}")
+    
+    return f"Interfaces: {synced_interfaces}, DDM: {synced_ddm}, Erros: {len(errors)}"

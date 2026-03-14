@@ -562,6 +562,10 @@ def api_device_interfaces(request, device_id):
                 'gbic_type': iface.gbic_type or '',
                 'gbic_vendor': iface.gbic_vendor or '',
                 'gbic_serial': iface.gbic_serial or '',
+                'gbic_part_number': iface.gbic_part_number or '',
+                'gbic_distance': iface.gbic_distance,
+                'gbic_temperature': iface.gbic_temperature,
+                'gbic_bias_current': iface.gbic_bias_current,
                 'rx_power': iface.rx_power,
                 'tx_power': iface.tx_power,
                 'optical_status': iface.get_optical_status(),
@@ -630,6 +634,352 @@ def api_sync_optical(request, device_id):
             'status': 'success',
             'device': device.name,
             'optical_synced': synced
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_sync_transceivers(request, device_id):
+    """Sincroniza transceivers/GBICs de um dispositivo do LibreNMS"""
+    from .models import Device, DeviceInterface
+    from core_system.models import SystemSettings
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        
+        if not device.librenms_id:
+            return JsonResponse({'status': 'error', 'message': 'Dispositivo nao tem LibreNMS ID'}, status=400)
+        
+        settings = SystemSettings.load()
+        if not settings.librenms_enabled:
+            return JsonResponse({'status': 'error', 'message': 'LibreNMS desabilitado'}, status=400)
+        
+        import requests
+        headers = {'X-Auth-Token': settings.librenms_api_token}
+        
+        # Buscar transceivers do LibreNMS
+        response = requests.get(
+            f"{settings.librenms_url}/api/v0/devices/{device.librenms_id}/transceivers",
+            headers=headers,
+            timeout=15
+        )
+        data = response.json()
+        
+        if data.get('status') != 'ok':
+            return JsonResponse({'status': 'error', 'message': 'Erro ao buscar transceivers'}, status=500)
+        
+        transceivers = data.get('transceivers', [])
+        synced = 0
+        not_found = 0
+        
+        for trans in transceivers:
+            port_id = trans.get('port_id')
+            
+            try:
+                interface = DeviceInterface.objects.get(
+                    device=device, 
+                    librenms_port_id=port_id
+                )
+                
+                interface.has_gbic = True
+                interface.gbic_type = trans.get('type', '')
+                interface.gbic_vendor = trans.get('vendor', '')
+                interface.gbic_part_number = trans.get('model', '')
+                interface.gbic_serial = trans.get('serial', '')
+                
+                wavelength = trans.get('wavelength')
+                if wavelength:
+                    interface.gbic_wavelength = f"{wavelength}nm"
+                
+                ddm = trans.get('ddm')
+                if ddm and isinstance(ddm, dict):
+                    interface.rx_power = ddm.get('rx_power')
+                    interface.tx_power = ddm.get('tx_power')
+                
+                interface.save()
+                synced += 1
+                
+            except DeviceInterface.DoesNotExist:
+                not_found += 1
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'transceivers_synced': synced,
+            'ports_not_found': not_found,
+            'total_transceivers': len(transceivers)
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_sync_all_interfaces(request, device_id):
+    """Sincroniza interfaces E transceivers de um dispositivo"""
+    from .models import Device, DeviceInterface
+    from core_system.models import SystemSettings
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        
+        if not device.librenms_id:
+            return JsonResponse({'status': 'error', 'message': 'Dispositivo nao tem LibreNMS ID'}, status=400)
+        
+        settings = SystemSettings.load()
+        if not settings.librenms_enabled:
+            return JsonResponse({'status': 'error', 'message': 'LibreNMS desabilitado'}, status=400)
+        
+        import requests
+        headers = {'X-Auth-Token': settings.librenms_api_token}
+        base_url = settings.librenms_url
+        
+        # 1. Buscar ports
+        ports_resp = requests.get(
+            f"{base_url}/api/v0/devices/{device.librenms_id}/ports",
+            headers=headers,
+            params={'columns': 'port_id,ifIndex,ifName,ifAlias,ifDescr,ifAdminStatus,ifOperStatus,ifSpeed,ifMtu,ifType,ifInOctets_rate,ifOutOctets_rate,ifInErrors,ifOutErrors'},
+            timeout=15
+        )
+        ports_data = ports_resp.json()
+        
+        if ports_data.get('status') != 'ok':
+            return JsonResponse({'status': 'error', 'message': 'Erro ao buscar ports'}, status=500)
+        
+        ports = ports_data.get('ports', [])
+        interfaces_synced = 0
+        port_map = {}
+        
+        for port in ports:
+            if_name = port.get('ifName', '')
+            if not if_name or 'Vlan' in if_name or 'Loop' in if_name or 'Null' in if_name or 'InLoop' in if_name:
+                continue
+            
+            interface, created = DeviceInterface.objects.update_or_create(
+                device=device,
+                if_index=port.get('ifIndex', 0),
+                defaults={
+                    'if_name': if_name,
+                    'if_alias': port.get('ifAlias', ''),
+                    'if_descr': port.get('ifDescr', ''),
+                    'if_admin_status': port.get('ifAdminStatus', 'down'),
+                    'if_oper_status': port.get('ifOperStatus', 'down'),
+                    'if_speed': int(port.get('ifSpeed', 0) or 0),
+                    'if_mtu': port.get('ifMtu', 1500),
+                    'if_type': port.get('ifType', ''),
+                    'traffic_in': int(port.get('ifInOctets_rate', 0) or 0) * 8,
+                    'traffic_out': int(port.get('ifOutOctets_rate', 0) or 0) * 8,
+                    'librenms_port_id': port.get('port_id'),
+                }
+            )
+            port_map[port.get('port_id')] = interface
+            interfaces_synced += 1
+        
+        # 2. Buscar transceivers
+        trans_synced = 0
+        try:
+            trans_resp = requests.get(
+                f"{base_url}/api/v0/devices/{device.librenms_id}/transceivers",
+                headers=headers,
+                timeout=15
+            )
+            trans_data = trans_resp.json()
+            
+            if trans_data.get('status') == 'ok':
+                for trans in trans_data.get('transceivers', []):
+                    port_id = trans.get('port_id')
+                    if port_id in port_map:
+                        interface = port_map[port_id]
+                        interface.has_gbic = True
+                        interface.gbic_type = trans.get('type', '')
+                        interface.gbic_vendor = trans.get('vendor', '')
+                        interface.gbic_part_number = trans.get('model', '')
+                        interface.gbic_serial = trans.get('serial', '')
+                        
+                        wavelength = trans.get('wavelength')
+                        if wavelength:
+                            interface.gbic_wavelength = f"{wavelength}nm"
+                        
+                        interface.save()
+                        trans_synced += 1
+        except Exception as e:
+            pass
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'interfaces_synced': interfaces_synced,
+            'transceivers_synced': trans_synced
+        })
+        
+    except Device.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_sync_ddm_sensors(request, device_id):
+    """Sincroniza dados DDM (temperatura, bias, rx/tx power) dos transceivers"""
+    from .models import Device, DeviceInterface
+    from core_system.models import SystemSettings
+    
+    try:
+        device = Device.objects.get(id=device_id)
+        
+        if not device.librenms_id:
+            return JsonResponse({'status': 'error', 'message': 'Dispositivo nao tem LibreNMS ID'}, status=400)
+        
+        settings = SystemSettings.load()
+        if not settings.librenms_enabled:
+            return JsonResponse({'status': 'error', 'message': 'LibreNMS desabilitado'}, status=400)
+        
+        import requests
+        headers = {'X-Auth-Token': settings.librenms_api_token}
+        base_url = settings.librenms_url
+        
+        synced = 0
+        errors = []
+        
+        # Buscar interfaces com GBIC
+        interfaces = DeviceInterface.objects.filter(device=device, has_gbic=True)
+        
+        if not interfaces.exists():
+            return JsonResponse({'status': 'warning', 'message': 'Nenhuma interface com GBIC encontrada'})
+        
+        # Buscar sensores de dBm (Rx/Tx power)
+        try:
+            dbm_resp = requests.get(
+                f"{base_url}/api/v0/devices/{device.librenms_id}/health/dbm",
+                headers=headers,
+                timeout=15
+            )
+            dbm_data = dbm_resp.json()
+            
+            if dbm_data.get('status') == 'ok':
+                for sensor in dbm_data.get('graphs', []):
+                    sensor_id = sensor.get('sensor_id')
+                    desc = sensor.get('desc', '')
+                    
+                    # Buscar valor atual do sensor
+                    sensor_resp = requests.get(
+                        f"{base_url}/api/v0/devices/{device.librenms_id}/health/dbm/{sensor_id}",
+                        headers=headers,
+                        timeout=10
+                    )
+                    sensor_data = sensor_resp.json()
+                    
+                    if sensor_data.get('status') == 'ok' and sensor_data.get('graphs'):
+                        sensor_info = sensor_data['graphs'][0]
+                        current_value = sensor_info.get('sensor_current')
+                        ent_physical_index = sensor_info.get('entPhysicalIndex')
+                        
+                        # Identificar se é Rx ou Tx
+                        desc_lower = desc.lower()
+                        
+                        # Buscar interface pelo entPhysicalIndex ou descrição
+                        for iface in interfaces:
+                            iface_name = iface.if_name.split('.')[0]  # Remover subinterface
+                            if iface_name in desc or str(iface.if_index) == str(ent_physical_index):
+                                if 'rx' in desc_lower:
+                                    iface.rx_power = current_value
+                                elif 'tx' in desc_lower:
+                                    iface.tx_power = current_value
+                                iface.save()
+                                synced += 1
+                                break
+        except Exception as e:
+            errors.append(f"Erro dBm: {str(e)}")
+        
+        # Buscar sensores de temperatura
+        try:
+            temp_resp = requests.get(
+                f"{base_url}/api/v0/devices/{device.librenms_id}/health/temperature",
+                headers=headers,
+                timeout=15
+            )
+            temp_data = temp_resp.json()
+            
+            if temp_data.get('status') == 'ok':
+                for sensor in temp_data.get('graphs', []):
+                    sensor_id = sensor.get('sensor_id')
+                    desc = sensor.get('desc', '')
+                    
+                    # Verificar se é transceiver (group = transceiver)
+                    sensor_resp = requests.get(
+                        f"{base_url}/api/v0/devices/{device.librenms_id}/health/temperature/{sensor_id}",
+                        headers=headers,
+                        timeout=10
+                    )
+                    sensor_data = sensor_resp.json()
+                    
+                    if sensor_data.get('status') == 'ok' and sensor_data.get('graphs'):
+                        sensor_info = sensor_data['graphs'][0]
+                        
+                        # Só processar se for do grupo transceiver
+                        if sensor_info.get('group') == 'transceiver':
+                            current_value = sensor_info.get('sensor_current')
+                            ent_physical_index = sensor_info.get('entPhysicalIndex')
+                            
+                            for iface in interfaces:
+                                iface_name = iface.if_name.split('.')[0]
+                                if iface_name in desc or str(iface.if_index) == str(ent_physical_index):
+                                    iface.gbic_temperature = current_value
+                                    iface.save()
+                                    synced += 1
+                                    break
+        except Exception as e:
+            errors.append(f"Erro temperatura: {str(e)}")
+        
+        # Buscar sensores de corrente (bias)
+        try:
+            current_resp = requests.get(
+                f"{base_url}/api/v0/devices/{device.librenms_id}/health/current",
+                headers=headers,
+                timeout=15
+            )
+            current_data = current_resp.json()
+            
+            if current_data.get('status') == 'ok':
+                for sensor in current_data.get('graphs', []):
+                    sensor_id = sensor.get('sensor_id')
+                    desc = sensor.get('desc', '')
+                    
+                    sensor_resp = requests.get(
+                        f"{base_url}/api/v0/devices/{device.librenms_id}/health/current/{sensor_id}",
+                        headers=headers,
+                        timeout=10
+                    )
+                    sensor_data = sensor_resp.json()
+                    
+                    if sensor_data.get('status') == 'ok' and sensor_data.get('graphs'):
+                        sensor_info = sensor_data['graphs'][0]
+                        
+                        if sensor_info.get('group') == 'transceiver':
+                            current_value = sensor_info.get('sensor_current')
+                            ent_physical_index = sensor_info.get('entPhysicalIndex')
+                            
+                            for iface in interfaces:
+                                iface_name = iface.if_name.split('.')[0]
+                                if iface_name in desc or str(iface.if_index) == str(ent_physical_index):
+                                    iface.gbic_bias_current = current_value
+                                    iface.save()
+                                    synced += 1
+                                    break
+        except Exception as e:
+            errors.append(f"Erro corrente: {str(e)}")
+        
+        return JsonResponse({
+            'status': 'success',
+            'device': device.name,
+            'sensors_synced': synced,
+            'errors': errors
         })
         
     except Device.DoesNotExist:

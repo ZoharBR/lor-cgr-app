@@ -166,6 +166,11 @@ class DeviceInterface(models.Model):
     gbic_part_number = models.CharField(max_length=100, blank=True, null=True)
     gbic_serial = models.CharField(max_length=100, blank=True, null=True)
     gbic_wavelength = models.CharField(max_length=50, blank=True, null=True)
+    gbic_distance = models.IntegerField(blank=True, null=True)
+    gbic_channels = models.IntegerField(default=1)
+    gbic_temperature = models.FloatField(blank=True, null=True)
+    gbic_bias_current = models.FloatField(blank=True, null=True)
+    
     rx_power = models.FloatField(blank=True, null=True)
     tx_power = models.FloatField(blank=True, null=True)
     rx_power_high_alert = models.FloatField(default=-10)
@@ -175,6 +180,19 @@ class DeviceInterface(models.Model):
     librenms_port_id = models.IntegerField(blank=True, null=True)
     last_updated = models.DateTimeField(auto_now=True)
     
+
+    def get_optical_status(self):
+        """Retorna status óptico baseado nos níveis de potência"""
+        if self.rx_power is None or self.tx_power is None:
+            return 'unknown'
+        
+        rx_ok = self.rx_power_low_alert <= self.rx_power <= self.rx_power_high_alert
+        tx_ok = self.tx_power_low_alert <= self.tx_power <= self.tx_power_high_alert
+        
+        if rx_ok and tx_ok:
+            return 'good'
+        return 'warning'
+
     class Meta:
         unique_together = ['device', 'if_index']
         ordering = ['if_name']

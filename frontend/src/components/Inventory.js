@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DeviceInterfaces from './DeviceInterfaces';
 import { devicesApi } from '../lib/api';
 
 const Inventory = () => {
@@ -13,6 +14,7 @@ const Inventory = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showSyncModal, setShowSyncModal] = useState(false);
+  const [showInterfaces, setShowInterfaces] = useState(null);
   const [syncing, setSyncing] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -449,6 +451,7 @@ const Inventory = () => {
                   </td>
                   <td className="px-4 py-3 text-gray-400 text-sm">{device.model || '-'}</td>
                   <td className="px-4 py-3 text-right">
+                    <button onClick={() => setShowInterfaces(device)} className="text-purple-400 hover:text-purple-300 mr-3 text-sm">Interfaces</button>
                     <button onClick={() => handleEdit(device)} className="text-blue-400 hover:text-blue-300 mr-3 text-sm">Editar</button>
                     <button onClick={() => handleDelete(device)} className="text-red-400 hover:text-red-300 text-sm">Excluir</button>
                   </td>
@@ -458,6 +461,9 @@ const Inventory = () => {
           </tbody>
         </table>
       </div>
+      {showInterfaces && (
+        <DeviceInterfaces device={showInterfaces} onClose={() => setShowInterfaces(null)} />
+      )}
     </div>
   );
 };
