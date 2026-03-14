@@ -15,6 +15,7 @@ urlpatterns = [
     
     # Device Types
     path('device-types/', views.api_device_types, name='api_device_types'),
+    path('interfaces/stats/', views.api_interfaces_stats, name='api_interfaces_stats'),
     
     # LibreNMS Sync
     path('librenms/sync/', views.api_librenms_sync, name='api_librenms_sync'),
@@ -26,6 +27,7 @@ urlpatterns = [
     
     # Interfaces
     path('device/<int:device_id>/interfaces/', views.api_device_interfaces, name='api_device_interfaces'),
+    path('interfaces/stats/', views.api_interfaces_stats, name='api_interfaces_stats'),
     
     # Backup
     path('backup/run/', views.api_run_backup, name='api_run_backup'),

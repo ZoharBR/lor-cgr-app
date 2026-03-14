@@ -986,3 +986,23 @@ def api_sync_ddm_sensors(request, device_id):
         return JsonResponse({'status': 'error', 'message': 'Dispositivo nao encontrado'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@csrf_exempt
+def api_interfaces_stats(request):
+    try:
+        from .models import DeviceInterface
+        transceivers = DeviceInterface.objects.filter(has_gbic=True)
+        total = transceivers.count()
+        temps = [t.gbic_temperature for t in transceivers if t.gbic_temperature]
+        rxs = [t.rx_power for t in transceivers if t.rx_power]
+        txs = [t.tx_power for t in transceivers if t.tx_power]
+        return JsonResponse({
+            'status': 'success',
+            'total_transceivers': total,
+            'avg_temperature': sum(temps)/len(temps) if temps else 0,
+            'avg_rx_power': sum(rxs)/len(rxs) if rxs else 0,
+            'avg_tx_power': sum(txs)/len(txs) if txs else 0,
+            'alerts': {'critical': 0, 'warning': 0, 'normal': total}
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
