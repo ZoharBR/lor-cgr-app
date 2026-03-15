@@ -1,0 +1,193 @@
+import React, { useState, useEffect } from 'react';
+import { devicesApi } from '../lib/api';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const Dashboard = ({ user }) => {
+  const [stats, setStats] = useState({
+    devices_total: 0,
+    bras_count: 0,
+    pppoe_total: 0,
+    pppoe_details: [],
+    server_health: { cpu: 0, ram: 0, disk: 0 }
+  });
+  const [devices, setDevices] = useState([]);
+  const [ddmStats, setDdmStats] = useState({
+    total_transceivers: 0,
+    avg_temperature: 0,
+    avg_rx_power: 0,
+    avg_tx_power: 0,
+    alerts: { critical: 0, warning: 0, normal: 0 }
+  });
+  const [loading, setLoading] = useState(true);
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 60000);
+    const clockInterval = setInterval(() => setTime(new Date()), 1000);
+    return () => { clearInterval(interval); clearInterval(clockInterval); };
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const dashRes = await devicesApi.dashboard();
+      setStats(dashRes || {});
+
+      const devRes = await devicesApi.list();
+      setDevices(devRes.devices || devRes || []);
+
+      const ddmRes = await fetch('/api/devices/interfaces/stats/', { credentials: 'include' });
+      const ddmData = await ddmRes.json();
+      if (ddmData.status === 'success') setDdmStats(ddmData);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onlineDevices = devices.filter(d => d.is_online === true).length;
+  const offlineDevices = devices.filter(d => d.is_online === false).length;
+
+  const pieData = [
+    { name: 'Online', value: onlineDevices, color: '#10B981' },
+    { name: 'Offline', value: offlineDevices, color: '#EF4444' }
+  ].filter(d => d.value > 0);
+
+  const barData = (stats.pppoe_details || []).slice(0, 8).map(item => ({
+    name: item.name?.substring(0, 12) || 'N/A',
+    total: item.count || 0
+  }));
+
+  const formatTime = (date) => date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const formatDate = (date) => date.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const getHealthColor = (val) => val > 80 ? 'bg-red-500' : val > 50 ? 'bg-yellow-500' : 'bg-green-500';
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Dashboard - LOR CGR</h1>
+          <p className="text-gray-400 mt-1">Sistema de Gestao de Rede</p>
+        </div>
+        <div className="text-right">
+          <div className="text-4xl font-mono text-green-400 font-bold">{formatTime(time)}</div>
+          <div className="text-sm text-gray-400 capitalize">{formatDate(time)}</div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg p-4 shadow-lg">
+          <p className="text-blue-200 text-sm">Total Dispositivos</p>
+          <p className="text-3xl font-bold text-white">{stats.devices_total || devices.length}</p>
+        </div>
+        <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg p-4 shadow-lg">
+          <p className="text-green-200 text-sm">Dispositivos Online</p>
+          <p className="text-3xl font-bold text-white">{onlineDevices}</p>
+        </div>
+        <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg p-4 shadow-lg">
+          <p className="text-red-200 text-sm">Dispositivos Offline</p>
+          <p className="text-3xl font-bold text-white">{offlineDevices}</p>
+        </div>
+        <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg p-4 shadow-lg">
+          <p className="text-purple-200 text-sm">Total PPPoE</p>
+          <p className="text-3xl font-bold text-white">{stats.pppoe_total || 0}</p>
+        </div>
+      </div>
+
+      {/* DDM Section */}
+      <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+        <h2 className="text-xl font-bold text-white mb-4">Saude Optica DDM</h2>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">Transceptores</p>
+            <p className="text-2xl font-bold text-white">{ddmStats.total_transceivers}</p>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">Temp. Media</p>
+            <p className="text-2xl font-bold text-cyan-400">{ddmStats.avg_temperature?.toFixed(1)}C</p>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">RX Power</p>
+            <p className="text-2xl font-bold text-green-400">{ddmStats.avg_rx_power?.toFixed(1)} dBm</p>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">TX Power</p>
+            <p className="text-2xl font-bold text-yellow-400">{ddmStats.avg_tx_power?.toFixed(1)} dBm</p>
+          </div>
+          <div className="bg-gray-700 rounded-lg p-4 text-center">
+            <p className="text-gray-400 text-sm">Alertas</p>
+            <div className="flex justify-center gap-2 mt-1">
+              <span className="px-2 py-1 bg-red-500 rounded text-xs text-white">{ddmStats.alerts?.critical || 0}</span>
+              <span className="px-2 py-1 bg-yellow-500 rounded text-xs text-white">{ddmStats.alerts?.warning || 0}</span>
+              <span className="px-2 py-1 bg-green-500 rounded text-xs text-white">{ddmStats.alerts?.normal || 0}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Pie Chart */}
+        <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-white mb-4">Status dos Dispositivos</h2>
+          {pieData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  {pieData.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : <div className="h-64 flex items-center justify-center text-gray-500">Sem dados</div>}
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-white mb-4">PPPoE por BRAS</h2>
+          {barData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="name" stroke="#9CA3AF" fontSize={10} />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: 'none' }} />
+                <Bar dataKey="total" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : <div className="h-64 flex items-center justify-center text-gray-500">Sem dados PPPoE</div>}
+        </div>
+      </div>
+
+      {/* Server Health */}
+      <div className="bg-gray-800 rounded-lg p-6 shadow-lg">
+        <h2 className="text-xl font-bold text-white mb-4">Saude do Servidor</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {['cpu', 'ram', 'disk'].map(m => {
+            const val = stats.server_health?.[m] || 0;
+            return (
+              <div key={m}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-400 uppercase">{m}</span>
+                  <span className="text-white">{val}%</span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-3">
+                  <div className={`h-3 rounded-full ${getHealthColor(val)}`} style={{ width: `${val}%` }}></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {loading && <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">Atualizando...</div>}
+    </div>
+  );
+};
+
+export default Dashboard;
