@@ -58,40 +58,32 @@ class Device(models.Model):
         (TYPE_OTHER, 'Outro'),
     ]
     
-    # Status ICMP
-    ICMP_ONLINE = 'online'
-    ICMP_WARNING = 'warning'
-    ICMP_OFFLINE = 'offline'
-    ICMP_UNKNOWN = 'unknown'
-    
-    ICMP_STATUS_CHOICES = [
-        (ICMP_ONLINE, 'Online'),
-        (ICMP_WARNING, 'Warning'),
-        (ICMP_OFFLINE, 'Offline'),
-        (ICMP_UNKNOWN, 'Unknown'),
-    ]
-    
     # Campos básicos
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
     ip = models.GenericIPAddressField()
-    vendor = models.CharField(max_length=50, default='Huawei', choices=VENDOR_CHOICES)
+    vendor = models.CharField(max_length=100, blank=True, null=True)
     device_type = models.CharField(max_length=30, default='Router', choices=TYPE_CHOICES)
     model = models.CharField(max_length=100, blank=True, null=True)
-    os_version = models.CharField(max_length=100, blank=True, null=True)
-    serial_number = models.CharField(max_length=100, blank=True, null=True)
+    is_online = models.BooleanField(default=False)
     
-    # Acesso
-    username = models.CharField(max_length=100, blank=True)
-    password = models.CharField(max_length=100, blank=True)
+    # Acesso básico
+    protocol = models.CharField(max_length=20, default='ssh')
     port = models.IntegerField(default=22)
-    protocol = models.CharField(max_length=10, default='SSH')
-    web_url = models.CharField(max_length=255, blank=True, null=True)
+    username = models.CharField(max_length=100, blank=True, null=True)
+    password = models.CharField(max_length=255, blank=True, null=True)
     
-    # LibreNMS
-    librenms_id = models.IntegerField(blank=True, null=True)
+    # SSH específico
+    ssh_user = models.CharField(max_length=255, blank=True, null=True)
+    ssh_password = models.CharField(max_length=255, blank=True, null=True)
+    ssh_port = models.IntegerField(default=22)
+    ssh_version = models.CharField(max_length=50, default='2')
+    
+    # Telnet
+    telnet_enabled = models.BooleanField(default=False)
+    telnet_port = models.IntegerField(default=23)
     
     # SNMP
-    snmp_community = models.CharField(max_length=100, default='Visiononline1')
+    snmp_community = models.CharField(max_length=100, blank=True, null=True)
     snmp_port = models.IntegerField(default=161)
     snmp_version = models.CharField(max_length=10, default='v2c')
     
@@ -100,12 +92,16 @@ class Device(models.Model):
     
     # Backup
     backup_enabled = models.BooleanField(default=True)
+    backup_method = models.CharField(max_length=50, default='ssh')
     backup_frequency = models.CharField(max_length=20, default='daily')
     backup_time = models.TimeField(default='03:00')
+    last_backup = models.DateTimeField(blank=True, null=True)
+    
+    # Localização
+    location = models.CharField(max_length=255, blank=True, null=True)
     
     # Status ICMP
-    is_online = models.BooleanField(default=False)
-    icmp_status = models.CharField(max_length=20, default='unknown', choices=ICMP_STATUS_CHOICES)
+    icmp_status = models.CharField(max_length=20, default='unknown')
     icmp_latency = models.FloatField(default=0)
     icmp_packet_loss = models.FloatField(default=0)
     last_icmp_check = models.DateTimeField(blank=True, null=True)
@@ -114,40 +110,14 @@ class Device(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'devices'
+
     def __str__(self):
         return self.name
-    
-    def get_status_color(self):
-        if self.icmp_status == self.ICMP_ONLINE:
-            return 'green'
-        elif self.icmp_status == self.ICMP_WARNING:
-            return 'orange'
-        elif self.icmp_status == self.ICMP_OFFLINE:
-            return 'red'
-        return 'gray'
-    
-    @classmethod
-    def get_vendor_types(cls, vendor):
-        vendor_types = {
-            cls.VENDOR_HUAWEI: [cls.TYPE_OLT, cls.TYPE_SWITCH, cls.TYPE_ROUTER, cls.TYPE_CONCENTRATOR, cls.TYPE_CGNAT],
-            cls.VENDOR_MIKROTIK: [cls.TYPE_SWITCH, cls.TYPE_ROUTER, cls.TYPE_CONCENTRATOR, cls.TYPE_CGNAT, cls.TYPE_WIRELESS],
-            cls.VENDOR_FIBERHOME: [cls.TYPE_OLT, cls.TYPE_ONU, cls.TYPE_ONT],
-            cls.VENDOR_JUNIPER: [cls.TYPE_ROUTER, cls.TYPE_CONCENTRATOR, cls.TYPE_SWITCH],
-            cls.VENDOR_TP_LINK: [cls.TYPE_OLT, cls.TYPE_ROUTER, cls.TYPE_SWITCH, cls.TYPE_ONU, cls.TYPE_ONT],
-            cls.VENDOR_CISCO: [cls.TYPE_SWITCH, cls.TYPE_ROUTER, cls.TYPE_CONCENTRATOR],
-            cls.VENDOR_UBIQUITI: [cls.TYPE_WIRELESS, cls.TYPE_SWITCH, cls.TYPE_ROUTER],
-            cls.VENDOR_FORTINET: [cls.TYPE_ROUTER, cls.TYPE_CGNAT],
-            cls.VENDOR_HP_ARUBA: [cls.TYPE_SWITCH, cls.TYPE_ROUTER],
-            cls.VENDOR_DELL: [cls.TYPE_SWITCH],
-            cls.VENDOR_LINUX: [cls.TYPE_SERVER, cls.TYPE_ROUTER, cls.TYPE_CONCENTRATOR],
-            cls.VENDOR_WINDOWS: [cls.TYPE_SERVER],
-            cls.VENDOR_OUTRO: [cls.TYPE_OTHER],
-        }
-        return vendor_types.get(vendor, [cls.TYPE_OTHER])
 
 
 class DeviceInterface(models.Model):
-    """Interfaces de rede dos dispositivos - dados do LibreNMS"""
     device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='interfaces')
     if_index = models.IntegerField()
     if_name = models.CharField(max_length=100)
@@ -163,61 +133,16 @@ class DeviceInterface(models.Model):
     has_gbic = models.BooleanField(default=False)
     gbic_type = models.CharField(max_length=100, blank=True, null=True)
     gbic_vendor = models.CharField(max_length=100, blank=True, null=True)
-    gbic_part_number = models.CharField(max_length=100, blank=True, null=True)
-    gbic_serial = models.CharField(max_length=100, blank=True, null=True)
-    gbic_wavelength = models.CharField(max_length=50, blank=True, null=True)
-    gbic_distance = models.IntegerField(blank=True, null=True)
-    gbic_channels = models.IntegerField(default=1)
-    gbic_temperature = models.FloatField(blank=True, null=True)
-    gbic_bias_current = models.FloatField(blank=True, null=True)
-    
     rx_power = models.FloatField(blank=True, null=True)
     tx_power = models.FloatField(blank=True, null=True)
-    rx_power_high_alert = models.FloatField(default=-10)
-    rx_power_low_alert = models.FloatField(default=-25)
-    tx_power_high_alert = models.FloatField(default=-3)
-    tx_power_low_alert = models.FloatField(default=-10)
-    librenms_port_id = models.IntegerField(blank=True, null=True)
     last_updated = models.DateTimeField(auto_now=True)
-    
-
-    def get_optical_status(self):
-        """Retorna status óptico baseado nos níveis de potência"""
-        if self.rx_power is None or self.tx_power is None:
-            return 'unknown'
-        
-        rx_ok = self.rx_power_low_alert <= self.rx_power <= self.rx_power_high_alert
-        tx_ok = self.tx_power_low_alert <= self.tx_power <= self.tx_power_high_alert
-        
-        if rx_ok and tx_ok:
-            return 'good'
-        return 'warning'
 
     class Meta:
+        db_table = 'device_interfaces'
         unique_together = ['device', 'if_index']
-        ordering = ['if_name']
-    
+
     def __str__(self):
         return f"{self.device.name} - {self.if_name}"
-
-
-class ICMPCheckHistory(models.Model):
-    """Historico de verificacoes ICMP"""
-    device = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='icmp_history')
-    timestamp = models.DateTimeField(auto_now_add=True)
-    packets_sent = models.IntegerField(default=5)
-    packets_received = models.IntegerField(default=0)
-    packet_loss = models.FloatField(default=0)
-    min_latency = models.FloatField(default=0)
-    avg_latency = models.FloatField(default=0)
-    max_latency = models.FloatField(default=0)
-    status = models.CharField(max_length=20)
-    
-    class Meta:
-        ordering = ['-timestamp']
-    
-    def __str__(self):
-        return f"{self.device.name} - {self.timestamp} - {self.status}"
 
 
 class TerminalSession(models.Model):
@@ -225,6 +150,19 @@ class TerminalSession(models.Model):
     user = models.CharField(max_length=100, default='Unknown')
     start_time = models.DateTimeField(auto_now_add=True)
     log_content = models.TextField(blank=True, default="")
+    
+    class Meta:
+        db_table = 'terminal_sessions'
+
+
+class TerminalLog(models.Model):
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    command = models.TextField(default='legacy_command')
+    output = models.TextField(default='legacy_output')
+    executed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'terminal_logs'
 
 
 class DeviceBackup(models.Model):
@@ -232,6 +170,9 @@ class DeviceBackup(models.Model):
     file_path = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20)
+    
+    class Meta:
+        db_table = 'backups'
 
 
 class DeviceHistory(models.Model):
@@ -239,6 +180,9 @@ class DeviceHistory(models.Model):
     event_type = models.CharField(max_length=50, default='SYSTEM')
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'device_history'
 
 
 class InterfaceData(models.Model):
@@ -247,78 +191,6 @@ class InterfaceData(models.Model):
     traffic_in = models.BigIntegerField(default=0)
     traffic_out = models.BigIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
-
-
-class TerminalLog(models.Model):
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    command = models.TextField(default='legacy_command')
-    output = models.TextField(default='legacy_output')
-    executed_at = models.DateTimeField(auto_now_add=True)
-
-
-class MassCommandScript(models.Model):
-    VENDOR_CHOICES = [
-        ('all', 'Todos'),
-        ('Mikrotik', 'Mikrotik'),
-        ('Huawei', 'Huawei'),
-        ('Juniper', 'Juniper'),
-        ('FiberHome', 'FiberHome OLT'),
-        ('Linux', 'Linux/Ubuntu/Debian'),
-        ('Windows', 'Windows Server'),
-    ]
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    vendor = models.CharField(max_length=50, choices=VENDOR_CHOICES, default='all')
-    commands = models.TextField()
-    variables = models.JSONField(default=dict, blank=True)
-    timeout = models.IntegerField(default=30)
-    created_by = models.CharField(max_length=100, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=True)
-
+    
     class Meta:
-        ordering = ['-updated_at']
-
-    def __str__(self):
-        return self.name
-
-
-class MassCommandExecution(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pendente'),
-        ('running', 'Executando'),
-        ('completed', 'Concluido'),
-        ('partial', 'Parcial'),
-        ('failed', 'Falhou'),
-    ]
-    script = models.ForeignKey(MassCommandScript, on_delete=models.CASCADE, related_name='executions')
-    devices = models.ManyToManyField(Device, related_name='command_executions')
-    scheduled_at = models.DateTimeField(blank=True, null=True)
-    started_at = models.DateTimeField(blank=True, null=True)
-    finished_at = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    triggered_by = models.CharField(max_length=100, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"{self.script.name} - {self.status}"
-
-
-class MassCommandResult(models.Model):
-    execution = models.ForeignKey(MassCommandExecution, on_delete=models.CASCADE, related_name='results')
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    success = models.BooleanField(default=False)
-    output = models.TextField(blank=True)
-    error_message = models.TextField(blank=True)
-    execution_time = models.FloatField(default=0)
-    executed_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ['execution', 'device']
-
-    def __str__(self):
-        return f"{self.device.name} - {'OK' if self.success else 'ERRO'}"
+        db_table = 'interface_data'

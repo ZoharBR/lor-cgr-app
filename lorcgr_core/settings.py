@@ -2,17 +2,18 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Carregar variaveis de ambiente
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Seguranca - usar variaveis de ambiente
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-me")
-DEBUG = os.getenv("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-change-me-in-production")
+DEBUG = os.getenv("DEBUG", "True") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,45.71.242.131").split(",")
 
 INSTALLED_APPS = [
+    'backups',
+    'audit',
+    'terminal',
     'users',
     'daphne',
     'django.contrib.admin',
@@ -48,7 +49,7 @@ ASGI_APPLICATION = "lorcgr_core.asgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "frontend/build")],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -63,15 +64,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "lorcgr_core.wsgi.application"
 
-# Banco de dados - usar variaveis de ambiente
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.getenv("DB_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.getenv("DB_USER", ""),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
-        "PORT": os.getenv("DB_PORT", ""),
+        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.getenv("DB_NAME", "lorcgr"),
+        "USER": os.getenv("DB_USER", "postgres"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "postgres"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
 
@@ -89,50 +89,24 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "frontend/build/static")]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# CORS seguro - apenas origens permitidas
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost").split(",")]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://45.71.242.131", "http://127.0.0.1"]
+CORS_ALLOW_ALL_ORIGINS = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Channel Layers com Redis
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
 
-# API Groq
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-
-# LibreNMS (opcional)
-LIBRENMS_URL = os.getenv("LIBRENMS_URL", "")
-LIBRENMS_API_TOKEN = os.getenv("LIBRENMS_API_TOKEN", "")
-
-# phpIPAM (opcional)
-PHPIPAM_URL = os.getenv("PHPIPAM_URL", "")
-PHPIPAM_APP_ID = os.getenv("PHPIPAM_APP_ID", "")
-PHPIPAM_APP_KEY = os.getenv("PHPIPAM_APP_KEY", "")
-
-# Sessões
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 86400  # 24 horas
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-
-# Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 }
